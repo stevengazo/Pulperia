@@ -1,0 +1,130 @@
+@page "/nueva-venta"
+@using System.Globalization
+@inject NavigationManager Nav
+
+<div class="container py-4">
+    @* Encabezado con navegación *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <button class="btn btn-outline-secondary btn-sm mb-2" @onclick='() => Nav.NavigateTo("/ventas")'>
+                <i class="bi bi-arrow-left"></i> Volver a la lista
+            </button>
+            <h3 class="text-white mb-0">🛒 Registro de Venta Directa</h3>
+        </div>
+        <div class="text-end">
+            <div class="text-white-50 small">Vendedor: Administrador</div>
+            <div class="badge bg-primary">Folio: #000124</div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        @* PANEL DE PRODUCTOS *@
+        <div class="col-lg-8">
+            <div class="card bg-dark text-white border-secondary shadow-lg">
+                <div class="card-body p-4">
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-9">
+                            <label class="form-label text-white-50">Escanear o buscar producto</label>
+                            <input type="text" class="form-control form-control-lg bg-dark text-white border-primary" 
+                                   placeholder="Código de barras o nombre..." @bind="busqueda" autofocus />
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label text-white-50">Cant.</label>
+                            <input type="number" class="form-control form-control-lg bg-dark text-white border-secondary text-center" @bind="cantidad" />
+                        </div>
+                    </div>
+
+                    <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
+                        <table class="table table-dark table-hover align-middle">
+                            <thead class="sticky-top bg-dark border-bottom border-secondary">
+                                <tr class="text-white-50">
+                                    <th>Descripción</th>
+                                    <th class="text-end">Precio</th>
+                                    <th class="text-center">Cant.</th>
+                                    <th class="text-end">Subtotal</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in carrito)
+                                {
+                                    <tr>
+                                        <td>@item.Nombre</td>
+                                        <td class="text-end">@item.Precio.ToString("C0")</td>
+                                        <td class="text-center">
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-secondary" @onclick="() => item.Cantidad--">-</button>
+                                                <span class="btn btn-dark disabled">@item.Cantidad</span>
+                                                <button class="btn btn-outline-secondary" @onclick="() => item.Cantidad++">+</button>
+                                            </div>
+                                        </td>
+                                        <td class="text-end fw-bold">@((item.Precio * item.Cantidad).ToString("C0"))</td>
+                                        <td class="text-center text-danger">
+                                            <i class="bi bi-x-circle btn" @onclick="() => carrito.Remove(item)"></i>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* PANEL DE PAGO (RESUMIDO) *@
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-success text-white text-center py-3">
+                    <span class="d-block small">TOTAL A COBRAR</span>
+                    <h2 class="mb-0 fw-bold">@Total.ToString("C0")</h2>
+                </div>
+                <div class="card-body bg-dark text-white border border-top-0 border-secondary rounded-bottom">
+                    
+                    <div class="mb-3">
+                        <label class="small text-white-50">Método de pago</label>
+                        <select class="form-select bg-dark text-white border-secondary" @bind="metodoPago">
+                            <option value="Efectivo">💵 Efectivo</option>
+                            <option value="SINPE">📱 SINPE / Transferencia</option>
+                            <option value="Tarjeta">💳 Tarjeta</option>
+                            <option value="Fiado">📋 Cuenta por Cobrar</option>
+                        </select>
+                    </div>
+
+                    @if (metodoPago == "Efectivo")
+                    {
+                        <div class="mb-3">
+                            <label class="small text-white-50">Pagó con:</label>
+                            <input type="number" class="form-control form-control-lg bg-dark text-white border-info" @bind-value="pagoCon" @bind-value:event="oninput" />
+                        </div>
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="text-white-50">Cambio:</span>
+                            <span class="h4 text-info fw-bold">@Cambio.ToString("C0")</span>
+                        </div>
+                    }
+
+                    <button class="btn btn-primary w-100 py-3 fw-bold" disabled="@(!carrito.Any())" @onclick="Procesar">
+                        <i class="bi bi-printer me-2"></i> COBRAR E IMPRIMIR
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string busqueda = "";
+    private int cantidad = 1;
+    private string metodoPago = "Efectivo";
+    private decimal pagoCon;
+    private List<Item> carrito = new();
+
+    private decimal Total => carrito.Sum(i => i.Precio * i.Cantidad);
+    private decimal Cambio => pagoCon > Total ? pagoCon - Total : 0;
+
+    void Procesar() {
+        // Lógica de guardado...
+        Nav.NavigateTo("/ventas");
+    }
+
+    class Item { public string Nombre; public decimal Precio; public int Cantidad; }
+}

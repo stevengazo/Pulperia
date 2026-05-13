@@ -1,0 +1,183 @@
+@page "/inventario"
+@inject NavigationManager Nav
+
+<div class="container-fluid py-4">
+
+    @* Cabecera *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-white fw-bold mb-0">📦 Control de Inventario</h2>
+            <p class="text-white-50 small mb-0">Gestione sus productos y niveles de existencias</p>
+        </div>
+        <button class="btn btn-primary d-flex align-items-center gap-2 shadow" @onclick="AbrirModalNuevo">
+            <i class="bi bi-plus-lg"></i> Nuevo Producto
+        </button>
+    </div>
+
+    @* Tarjetas de Estado *@
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card bg-dark text-white border-secondary h-100 shadow-sm">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="stats-icon bg-primary bg-opacity-10 text-primary">
+                        <i class="bi bi-box-seam fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-white-50 small mb-0">Total Productos</h6>
+                        <h3 class="mb-0 fw-bold">154</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-white border-warning border-opacity-25 h-100 shadow-sm">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="stats-icon bg-warning bg-opacity-10 text-warning">
+                        <i class="bi bi-exclamation-triangle fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-white-50 small mb-0">Stock Bajo</h6>
+                        <h3 class="mb-0 fw-bold text-warning">12</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-dark text-white border-danger border-opacity-25 h-100 shadow-sm">
+                <div class="card-body d-flex align-items-center gap-3">
+                    <div class="stats-icon bg-danger bg-opacity-10 text-danger">
+                        <i class="bi bi-x-octagon fs-3"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-white-50 small mb-0">Agotados</h6>
+                        <h3 class="mb-0 fw-bold text-danger">3</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Filtros y Tabla *@
+    <div class="card bg-dark text-white border-secondary shadow">
+        <div class="card-header border-secondary bg-transparent py-3">
+            <div class="row g-2">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text bg-dark border-secondary text-white-50"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control bg-dark text-white border-secondary" 
+                               placeholder="Buscar por nombre, SKU o categoría..." @bind="filtro" @bind:event="oninput" />
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select bg-dark text-white border-secondary">
+                        <option value="">Todas las categorías</option>
+                        <option value="Abarrotes">Abarrotes</option>
+                        <option value="Lacteos">Lácteos</option>
+                        <option value="Bebidas">Bebidas</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead class="text-white-50 small border-secondary">
+                        <tr>
+                            <th class="ps-4">SKU</th>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th class="text-end">Precio Venta</th>
+                            <th class="text-center">Stock</th>
+                            <th class="text-center pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in productos.Where(x => string.IsNullOrEmpty(filtro) || x.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            <tr>
+                                <td class="ps-4 text-white-50 small">@p.Sku</td>
+                                <td>
+                                    <div class="fw-bold">@p.Nombre</div>
+                                    <div class="text-white-50 x-small" style="font-size: 0.7rem;">Modificado: @p.UltimaModificacion</div>
+                                </td>
+                                <td><span class="badge bg-secondary">@p.Categoria</span></td>
+                                <td class="text-end fw-bold text-info">@p.Precio.ToString("C0")</td>
+                                <td class="text-center">
+                                    @if (p.Stock <= 0)
+                                    {
+                                        <span class="badge bg-danger">Agotado</span>
+                                    }
+                                    else if (p.Stock <= 5)
+                                    {
+                                        <span class="badge bg-warning text-dark">@p.Stock unidades</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-success fw-bold">@p.Stock</span>
+                                    }
+                                </td>
+                                <td class="text-center pe-4">
+                                    <div class="btn-group border border-secondary rounded">
+                                        <button class="btn btn-sm btn-dark text-info"><i class="bi bi-pencil-square"></i></button>
+                                        <button class="btn btn-sm btn-dark text-success"><i class="bi bi-plus-circle"></i></button>
+                                        <button class="btn btn-sm btn-dark text-danger"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .stats-icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+    }
+
+    .table thead th {
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-top: none;
+    }
+
+    .table tbody tr {
+        border-color: rgba(255,255,255,0.05);
+    }
+
+    .btn-group .btn:hover {
+        background-color: rgba(255,255,255,0.1);
+    }
+</style>
+
+@code {
+    private string filtro = "";
+
+    private List<ProductoInv> productos = new()
+    {
+        new ProductoInv { Sku = "AB-001", Nombre = "Arroz Tío Pelón 1kg", Categoria = "Abarrotes", Precio = 750, Stock = 45, UltimaModificacion = "Hoy" },
+        new ProductoInv { Sku = "LA-012", Nombre = "Leche Pinito 400g", Categoria = "Lácteos", Precio = 2100, Stock = 4, UltimaModificacion = "Ayer" },
+        new ProductoInv { Sku = "BE-055", Nombre = "Coca Cola 2.5L", Categoria = "Bebidas", Precio = 1600, Stock = 0, UltimaModificacion = "Hace 3 días" },
+        new ProductoInv { Sku = "AB-088", Nombre = "Frijoles Rojos 500g", Categoria = "Abarrotes", Precio = 900, Stock = 15, UltimaModificacion = "Hoy" }
+    };
+
+    private void AbrirModalNuevo() { /* Lógica */ }
+
+    public class ProductoInv
+    {
+        public string Sku { get; set; } = "";
+        public string Nombre { get; set; } = "";
+        public string Categoria { get; set; } = "";
+        public decimal Precio { get; set; }
+        public int Stock { get; set; }
+        public string UltimaModificacion { get; set; } = "";
+    }
+}

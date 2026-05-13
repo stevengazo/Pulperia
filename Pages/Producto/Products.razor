@@ -1,0 +1,126 @@
+@page "/productos"
+@inject NavigationManager Nav
+
+<div class="container-fluid py-4">
+
+    @* Cabecera *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="text-white fw-bold mb-0">🍎 Catálogo de Productos</h2>
+            <p class="text-white-50 small mb-0">Administre los precios y detalles de sus artículos</p>
+        </div>
+        <button class="btn btn-primary d-flex align-items-center gap-2 shadow" @onclick="CrearProducto">
+            <i class="bi bi-plus-circle"></i> Nuevo Producto
+        </button>
+    </div>
+
+    @* Barra de Herramientas *@
+    <div class="card bg-dark border-secondary mb-4 shadow-sm">
+        <div class="card-body p-3">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-secondary text-white-50">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control bg-dark text-white border-secondary" 
+                               placeholder="Buscar por nombre o código de barras..." @bind="filtro" @bind:event="oninput" />
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select bg-dark text-white border-secondary">
+                        <option value="">Todas las categorías</option>
+                        <option value="Abarrotes">Abarrotes</option>
+                        <option value="Limpieza">Limpieza</option>
+                        <option value="Snacks">Snacks</option>
+                    </select>
+                </div>
+                <div class="col-md-3 text-end">
+                    <button class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-download me-2"></i>Exportar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Tabla de Productos *@
+    <div class="card bg-dark text-white border-secondary shadow">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead class="text-white-50 small border-bottom border-secondary">
+                        <tr>
+                            <th class="ps-4">Código</th>
+                            <th>Descripción</th>
+                            <th>Categoría</th>
+                            <th class="text-end">Costo</th>
+                            <th class="text-end">P. Venta</th>
+                            <th class="text-center">Margen</th>
+                            <th class="text-center pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var p in productos.Where(x => string.IsNullOrEmpty(filtro) || x.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <span class="font-monospace text-info">@p.CodigoBarras</span>
+                                </td>
+                                <td>
+                                    <div class="fw-bold">@p.Nombre</div>
+                                    <div class="text-white-50 small">@p.Presentacion</div>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill bg-secondary bg-opacity-25 text-white-50 border border-secondary">@p.Categoria</span>
+                                </td>
+                                <td class="text-end text-white-50">@p.PrecioCosto.ToString("C0")</td>
+                                <td class="text-end fw-bold text-success">@p.PrecioVenta.ToString("C0")</td>
+                                <td class="text-center">
+                                    <span class="text-warning small">@CalcularMargen(p.PrecioCosto, p.PrecioVenta)%</span>
+                                </td>
+                                <td class="text-center pe-4">
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-outline-light border-secondary"><i class="bi bi-pencil"></i></button>
+                                        <button class="btn btn-sm btn-outline-danger border-secondary"><i class="bi bi-trash"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string filtro = "";
+
+    private List<Producto> productos = new()
+    {
+        new Producto { CodigoBarras = "744100123456", Nombre = "Arroz Tío Pelón", Presentacion = "Bolsa 1.8kg", Categoria = "Abarrotes", PrecioCosto = 1100, PrecioVenta = 1450 },
+        new Producto { CodigoBarras = "744100987654", Nombre = "Atún Sardimar", Presentacion = "Aceite 140g", Categoria = "Enlatados", PrecioCosto = 850, PrecioVenta = 1200 },
+        new Producto { CodigoBarras = "750105530007", Nombre = "Coca Cola", Presentacion = "Botella 600ml", Categoria = "Bebidas", PrecioCosto = 680, PrecioVenta = 950 },
+        new Producto { CodigoBarras = "075724123011", Nombre = "Papitas Lays", Presentacion = "Clásicas 40g", Categoria = "Snacks", PrecioCosto = 420, PrecioVenta = 600 }
+    };
+
+    private string CalcularMargen(decimal costo, decimal venta)
+    {
+        if (costo == 0) return "0";
+        var margen = ((venta - costo) / venta) * 100;
+        return margen.ToString("F1");
+    }
+
+    private void CrearProducto() => Nav.NavigateTo("/productos/nuevo");
+
+    public class Producto
+    {
+        public string CodigoBarras { get; set; } = "";
+        public string Nombre { get; set; } = "";
+        public string Presentacion { get; set; } = "";
+        public string Categoria { get; set; } = "";
+        public decimal PrecioCosto { get; set; }
+        public decimal PrecioVenta { get; set; }
+    }
+}

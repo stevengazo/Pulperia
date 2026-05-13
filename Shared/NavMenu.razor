@@ -1,39 +1,111 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Pulperia</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+﻿<div class="sidebar-wrapper bg-dark shadow-lg">
+    @* Navbar superior (Brand) *@
+    <nav class="navbar navbar-dark bg-dark px-3 border-bottom border-secondary border-opacity-25">
+        <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="">
+            <span class="fs-4">🛒</span> Pulperia
+        </a>
+        <button class="navbar-toggler d-md-none" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
         </button>
+    </nav>
+
+    @* Contenedor de navegación *@
+    <div class="@NavMenuCssClass">
+        <nav class="nav-content d-flex flex-column p-3 gap-1">
+
+            <NavLink class="nav-link text-white-50 d-flex align-items-center gap-2" href="" Match="NavLinkMatch.All">
+                <i class="bi bi-house"></i> Inicio
+            </NavLink>
+
+            <NavLink class="nav-link text-white-50 d-flex align-items-center gap-2" href="productos">
+                <i class="bi bi-box-seam"></i> Productos
+            </NavLink>
+
+            <NavLink class="nav-link text-white-50 d-flex align-items-center gap-2" href="empleados">
+                <i class="bi bi-people"></i> Empleados
+            </NavLink>
+
+            <NavLink class="nav-link text-white-50 d-flex align-items-center gap-2" href="ventas">
+                <i class="bi bi-receipt"></i> Ventas
+            </NavLink>
+
+            <NavLink class="nav-link text-white-50 d-flex align-items-center gap-2" href="inventario">
+                <i class="bi bi-clipboard-data"></i> Inventario
+            </NavLink>
+
+            <hr class="border-secondary opacity-25" />
+
+            <NavLink class="nav-link text-white-50 d-flex align-items-center gap-2" href="configuracion">
+                <i class="bi bi-gear"></i> Configuración
+            </NavLink>
+
+            @* BOTÓN INFERIOR - URL Actualizada *@
+            <div class="mt-auto pt-3">
+                <NavLink class="btn btn-success w-100 d-flex align-items-center justify-content-center gap-2 py-3 shadow-sm border-0" 
+                         href="nueva-venta"> @* <--- Aquí cambié la URL a la nueva ruta *@
+                    <i class="bi bi-plus-lg fw-bold"></i>
+                    <span class="fw-bold">NUEVA VENTA</span>
+                </NavLink>
+            </div>
+
+        </nav>
     </div>
 </div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
-    </nav>
-</div>
+<style>
+    /* Contenedor principal del Sidebar */
+    .sidebar-wrapper {
+        position: sticky;
+        top: 0;
+        height: 90vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden; /* Evita el scroll del sidebar */
+    }
+
+    /* Ajuste del contenido para que ocupe el espacio restante */
+    .nav-content {
+        flex-grow: 1;
+        overflow: hidden; /* No scroll interno */
+    }
+
+    /* Links y estados */
+    .nav-link {
+        color: rgba(255,255,255,0.6) !important;
+        transition: all 0.2s ease;
+        padding: 0.8rem 1rem;
+        border-radius: 8px;
+    }
+
+    .nav-link:hover, .nav-link.active:not(.btn-success) {
+        color: white !important;
+        background-color: rgba(255,255,255,0.08);
+    }
+
+    /* Estilo del botón de éxito para que no herede estilos de nav-link común */
+    .btn-success {
+        background-color: #198754 !important;
+        color: white !important;
+        transition: transform 0.1s ease;
+    }
+
+    .btn-success:hover {
+        background-color: #157347 !important;
+        transform: scale(1.02);
+    }
+
+    /* Responsivo para móviles */
+    @@media (max-width: 767.98px) {
+        .sidebar-wrapper {
+            height: auto;
+            position: relative;
+        }
+    }
+</style>
 
 @code {
     private bool collapseNavMenu = true;
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse d-md-block flex-grow-1" : "d-block flex-grow-1";
 
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
+    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
 }

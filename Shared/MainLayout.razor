@@ -1,19 +1,63 @@
 ﻿@inherits LayoutComponentBase
 
-<PageTitle>Pulperia</PageTitle>
+<PageTitle>Pulpería - Sistema POS</PageTitle>
 
-<div class="page">
-    <div class="sidebar">
+<div class="page dark-theme">
+    <div class="sidebar shadow-lg">
+        <div class="brand-logo px-4 py-3 mb-2 border-bottom border-secondary">
+            <h5 class="text-info fw-bold mb-0">🏪 Pulpe POS</h5>
+        </div>
         <NavMenu />
     </div>
 
     <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+        <div class="top-row px-4 d-flex justify-content-end align-items-center">
+            <div class="user-profile small text-white-50 me-3">
+                <i class="bi bi-person-circle"></i> Administrador
+            </div>
+            <a href="logout" class="btn btn-sm btn-outline-danger border-0">Salir</a>
         </div>
 
-        <article class="content px-4">
+        <article class="content px-4 py-3">
             @Body
         </article>
     </main>
 </div>
+
+<style>
+    /* Estilos rápidos para el Layout Oscuro */
+    .dark-theme {
+        background-color: #0f111a; /* Fondo ultra oscuro */
+        color: #e0e0e0;
+        min-height: 100vh;
+    }
+
+    main {
+        background-color: #1a1d29; /* Un tono más claro para el área de contenido */
+    }
+
+    .top-row {
+        background-color: #12141d !important;
+        border-bottom: 1px solid #2d2f3b !important;
+        justify-content: space-between;
+    }
+
+    .sidebar {
+        background-image: linear-gradient(180deg, #12141d 0%, #08090d 100%) !important;
+    }
+
+    /* Personalización de scrollbar para que no rompa la estética */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+        background: #0f111a;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #313442;
+        border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #414452;
+    }
+</style>
