@@ -485,3 +485,4 @@ $RECYCLE.BIN/
 *.swp
 bin/*
 bin/
+appsettings.json
