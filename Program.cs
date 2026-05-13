@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Pulperia.Data;
+using Pulperia.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+
+
+// SQL Server
+//builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Supabase
+var supabaseUrl = builder.Configuration["Supabase:Url"];
+var supabaseKey = builder.Configuration["Supabase:AnonKey"];
+
+
+var supabasePublic = new Supabase.Client(supabaseUrl,supabaseKey,  new Supabase.SupabaseOptions { Schema = "public" });
+await supabasePublic.InitializeAsync();
+builder.Services.AddSingleton(supabasePublic);
+
+
+builder.Services.AddScoped<EmpleadoService>();
 
 var app = builder.Build();
 

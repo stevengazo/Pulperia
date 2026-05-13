@@ -1,0 +1,48 @@
+@page "/productos"
+@inject EmpleadoService EmpleadoService
+
+<h3>Empleados</h3>
+
+@if (empleados is null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Rol</th>
+                <th>Activo</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in empleados)
+            {
+                <tr>
+                    <td>@e.CodigoEmpleado</td>
+                    <td>@e.Nombre</td>
+                    <td>@e.Apellido</td>
+                    <td>@e.Email</td>
+                    <td>@e.Telefono</td>
+                    <td>@e.Rol</td>
+                    <td>@(e.Activo ? "✅" : "❌")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<Empleado>? empleados;
+
+    protected override async Task OnInitializedAsync()
+    {
+        empleados = await EmpleadoService.GetAllAsync();
+    }
+}
