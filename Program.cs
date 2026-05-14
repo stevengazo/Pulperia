@@ -27,6 +27,23 @@ builder.Services.AddScoped<EmpleadoService>();
 
 var app = builder.Build();
 
+
+// Try to create the DB
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var db = scope.ServiceProvider.GetRequiredService<PulperiaDbContext>();
+        db.Database.Migrate();
+    }
+    catch (System.Exception e)
+    {
+        Console.WriteLine(e.Message);
+        throw;
+    }
+}
+
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
