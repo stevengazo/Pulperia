@@ -5,7 +5,6 @@
 @inject NavigationManager Nav
 
 <div class="container py-4">
-    @* Encabezado con navegación *@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <button class="btn btn-outline-secondary btn-sm mb-2" @onclick='() => Nav.NavigateTo("/ventas")'>
@@ -15,7 +14,7 @@
         </div>
         <div class="text-end">
             <div class="text-white-50 small">Vendedor: Administrador</div>
-            <div class="badge bg-primary">Folio: #000124</div>
+            <div class="badge bg-primary">Folio: #@ventaId.ToString("D6")</div>
         </div>
     </div>
 
@@ -27,16 +26,32 @@
                     <div class="row g-3 mb-4">
                         <div class="col-md-9">
                             <label class="form-label text-white-50">Escanear o buscar producto</label>
-                            <input type="text" class="form-control form-control-lg bg-dark text-white border-primary"
-                                   placeholder="Código de barras o nombre..." @bind="busqueda" autofocus />
+                            <select class="form-select bg-dark text-white border-secondary"
+                                    @bind="productoSeleccionadoId">
+                                <option value="0">-- Seleccione un producto --</option>
+                                @foreach (var p in productos)
+                                {
+                                    <option value="@p.Id">@p.Nombre / @p.Presentacion</option>
+                                }
+                            </select>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label text-white-50">Cant.</label>
-                            <input type="number"
+                            <input type="number" min="1"
                                    class="form-control form-control-lg bg-dark text-white border-secondary text-center"
                                    @bind="cantidad" />
                         </div>
                     </div>
+
+                    <button class="btn btn-outline-success mb-3" @onclick="AgregarAlCarrito"
+                            disabled="@(productoSeleccionadoId == 0)">
+                        <i class="bi bi-plus-circle me-1"></i> Agregar
+                    </button>
+
+                    @if (errorMsg != "")
+                    {
+                        <div class="alert alert-warning py-1 px-3">@errorMsg</div>
+                    }
 
                     <div class="table-responsive" style="max-height: 400px; overflow-y: auto;">
                         <table class="table table-dark table-hover align-middle">
@@ -53,20 +68,23 @@
                                 @foreach (var item in carrito)
                                 {
                                     <tr>
-                                        <td>@item.Nombre</td>
-                                        <td class="text-end">@item.Precio.ToString("C0")</td>
+                                        <td>@item.Producto.Nombre</td>
+                                        <td class="text-end">@item.PrecioUnitarioHistorico.ToString("C0")</td>
                                         <td class="text-center">
                                             <div class="btn-group btn-group-sm">
                                                 <button class="btn btn-outline-secondary"
-                                                        @onclick="() => item.Cantidad--">-</button>
+                                                        @onclick="() => CambiarCantidad(item, -1)">-</button>
                                                 <span class="btn btn-dark disabled">@item.Cantidad</span>
                                                 <button class="btn btn-outline-secondary"
-                                                        @onclick="() => item.Cantidad++">+</button>
+                                                        @onclick="() => CambiarCantidad(item, 1)">+</button>
                                             </div>
                                         </td>
-                                        <td class="text-end fw-bold">@((item.Precio * item.Cantidad).ToString("C0"))</td>
-                                        <td class="text-center text-danger">
-                                            <i class="bi bi-x-circle btn" @onclick="() => carrito.Remove(item)"></i>
+                                        <td class="text-end fw-bold">
+                                            @((item.PrecioUnitarioHistorico * item.Cantidad).ToString("C0"))
+                                        </td>
+                                        <td class="text-center">
+                                            <i class="bi bi-x-circle btn text-danger"
+                                               @onclick="() => carrito.Remove(item)"></i>
                                         </td>
                                     </tr>
                                 }
@@ -77,7 +95,7 @@
             </div>
         </div>
 
-        @* PANEL DE PAGO (RESUMIDO) *@
+        @* PANEL DE PAGO *@
         <div class="col-lg-4">
             <div class="card border-0 shadow-lg">
                 <div class="card-header bg-success text-white text-center py-3">
@@ -85,14 +103,6 @@
                     <h2 class="mb-0 fw-bold">@Total.ToString("C0")</h2>
                 </div>
                 <div class="card-body bg-dark text-white border border-top-0 border-secondary rounded-bottom">
-                    <div class="mb-3">
-                        <label class="small text-white-50">Empleado</label>
-                       <select>
-                        @foreach(var i in empleados){
-                            <option value="@i.Id"> @i.Nombre @i.Apellido</option>
-                        }
-                       </select>
-                    </div>
 
                     <div class="mb-3">
                         <label class="small text-white-50">Método de pago</label>
@@ -117,7 +127,14 @@
                         </div>
                     }
 
-                    <button class="btn btn-primary w-100 py-3 fw-bold" disabled="@(!carrito.Any())" @onclick="Procesar">
+                    @if (guardando)
+                    {
+                        <div class="text-center text-white-50 mb-2">Guardando...</div>
+                    }
+
+                    <button class="btn btn-primary w-100 py-3 fw-bold"
+                            disabled="@(!carrito.Any() || guardando)"
+                            @onclick="Procesar">
                         <i class="bi bi-printer me-2"></i> COBRAR E IMPRIMIR
                     </button>
                 </div>
@@ -127,28 +144,100 @@
 </div>
 
 @code {
-    private PulperiaDbContext db;
+    private PulperiaDbContext db = default!;
     private List<Empleado> empleados = new();
-    private string busqueda = "";
+    private List<Producto> productos = new();
+    private List<DetalleVenta> carrito = new();
+
+    private int productoSeleccionadoId = 0;
     private int cantidad = 1;
     private string metodoPago = "Efectivo";
     private decimal pagoCon;
-    private List<Item> carrito = new();
-    private decimal Total => carrito.Sum(i => i.Precio * i.Cantidad);
+    private string errorMsg = "";
+    private bool guardando = false;
+    private int ventaId = 0;
+
+    private decimal Total => carrito.Sum(i => i.PrecioUnitarioHistorico * i.Cantidad);
     private decimal Cambio => pagoCon > Total ? pagoCon - Total : 0;
 
     protected override async Task OnInitializedAsync()
     {
         db = DbFactory.CreateDbContext();
         empleados = await empleadoService.GetAllAsync();
-        empleados = empleados.OrderBy(e=>e.Nombre).ToList();
+        empleados = empleados.OrderBy(e => e.Nombre).ToList();
+        productos = db.Producto
+            .Where(p => p.StockActual > 0)
+            .OrderBy(p => p.Nombre)
+            .ToList();
+
+        // Calcular próximo folio
+        ventaId = db.Venta.Any() ? db.Venta.Max(v => v.Id) + 1 : 1;
     }
 
-    void Procesar()
+    void AgregarAlCarrito()
     {
-        // Lógica de guardado...
+        errorMsg = "";
+        var producto = productos.FirstOrDefault(p => p.Id == productoSeleccionadoId);
+        if (producto == null) return;
+
+        var existente = carrito.FirstOrDefault(c => c.ProductoId == producto.Id);
+        if (existente != null)
+        {
+            existente.Cantidad += cantidad;
+        }
+        else
+        {
+            carrito.Add(new DetalleVenta
+            {
+                ProductoId = producto.Id,
+                Producto = producto,
+                Cantidad = cantidad,
+                PrecioUnitarioHistorico = producto.PrecioVenta
+            });
+        }
+
+        productoSeleccionadoId = 0;
+        cantidad = 1;
+    }
+
+    void CambiarCantidad(DetalleVenta item, int delta)
+    {
+        item.Cantidad += delta;
+        if (item.Cantidad <= 0)
+            carrito.Remove(item);
+    }
+
+    async Task Procesar()
+    {
+        if (!carrito.Any()) return;
+        guardando = true;
+
+        var venta = new Venta
+        {
+            Fecha = DateTime.Now,
+            Total = Total,
+            MetodoPago = metodoPago,
+            MontoRecibido = metodoPago == "Efectivo" ? pagoCon : Total,
+            Cambio = Cambio,
+            Notas = ""
+        };
+
+        db.Venta.Add(venta);
+        await db.SaveChangesAsync(); // Para obtener el Id generado
+
+        foreach (var item in carrito)
+        {
+            item.VentaId = venta.Id;
+            db.DetalleVenta.Add(item);
+
+            // Descontar stock
+            var prod = db.Producto.Find(item.ProductoId);
+            if (prod != null)
+                prod.StockActual -= item.Cantidad;
+        }
+
+        await db.SaveChangesAsync();
+        guardando = false;
         Nav.NavigateTo("/ventas");
     }
-
-    class Item { public string Nombre; public decimal Precio; public int Cantidad; }
 }
