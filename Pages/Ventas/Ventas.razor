@@ -1,5 +1,6 @@
 @page "/ventas"
 @inject IDbContextFactory<PulperiaDbContext> DbFactory
+@inject EmpleadoService empleadoService
 @inject NavigationManager Nav
 
 <div class="container-fluid py-4">
@@ -11,7 +12,6 @@
         </button>
     </div>
 
-    @* Tarjetas de Resumen *@
     <div class="row g-3 mb-4">
         <div class="col-md-3">
             <div class="card bg-dark text-white border-start border-4 border-info shadow-sm">
@@ -47,7 +47,6 @@
         </div>
     </div>
 
-    @* Filtros y Tabla *@
     <div class="card bg-dark text-white border-secondary shadow">
         <div class="card-header border-secondary bg-transparent py-3">
             <div class="row align-items-center">
@@ -57,7 +56,7 @@
                             <i class="bi bi-filter"></i>
                         </span>
                         <input type="text" class="form-control bg-transparent text-white border-secondary"
-                               placeholder="Buscar por folio..." @bind="filtro" @bind:event="oninput" />
+                               placeholder="Buscar por folio o empleado..." @bind="filtro" @bind:event="oninput" />
                     </div>
                 </div>
                 <div class="col-md-6 text-md-end mt-2 mt-md-0">
@@ -80,6 +79,7 @@
                         <tr>
                             <th class="ps-4">Folio</th>
                             <th>Fecha/Hora</th>
+                            <th>Empleado</th>
                             <th>Método</th>
                             <th class="text-end">Total</th>
                             <th class="text-center">Estado</th>
@@ -89,11 +89,22 @@
                     <tbody>
                         @foreach (var venta in VentasFiltradas)
                         {
+                            var empleado = empleados.FirstOrDefault(e => e.Id.ToString() == venta.ClienteId);
                             <tr>
                                 <td class="ps-4 fw-bold">#@venta.Id.ToString("D5")</td>
                                 <td>
                                     <div class="small">@venta.Fecha.ToShortDateString()</div>
-                                    <div class="text-white-50" style="font-size: 0.75rem;">@venta.Fecha.ToShortTimeString()</div>
+                                    <div class="text-white-50" style="font-size:0.75rem">@venta.Fecha.ToShortTimeString()</div>
+                                </td>
+                                <td class="small">
+                                    @if (empleado != null)
+                                    {
+                                        <span>@empleado.Nombre @empleado.Apellido</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-white-50">—</span>
+                                    }
                                 </td>
                                 <td>
                                     @switch (venta.MetodoPago)
@@ -136,10 +147,10 @@
 @code {
     private PulperiaDbContext db = default!;
     private List<Venta> ventas = new();
+    private List<Empleado> empleados = new();
     private string filtro = "";
     private string filtroEstado = "Todas";
 
-    // Resumen
     private decimal VentasHoy => ventas
         .Where(v => v.Fecha.Date == DateTime.Today)
         .Sum(v => v.Total);
@@ -155,21 +166,22 @@
     private int Transacciones => ventas
         .Count(v => v.Fecha.Date == DateTime.Today);
 
-    private IEnumerable<Venta> VentasFiltradas => ventas
-        .Where(v =>
-            (string.IsNullOrEmpty(filtro) || v.Id.ToString().Contains(filtro)) &&
-            filtroEstado switch
-            {
-                "Fiado" => v.MetodoPago == "Fiado",
-                "Hoy"   => v.Fecha.Date == DateTime.Today,
-                _       => true
-            });
+    private IEnumerable<Venta> VentasFiltradas => ventas.Where(v =>
+        (string.IsNullOrEmpty(filtro) ||
+            v.Id.ToString().Contains(filtro) ||
+            empleados.Any(e => e.Id.ToString() == v.ClienteId &&
+                ($"{e.Nombre} {e.Apellido}").Contains(filtro, StringComparison.OrdinalIgnoreCase))) &&
+        filtroEstado switch
+        {
+            "Fiado" => v.MetodoPago == "Fiado",
+            "Hoy"   => v.Fecha.Date == DateTime.Today,
+            _       => true
+        });
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         db = DbFactory.CreateDbContext();
-        ventas = db.Venta
-            .OrderByDescending(v => v.Fecha)
-            .ToList();
+        ventas = db.Venta.OrderByDescending(v => v.Fecha).ToList();
+        empleados = await empleadoService.GetAllAsync();
     }
 }
