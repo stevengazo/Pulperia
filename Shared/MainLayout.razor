@@ -2,62 +2,148 @@
 
 <PageTitle>Pulpería - Sistema POS</PageTitle>
 
-<div class="page dark-theme">
-    <div class="sidebar shadow-lg">
-        <div class="brand-logo px-4 py-3 mb-2 border-bottom border-secondary">
-            <h5 class="text-info fw-bold mb-0">🏪 Pulpe POS</h5>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="brand">
+            <span class="brand-icon">P</span>
+            <span class="brand-name">Pulpe<span class="brand-accent">POS</span></span>
         </div>
         <NavMenu />
-    </div>
+    </aside>
 
-    <main>
-        <div class="top-row px-4 d-flex justify-content-end align-items-center">
-            <div class="user-profile small text-white-50 me-3">
-                <i class="bi bi-person-circle"></i> Administrador
+    <div class="main-area">
+        <header class="topbar">
+            <div class="topbar-right">
+                <span class="user-label">
+                    <i class="bi bi-person-circle"></i> Administrador
+                </span>
+                <a href="logout" class="btn-logout">Salir</a>
             </div>
-            <a href="logout" class="btn btn-sm btn-outline-danger border-0">Salir</a>
-        </div>
+        </header>
 
-        <article class="content px-4 py-3">
+        <article class="content">
             @Body
         </article>
-    </main>
+    </div>
 </div>
 
 <style>
-    /* Estilos rápidos para el Layout Oscuro */
-    .dark-theme {
-        background-color: #0f111a; /* Fondo ultra oscuro */
-        color: #e0e0e0;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+        --bg: #080809;
+        --surface: #0e0e11;
+        --border: #17171c;
+        --text: #d8d8e0;
+        --muted: #3a3a46;
+        --accent: #7c6bff;
+        --accent-dim: #16142a;
+        --sidebar-w: 220px;
+        --topbar-h: 50px;
+    }
+
+    .layout {
+        display: flex;
         min-height: 100vh;
-    }
-
-    main {
-        background-color: #1a1d29; /* Un tono más claro para el área de contenido */
-    }
-
-    .top-row {
-        background-color: #12141d !important;
-        border-bottom: 1px solid #2d2f3b !important;
-        justify-content: space-between;
+        background: var(--bg);
+        color: var(--text);
+        font-family: 'DM Sans', system-ui, sans-serif;
     }
 
     .sidebar {
-        background-image: linear-gradient(180deg, #12141d 0%, #08090d 100%) !important;
+        width: var(--sidebar-w);
+        background: var(--surface);
+        border-right: 0.5px solid var(--border);
+        position: fixed;
+        top: 0; left: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        z-index: 100;
     }
 
-    /* Personalización de scrollbar para que no rompa la estética */
-    ::-webkit-scrollbar {
-        width: 8px;
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 17px 20px 15px;
+        border-bottom: 0.5px solid var(--border);
     }
-    ::-webkit-scrollbar-track {
-        background: #0f111a;
+
+    .brand-icon {
+        width: 26px;
+        height: 26px;
+        background: var(--accent);
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        color: #fff;
+        flex-shrink: 0;
     }
-    ::-webkit-scrollbar-thumb {
-        background: #313442;
-        border-radius: 10px;
+
+    .brand-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--text);
+        letter-spacing: -0.01em;
     }
-    ::-webkit-scrollbar-thumb:hover {
-        background: #414452;
+
+    .brand-accent { color: var(--accent); }
+
+    .main-area {
+        margin-left: var(--sidebar-w);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
     }
+
+    .topbar {
+        height: var(--topbar-h);
+        background: var(--surface);
+        border-bottom: 0.5px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0 24px;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+    }
+
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .user-label {
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    .btn-logout {
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        border: 0.5px solid #1e1e23;
+        border-radius: 5px;
+        padding: 5px 11px;
+        transition: color 0.15s, border-color 0.15s;
+    }
+
+    .btn-logout:hover { color: #e2734a; border-color: #e2734a44; }
+
+    .content {
+        flex: 1;
+        padding: 2rem 2.5rem;
+        background: var(--bg);
+    }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #202026; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
 </style>
