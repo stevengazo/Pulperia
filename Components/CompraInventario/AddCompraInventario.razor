@@ -1,153 +1,262 @@
 @inject PulperiaDbContext db
 @using Microsoft.EntityFrameworkCore
 
-<div class="container">
-    <h3>Registro de Compra</h3>
+@if (isVisible)
+{
+    <div class="modal fade show d-block" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content bg-dark-custom border-secondary-custom shadow-2xl">
+                
+                @* --- CABECERA MINIMALISTA --- *@
+                <div class="modal-header border-bottom-custom px-4">
+                    <h5 class="modal-title text-white fw-bold">
+                        <i class="bi bi-cart-plus me-2 text-emerald"></i>Registro de Compra
+                    </h5>
+                    <button type="button" class="btn-close-custom" @onclick="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
 
-    @* --- SECCIÓN DE ENCABEZADO --- *@
-    <EditForm Model="@compraInventario" OnValidSubmit="GuardarCompra">
-        <div class="row mb-3">
-            <div class="col-md-4">
-                <label>Proveedor</label>
-                <InputSelect @bind-Value="compraInventario.ProveedorId" class="form-control">
-                    <option value="0">-- Seleccione Proveedor --</option>
-                    @foreach (var i in proveedores)
-                    {
-                        <option value="@i.Id"> @i.Nombre</option>
-                    }
-                </InputSelect>
-            </div>
-            <div class="col-md-4">
-                <label>Fecha</label>
-                <InputDate @bind-Value="compraInventario.Fecha" class="form-control" />
-            </div>
-            <div class="col-md-4">
-                <label>Notas</label>
-                <InputTextArea @bind-Value="compraInventario.Notas" class="form-control" rows="1" />
+                <div class="modal-body p-4 text-white-50">
+                    <EditForm Model="@compraInventario" OnValidSubmit="GuardarCompra">
+                        
+                        @* --- ENCABEDADO --- *@
+                        <div class="row g-4 mb-4">
+                            <div class="col-md-4">
+                                <label class="small text-uppercase tracking-wider mb-2 d-block">Proveedor</label>
+                                <InputSelect @bind-Value="compraInventario.ProveedorId" class="form-control-custom">
+                                    <option value="0">Seleccionar...</option>
+                                    @foreach (var i in proveedores)
+                                    {
+                                        <option value="@i.Id">@i.Nombre</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small text-uppercase tracking-wider mb-2 d-block">Fecha de Entrada</label>
+                                <InputDate @bind-Value="compraInventario.Fecha" class="form-control-custom" />
+                            </div>
+                            <div class="col-md-4">
+                                <label class="small text-uppercase tracking-wider mb-2 d-block">Notas de Referencia</label>
+                                <InputTextArea @bind-Value="compraInventario.Notas" class="form-control-custom" rows="1" placeholder="..." />
+                            </div>
+                        </div>
+
+                        @* --- INPUT DE PRODUCTO ESTILO BARRA --- *@
+                        <div class="add-product-zone p-3 mb-4 rounded-3 shadow-inner">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-5">
+                                    <label class="x-small text-emerald fw-bold mb-1">PRODUCTO</label>
+                                    <select class="form-control-custom accent" @bind="nuevoDetalle.ProductoId">
+                                        <option value="0">Buscar producto...</option>
+                                        @foreach (var p in productos)
+                                        {
+                                            <option value="@p.Id">@p.Nombre</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="x-small text-emerald fw-bold mb-1">CANT.</label>
+                                    <input type="number" class="form-control-custom accent text-center" @bind="nuevoDetalle.Cantidad" />
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="x-small text-emerald fw-bold mb-1">PRECIO U.</label>
+                                    <input type="number" step="0.01" class="form-control-custom accent text-end" @bind="nuevoDetalle.PrecioUnitario" />
+                                </div>
+                                <div class="col-md-3">
+                                    <button type="button" class="btn-emerald w-100" @onclick="AgregarAlDetalle">
+                                        <i class="bi bi-plus-circle me-1"></i> Añadir
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        @* --- TABLA MINIMALISTA --- *@
+                        <div class="table-responsive custom-scrollbar" style="max-height: 350px;">
+                            <table class="table table-dark-minimal table-hover border-0 mb-0">
+                                <thead>
+                                    <tr class="text-emerald">
+                                        <th class="border-0 bg-transparent ps-0">Ítems</th>
+                                        <th class="border-0 bg-transparent text-center">Cant.</th>
+                                        <th class="border-0 bg-transparent text-end">Unitario</th>
+                                        <th class="border-0 bg-transparent text-end">Subtotal</th>
+                                        <th class="border-0 bg-transparent text-center"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in detalles)
+                                    {
+                                        <tr>
+                                            <td class="ps-0 text-white">@productos.FirstOrDefault(p => p.Id == item.ProductoId)?.Nombre</td>
+                                            <td class="text-center">@item.Cantidad</td>
+                                            <td class="text-end">@item.PrecioUnitario.ToString("N2")</td>
+                                            <td class="text-end fw-bold text-white">@((item.Cantidad * item.PrecioUnitario).ToString("N2"))</td>
+                                            <td class="text-center pe-0">
+                                                <button type="button" class="btn-remove" @onclick="() => detalles.Remove(item)">
+                                                    <i class="bi bi-trash3"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        @* --- FOOTER CON TOTAL --- *@
+                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top-custom">
+                            <div>
+                                <span class="text-white-50 small text-uppercase">Total Acumulado</span>
+                                <h3 class="text-emerald fw-bold mb-0">@TotalCompra.ToString("C")</h3>
+                            </div>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn-outline-custom" @onclick="Close">Cancelar</button>
+                                <button type="submit" class="btn-save shadow-emerald" disabled="@(!detalles.Any())">
+                                    Finalizar Compra
+                                </button>
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
             </div>
         </div>
+    </div>
+    <div class="modal-backdrop-custom"></div>
+}
 
-        <hr />
+<style>
+    :root {
+        --bg-dark: #121212;
+        --bg-card: #1e1e1e;
+        --emerald: #10b981;
+        --border-color: rgba(255,255,255,0.08);
+    }
 
-        @* --- SECCIÓN PARA AGREGAR PRODUCTOS (DETALLE) --- *@
-        <h5>Agregar Productos</h5>
-        <div class="row g-2 align-items-end">
-            <div class="col-md-4">
-                <label>Producto</label>
-                <select class="form-control" @bind="nuevoDetalle.ProductoId">
-                    <option value="0">-- Seleccione --</option>
-                    @foreach (var p in productos)
-                    {
-                        <option value="@p.Id">@p.Nombre</option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label>Cantidad</label>
-                <input type="number" class="form-control" @bind="nuevoDetalle.Cantidad" />
-            </div>
-            <div class="col-md-2">
-                <label>Precio Unitario</label>
-                <input type="number" step="0.01" class="form-control" @bind="nuevoDetalle.PrecioUnitario" />
-            </div>
-            <div class="col-md-2">
-                <button type="button" class="btn btn-success w-100" @onclick="AgregarAlDetalle">Agregar</button>
-            </div>
-        </div>
+    .bg-dark-custom { background-color: var(--bg-dark); }
+    .border-secondary-custom { border: 1px solid var(--border-color); }
+    .border-bottom-custom { border-bottom: 1px solid var(--border-color); }
+    .border-top-custom { border-top: 1px solid var(--border-color); }
+    .text-emerald { color: var(--emerald) !important; }
+    .x-small { font-size: 0.65rem; letter-spacing: 1px; }
 
-        @* --- TABLA DE ITEMS AGREGADOS --- *@
-        <table class="table mt-4">
-            <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Precio</th>
-                    <th>Subtotal</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in detalles)
-                {
-                    <tr>
-                        <td>@productos.FirstOrDefault(p => p.Id == item.ProductoId)?.Nombre</td>
-                        <td>@item.Cantidad</td>
-                        <td>@item.PrecioUnitario.ToString("C")</td>
-                        <td>@((item.Cantidad * item.PrecioUnitario).ToString("C"))</td>
-                        <td>
-                            <button type="button" class="btn btn-danger btn-sm" @onclick="() => detalles.Remove(item)">Eliminar</button>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    /* Inputs */
+    .form-control-custom {
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--border-color);
+        color: white;
+        padding: 0.6rem 0.8rem;
+        border-radius: 8px;
+        width: 100%;
+        transition: all 0.2s;
+    }
+    .form-control-custom:focus {
+        background: rgba(255,255,255,0.08);
+        border-color: var(--emerald);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
 
-        <button type="submit" class="btn btn-primary mt-3">Guardar Compra Completa</button>
-    </EditForm>
-</div>
+    /* Botones */
+    .btn-emerald {
+        background: var(--emerald);
+        color: #000;
+        border: none;
+        padding: 0.6rem;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.1s;
+    }
+    .btn-save {
+        background: var(--emerald);
+        color: #000;
+        border: none;
+        padding: 0.7rem 2rem;
+        border-radius: 8px;
+        font-weight: bold;
+    }
+    .btn-outline-custom {
+        background: transparent;
+        border: 1px solid var(--border-color);
+        color: white;
+        padding: 0.7rem 1.5rem;
+        border-radius: 8px;
+    }
+    .btn-close-custom {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        opacity: 0.5;
+    }
+    .btn-remove {
+        background: none;
+        border: none;
+        color: #ef4444;
+        opacity: 0.7;
+    }
+
+    /* Tablas */
+    .table-dark-minimal tbody tr { border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .table-dark-minimal td { padding: 1rem 0.5rem; color: #a1a1aa; }
+
+    .add-product-zone { background: rgba(0,0,0,0.2); }
+    .modal-backdrop-custom {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        background: rgba(0,0,0,0.85);
+        backdrop-filter: blur(4px);
+        z-index: 1040;
+    }
+    .shadow-emerald { box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2); }
+</style>
 
 @code {
+    [Parameter] public EventCallback OnSaved { get; set; }
+    private bool isVisible = false;
     private List<Proveedor> proveedores = new();
     private List<Producto> productos = new();
     private CompraInventario compraInventario = new() { Fecha = DateTime.Now };
-    
-    // Objeto temporal para la línea que se está escribiendo
     private DetalleCompra nuevoDetalle = new();
-    
-    // Lista de detalles que se guardarán
     private List<DetalleCompra> detalles = new();
+    private decimal TotalCompra => detalles.Sum(x => x.Cantidad * x.PrecioUnitario);
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
         productos = await db.Producto.ToListAsync();
         proveedores = await db.Proveedores.ToListAsync();
     }
 
-    private void AgregarAlDetalle()
-    {
-        if (nuevoDetalle.ProductoId > 0 && nuevoDetalle.Cantidad > 0)
-        {
-            // Agregamos una copia a la lista
-            detalles.Add(new DetalleCompra
-            {
+    public void Show() {
+        isVisible = true;
+        compraInventario = new() { Fecha = DateTime.Now };
+        detalles.Clear();
+        StateHasChanged();
+    }
+
+    private void Close() => isVisible = false;
+
+    private void AgregarAlDetalle() {
+        if (nuevoDetalle.ProductoId > 0 && nuevoDetalle.Cantidad > 0) {
+            detalles.Add(new DetalleCompra {
                 ProductoId = nuevoDetalle.ProductoId,
                 Cantidad = nuevoDetalle.Cantidad,
                 PrecioUnitario = nuevoDetalle.PrecioUnitario
             });
-
-            // Limpiamos el objeto temporal para el siguiente producto
             nuevoDetalle = new DetalleCompra();
         }
     }
 
-    private async Task GuardarCompra()
-    {
-        if (detalles.Count == 0) return;
-
-        try
-        {
-            // 1. Guardar la compra principal
+    private async Task GuardarCompra() {
+        if (!detalles.Any() || compraInventario.ProveedorId == 0) return;
+        try {
             db.CompraInventario.Add(compraInventario);
             await db.SaveChangesAsync();
-
-            // 2. Asignar el ID de la compra a cada detalle y guardar
-            foreach (var item in detalles)
-            {
+            foreach (var item in detalles) {
                 item.CompraId = compraInventario.Id;
                 db.DetalleCompra.Add(item);
             }
-            
             await db.SaveChangesAsync();
-            
-            // Limpiar todo después de guardar
-            compraInventario = new() { Fecha = DateTime.Now };
-            detalles.Clear();
-            // Aquí podrías redirigir o mostrar un mensaje de éxito
-        }
-        catch (Exception ex)
-        {
-            // Manejar error
-            Console.WriteLine(ex.Message);
-        }
+            await OnSaved.InvokeAsync();
+            Close();
+        } catch (Exception ex) { Console.WriteLine(ex.Message); }
     }
 }

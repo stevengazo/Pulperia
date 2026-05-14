@@ -2,9 +2,10 @@
 @using Pulperia.Components.CompraInventario
 @inject NavigationManager Nav
 
-<AddCompraInventario />
+@* 1. Agregamos la referencia al componente modal y el evento de refresco *@
+<AddCompraInventario @ref="modalCompra" OnSaved="ActualizarDatos" />
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-4 bg-dark min-vh-100">
 
     @* Cabecera *@
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -12,8 +13,9 @@
             <h2 class="text-white fw-bold mb-0">📦 Control de Inventario</h2>
             <p class="text-white-50 small mb-0">Gestione sus productos y niveles de existencias</p>
         </div>
+        @* 2. El botón ahora llama a AbrirModalNuevo *@
         <button class="btn btn-primary d-flex align-items-center gap-2 shadow" @onclick="AbrirModalNuevo">
-            <i class="bi bi-plus-lg"></i> Nuevo Producto
+            <i class="bi bi-plus-lg"></i> Registrar Compra
         </button>
     </div>
 
@@ -94,7 +96,19 @@
                             <th class="text-center pe-4">Acciones</th>
                         </tr>
                     </thead>
-               
+                    <tbody>
+                        @* Aquí iría el renderizado de tus productos *@
+                        <tr>
+                            <td class="ps-4 text-white-50">PROD-001</td>
+                            <td class="fw-bold">Leche Entera 1L</td>
+                            <td><span class="badge bg-secondary">Lácteos</span></td>
+                            <td class="text-end">₡950.00</td>
+                            <td class="text-center"><span class="badge bg-success">45</span></td>
+                            <td class="text-center pe-4">
+                                <button class="btn btn-sm btn-outline-light"><i class="bi bi-pencil"></i></button>
+                            </td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </div>
@@ -116,6 +130,7 @@
         text-transform: uppercase;
         letter-spacing: 0.5px;
         border-top: none;
+        background-color: rgba(0,0,0,0.2);
     }
 
     .table tbody tr {
@@ -129,9 +144,21 @@
 
 @code {
     private string filtro = "";
+    
+    // Referencia al componente modal
+    private AddCompraInventario modalCompra;
 
-  
-    private void AbrirModalNuevo() { /* Lógica */ }
+    private void AbrirModalNuevo() 
+    {
+        // 3. Llamamos al método Show() del componente hijo
+        modalCompra.Show();
+    }
 
-
+    private async Task ActualizarDatos()
+    {
+        // 4. Esta lógica se ejecuta cuando el modal guarda con éxito
+        // Aquí deberías volver a cargar la lista de productos de la DB
+        Console.WriteLine("La compra se guardó, refrescando inventario...");
+        StateHasChanged();
+    }
 }
