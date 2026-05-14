@@ -1,95 +1,219 @@
 @inject PulperiaDbContext db
 
-<div class="modal fade @(isVisible ? "show d-block" : "")" tabindex="-1" style="background-color: rgba(0,0,0,0.6);">
+<style>
+    .pm-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.75);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1050;
+    }
 
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content bg-dark text-white border-secondary">
+    .pm-box {
+        background: #0e0e10;
+        border: 0.5px solid #1f1f23;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 580px;
+        overflow: hidden;
+    }
 
-            <div class="modal-header border-secondary">
-                <h5 class="modal-title">➕ Nuevo Producto</h5>
-                <button type="button" class="btn-close btn-close-white" @onclick="Close"></button>
-            </div>
+    .pm-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1.25rem 1.5rem 1rem;
+        border-bottom: 0.5px solid #1f1f23;
+    }
 
-            <div class="modal-body">
+    .pm-title {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #5a5a65;
+        margin: 0;
+    }
 
-                <EditForm Model="@producto" OnValidSubmit="Guardar">
+    .pm-close {
+        background: none;
+        border: none;
+        color: #5a5a65;
+        cursor: pointer;
+        font-size: 18px;
+        padding: 4px;
+        line-height: 1;
+        border-radius: 4px;
+        transition: color 0.15s;
+    }
 
-                    <div class="row g-3">
+    .pm-close:hover { color: #e2e2e6; }
 
-                        <div class="col-md-6">
-                            <label class="form-label">Nombre</label>
-                            <InputText class="form-control" @bind-Value="producto.Nombre" />
-                        </div>
+    .pm-body { padding: 1.25rem 1.5rem 1.5rem; }
 
-                        <div class="col-md-6">
-                            <label class="form-label">Presentación</label>
-                            <InputText class="form-control" @bind-Value="producto.Presentacion" />
-                        </div>
+    .pm-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
 
-                        <div class="col-md-4">
-                            <label class="form-label">Costo</label>
+    .pm-3col {
+        grid-column: 1 / -1;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .pm-field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .pm-field label {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: #5a5a65;
+    }
+
+    .pm-field .form-control {
+        background: #18181c;
+        border: 0.5px solid #2a2a2f;
+        border-radius: 6px;
+        color: #e2e2e6;
+        font-size: 13px;
+        padding: 9px 12px;
+        transition: border-color 0.15s;
+        box-shadow: none;
+    }
+
+    .pm-field .form-control:focus {
+        background: #18181c;
+        border-color: #3d3d45;
+        color: #e2e2e6;
+        box-shadow: none;
+        outline: none;
+    }
+
+    .pm-divider {
+        height: 0.5px;
+        background: #1f1f23;
+        margin: 1.25rem 0 1rem;
+    }
+
+    .pm-footer {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+
+    .pm-btn {
+        font-size: 13px;
+        font-weight: 500;
+        padding: 8px 18px;
+        border-radius: 6px;
+        cursor: pointer;
+        border: 0.5px solid transparent;
+        transition: opacity 0.15s;
+    }
+
+    .pm-btn:hover { opacity: 0.8; }
+
+    .pm-btn-cancel {
+        background: #1a1a1e;
+        border-color: #2a2a2f;
+        color: #8888a0;
+    }
+
+    .pm-btn-save {
+        background: #7c6bff;
+        color: #fff;
+    }
+</style>
+
+<div class="@(isVisible ? "pm-overlay" : "d-none")">
+    <div class="pm-box">
+
+        <div class="pm-header">
+            <p class="pm-title">Nuevo producto</p>
+            <button class="pm-close" @onclick="Close">✕</button>
+        </div>
+
+        <div class="pm-body">
+            <EditForm Model="@producto" OnValidSubmit="Guardar">
+
+                <div class="pm-grid">
+
+                    <div class="pm-field">
+                        <label>Nombre</label>
+                        <InputText class="form-control" @bind-Value="producto.Nombre" />
+                    </div>
+
+                    <div class="pm-field">
+                        <label>Presentación</label>
+                        <InputText class="form-control" @bind-Value="producto.Presentacion" />
+                    </div>
+
+                    <div class="pm-3col">
+                        <div class="pm-field">
+                            <label>Costo</label>
                             <InputNumber class="form-control" @bind-Value="producto.PrecioCosto" />
                         </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Venta</label>
+                        <div class="pm-field">
+                            <label>Venta</label>
                             <InputNumber class="form-control" @bind-Value="producto.PrecioVenta" />
                         </div>
-
-                        <div class="col-md-4">
-                            <label class="form-label">Stock</label>
+                        <div class="pm-field">
+                            <label>Stock actual</label>
                             <InputNumber class="form-control" @bind-Value="producto.StockActual" />
                         </div>
-                                <div class="col-md-4">
-                            <label class="form-label">Stock Minimo</label>
-                            <InputNumber class="form-control" @bind-Value="producto.StockMinimo" />
-                        </div>
+                    </div>
 
+                    <div class="pm-field">
+                        <label>Stock mínimo</label>
+                        <InputNumber class="form-control" @bind-Value="producto.StockMinimo" />
+                    </div>
 
-                        <div class="col-md-4">
-                            <label class="form-label">Categoria</label>
-                            <InputSelect class="form-control" @bind-Value="producto.CategoriaId" >
-                            @foreach(var i in Categorias){
-                                <option value="@i.Id" > @i.Nombre</option>
+                    <div class="pm-field">
+                        <label>Categoría</label>
+                        <InputSelect class="form-control" @bind-Value="producto.CategoriaId">
+                            @foreach (var i in Categorias)
+                            {
+                                <option value="@i.Id">@i.Nombre</option>
                             }
-                            </InputSelect>
-                        </div>
-                        
-
+                        </InputSelect>
                     </div>
 
-                    <div class="mt-4 d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-secondary" @onclick="Close">
-                            Cancelar
-                        </button>
+                </div>
 
-                        <button type="submit" class="btn btn-primary">
-                            Guardar
-                        </button>
-                    </div>
+                <div class="pm-divider"></div>
 
-                </EditForm>
+                <div class="pm-footer">
+                    <button type="button" class="pm-btn pm-btn-cancel" @onclick="Close">Cancelar</button>
+                    <button type="submit" class="pm-btn pm-btn-save">Guardar</button>
+                </div>
 
-            </div>
-
+            </EditForm>
         </div>
+
     </div>
 </div>
 
 @code {
-
     [Parameter] public EventCallback OnSaved { get; set; }
 
     private Producto producto = new Producto();
     private bool isVisible = false;
-
-    private List<Categoria> Categorias =new();
+    private List<Categoria> Categorias = new();
 
     protected override async Task OnInitializedAsync()
     {
         Categorias = db.Categoria.ToList();
     }
-
 
     public void Show()
     {
