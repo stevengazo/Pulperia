@@ -1,6 +1,7 @@
 @page "/nueva-venta"
-@using System.Globalization
-@inject PulperiaDbContext db;
+
+@inject IDbContextFactory<PulperiaDbContext> DbFactory
+@inject EmpleadoService empleadoService
 @inject NavigationManager Nav
 
 <div class="container py-4">
@@ -26,12 +27,14 @@
                     <div class="row g-3 mb-4">
                         <div class="col-md-9">
                             <label class="form-label text-white-50">Escanear o buscar producto</label>
-                            <input type="text" class="form-control form-control-lg bg-dark text-white border-primary" 
+                            <input type="text" class="form-control form-control-lg bg-dark text-white border-primary"
                                    placeholder="Código de barras o nombre..." @bind="busqueda" autofocus />
                         </div>
                         <div class="col-md-3">
                             <label class="form-label text-white-50">Cant.</label>
-                            <input type="number" class="form-control form-control-lg bg-dark text-white border-secondary text-center" @bind="cantidad" />
+                            <input type="number"
+                                   class="form-control form-control-lg bg-dark text-white border-secondary text-center"
+                                   @bind="cantidad" />
                         </div>
                     </div>
 
@@ -54,9 +57,11 @@
                                         <td class="text-end">@item.Precio.ToString("C0")</td>
                                         <td class="text-center">
                                             <div class="btn-group btn-group-sm">
-                                                <button class="btn btn-outline-secondary" @onclick="() => item.Cantidad--">-</button>
+                                                <button class="btn btn-outline-secondary"
+                                                        @onclick="() => item.Cantidad--">-</button>
                                                 <span class="btn btn-dark disabled">@item.Cantidad</span>
-                                                <button class="btn btn-outline-secondary" @onclick="() => item.Cantidad++">+</button>
+                                                <button class="btn btn-outline-secondary"
+                                                        @onclick="() => item.Cantidad++">+</button>
                                             </div>
                                         </td>
                                         <td class="text-end fw-bold">@((item.Precio * item.Cantidad).ToString("C0"))</td>
@@ -80,7 +85,15 @@
                     <h2 class="mb-0 fw-bold">@Total.ToString("C0")</h2>
                 </div>
                 <div class="card-body bg-dark text-white border border-top-0 border-secondary rounded-bottom">
-                    
+                    <div class="mb-3">
+                        <label class="small text-white-50">Empleado</label>
+                       <select>
+                        @foreach(var i in empleados){
+                            <option value="@i.Id"> @i.Nombre @i.Apellido</option>
+                        }
+                       </select>
+                    </div>
+
                     <div class="mb-3">
                         <label class="small text-white-50">Método de pago</label>
                         <select class="form-select bg-dark text-white border-secondary" @bind="metodoPago">
@@ -95,7 +108,8 @@
                     {
                         <div class="mb-3">
                             <label class="small text-white-50">Pagó con:</label>
-                            <input type="number" class="form-control form-control-lg bg-dark text-white border-info" @bind-value="pagoCon" @bind-value:event="oninput" />
+                            <input type="number" class="form-control form-control-lg bg-dark text-white border-info"
+                                   @bind-value="pagoCon" @bind-value:event="oninput" />
                         </div>
                         <div class="d-flex justify-content-between mb-4">
                             <span class="text-white-50">Cambio:</span>
@@ -113,16 +127,25 @@
 </div>
 
 @code {
+    private PulperiaDbContext db;
+    private List<Empleado> empleados = new();
     private string busqueda = "";
     private int cantidad = 1;
     private string metodoPago = "Efectivo";
     private decimal pagoCon;
     private List<Item> carrito = new();
-
     private decimal Total => carrito.Sum(i => i.Precio * i.Cantidad);
     private decimal Cambio => pagoCon > Total ? pagoCon - Total : 0;
 
-    void Procesar() {
+    protected override async Task OnInitializedAsync()
+    {
+        db = DbFactory.CreateDbContext();
+        empleados = await empleadoService.GetAllAsync();
+        empleados = empleados.OrderBy(e=>e.Nombre).ToList();
+    }
+
+    void Procesar()
+    {
         // Lógica de guardado...
         Nav.NavigateTo("/ventas");
     }
