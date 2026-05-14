@@ -1,1 +1,95 @@
-@page "/producto/id"
+@page "/producto/{id:int}"
+
+@inject PulperiaDbContext db
+@inject NavigationManager Nav
+
+<div class="container py-5">
+
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+
+            <div class="card bg-dark text-white border-secondary shadow-sm rounded-3">
+
+                <div class="card-body p-4">
+
+                    @if (producto == null)
+                    {
+                        <div class="text-center text-white-50">
+                            Cargando producto...
+                        </div>
+                    }
+                    else
+                    {
+                        <h4 class="mb-3 fw-semibold">
+                            📦 @producto.Nombre
+                        </h4>
+
+                        <hr class="border-secondary" />
+
+                        <div class="mb-2 text-white-50 small">Presentación</div>
+                        <div class="mb-3">@producto.Presentacion</div>
+
+                        <div class="row">
+
+                            <div class="col-6">
+                                <div class="text-white-50 small">Precio Costo</div>
+                                <div class="fw-semibold">@producto.PrecioCosto</div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="text-white-50 small">Precio Venta</div>
+                                <div class="fw-semibold">@producto.PrecioVenta</div>
+                            </div>
+
+                        </div>
+
+                        <hr class="border-secondary" />
+
+                        <div class="row">
+
+                            <div class="col-6">
+                                <div class="text-white-50 small">Stock Actual</div>
+                                <div class="fw-semibold">@producto.StockActual</div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="text-white-50 small">Stock Mínimo</div>
+                                <div class="fw-semibold">@producto.StockMinimo</div>
+                            </div>
+
+                        </div>
+
+                        <hr class="border-secondary" />
+
+                        <div class="d-flex justify-content-between mt-4">
+
+                            <button class="btn btn-outline-secondary">
+                                Volver
+                            </button>
+
+                            <button class="btn btn-primary">
+                                Editar
+                            </button>
+
+                        </div>
+                    }
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@code {
+
+    [Parameter] public int id { get; set; }
+
+    private Producto? producto;
+
+    protected override async Task OnInitializedAsync()
+    {
+        producto = await db.Producto.FindAsync(id);
+    }
+}
