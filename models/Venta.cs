@@ -1,23 +1,24 @@
 
 
-namespace Pulperia.Models; 
+using System.ComponentModel.DataAnnotations;
+
+namespace Pulperia.Models;
 
 
 public class Venta
 {
+    [Key]
     public int Id { get; set; }
-    public DateTime Fecha { get; set; } = DateTime.Now;
+    public DateTime Fecha { get; set; }
     public decimal Total { get; set; }
-    
-    // MetodoPago: "Efectivo", "SINPE", "Fiado"
-    public string MetodoPago { get; set; } = "Efectivo"; 
+    public decimal MetodoPago { get; set; }
     public decimal MontoRecibido { get; set; }
     public decimal Cambio { get; set; }
-    public string? Notas { get; set; }
+    public string Notas { get; set; }
+    public string ClienteId { get; set; }
+    public bool Pagado { get; set; }
 
-    // Relación con Cliente (opcional, obligatorio si es Fiado)
-    public int? ClienteId { get; set; }
-    public Cliente? Cliente { get; set; }
+    // Relation With Detalle Venta
+    public ICollection<DetalleVenta> DetalleVentas { get; set; }
 
-    public List<DetalleVenta> Detalles { get; set; } = new();
 }
