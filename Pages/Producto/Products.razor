@@ -243,7 +243,9 @@
                 <tr>
                     <th>Producto</th>
                     <th>Categoría</th>
+                    <th class="num">Unidades Compradas</th>
                     <th class="num">Costo Total</th>
+                    <th class="num">Unidades Vendidas</th>
                     <th class="num">Ventas Total</th>
                     <th class="ctr">Stock</th>
                     <th class="ctr">Acciones</th>
@@ -266,12 +268,21 @@
                         <td>
                             <span class="td-badge">@p.Categoria?.Nombre</span>
                         </td>
+                        <td class="td-ctr">
+                            @p.DetalleCompras.Sum(d=>d.Cantidad).ToString()
+                        </td>
                         <td class="td-num">
                             ₡@GetCompraCosto(p.DetalleCompras.ToList())
+                        </td>
+                        <td class="td-ctr">
+                            @p.DetalleVentas.Sum(d=>d.Cantidad).ToString()
                         </td>
                         <td class="td-num">
                             ₡@GetVentas(p.DetalleVentas.ToList())
                         </td>
+
+
+         
                         <td class="td-ctr">
                             <span class="@(p.StockActual <= p.StockMinimo ? "stock-low" : "stock-ok")">
                                 <span class="stock-dot @(p.StockActual <= p.StockMinimo ? "dot-low" : "dot-ok")"></span>

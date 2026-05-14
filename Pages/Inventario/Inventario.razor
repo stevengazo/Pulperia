@@ -158,7 +158,7 @@
                             <th class="text-center">Cantidad</th>
                             <th class="text-end">Costo</th>
                             <th class="text-end">Venta</th>
-                            <th class="text-center pe-4">Estado</th>
+                            <th class="text-center pe-4">Ganacia</th>
                         </tr>
 
                     </thead>
@@ -208,24 +208,7 @@
 
                                 <td class="text-center pe-4">
 
-                                    @if(i.Producto.StockActual <= 0)
-                                    {
-                                        <span class="badge bg-danger">
-                                            Agotado
-                                        </span>
-                                    }
-                                    else if(i.Producto.StockActual <= i.Producto.StockMinimo)
-                                    {
-                                        <span class="badge bg-warning text-dark">
-                                            Bajo
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-success">
-                                            Disponible
-                                        </span>
-                                    }
+                                 ₡  @(i.Producto.PrecioVenta - i.PrecioUnitario )
 
                                 </td>
 
