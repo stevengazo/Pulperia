@@ -6,8 +6,7 @@
     <div class="modal fade show d-block" tabindex="-1" role="dialog">
         <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
             <div class="modal-content bg-dark-custom border-secondary-custom shadow-2xl">
-                
-                @* --- CABECERA MINIMALISTA --- *@
+
                 <div class="modal-header border-bottom-custom px-4">
                     <h5 class="modal-title text-white fw-bold">
                         <i class="bi bi-cart-plus me-2 text-emerald"></i>Registro de Compra
@@ -19,11 +18,10 @@
 
                 <div class="modal-body p-4 text-white-50">
                     <EditForm Model="@compraInventario" OnValidSubmit="GuardarCompra">
-                        
-                        @* --- ENCABEDADO --- *@
+
                         <div class="row g-4 mb-4">
                             <div class="col-md-4">
-                                <label class="small text-uppercase tracking-wider mb-2 d-block">Proveedor</label>
+                                <label class="small text-uppercase mb-2 d-block">Proveedor</label>
                                 <InputSelect @bind-Value="compraInventario.ProveedorId" class="form-control-custom">
                                     <option value="0">Seleccionar...</option>
                                     @foreach (var i in proveedores)
@@ -32,22 +30,24 @@
                                     }
                                 </InputSelect>
                             </div>
+
                             <div class="col-md-4">
-                                <label class="small text-uppercase tracking-wider mb-2 d-block">Fecha de Entrada</label>
+                                <label class="small text-uppercase mb-2 d-block">Fecha</label>
                                 <InputDate @bind-Value="compraInventario.Fecha" class="form-control-custom" />
                             </div>
+
                             <div class="col-md-4">
-                                <label class="small text-uppercase tracking-wider mb-2 d-block">Notas de Referencia</label>
-                                <InputTextArea @bind-Value="compraInventario.Notas" class="form-control-custom" rows="1" placeholder="..." />
+                                <label class="small text-uppercase mb-2 d-block">Notas</label>
+                                <InputTextArea @bind-Value="compraInventario.Notas" class="form-control-custom" rows="1" />
                             </div>
                         </div>
 
-                        @* --- INPUT DE PRODUCTO ESTILO BARRA --- *@
-                        <div class="add-product-zone p-3 mb-4 rounded-3 shadow-inner">
+                        <div class="add-product-zone p-3 mb-4 rounded-3">
                             <div class="row g-3 align-items-end">
+
                                 <div class="col-md-5">
                                     <label class="x-small text-emerald fw-bold mb-1">PRODUCTO</label>
-                                    <select class="form-control-custom accent" @bind="nuevoDetalle.ProductoId">
+                                    <select class="form-control-custom" @bind="nuevoDetalle.ProductoId">
                                         <option value="0">Buscar producto...</option>
                                         @foreach (var p in productos)
                                         {
@@ -55,44 +55,53 @@
                                         }
                                     </select>
                                 </div>
+
                                 <div class="col-md-2">
-                                    <label class="x-small text-emerald fw-bold mb-1">CANT.</label>
-                                    <input type="number" class="form-control-custom accent text-center" @bind="nuevoDetalle.Cantidad" />
+                                    <label class="x-small text-emerald fw-bold mb-1">CANT</label>
+                                    <input type="number" class="form-control-custom text-center"
+                                           @bind="nuevoDetalle.Cantidad" />
                                 </div>
+
                                 <div class="col-md-2">
-                                    <label class="x-small text-emerald fw-bold mb-1">PRECIO U.</label>
-                                    <input type="number" step="0.01" class="form-control-custom accent text-end" @bind="nuevoDetalle.PrecioUnitario" />
+                                    <label class="x-small text-emerald fw-bold mb-1">PRECIO</label>
+                                    <input type="number" step="0.01" class="form-control-custom text-end"
+                                           @bind="nuevoDetalle.PrecioUnitario" />
                                 </div>
+
                                 <div class="col-md-3">
                                     <button type="button" class="btn-emerald w-100" @onclick="AgregarAlDetalle">
                                         <i class="bi bi-plus-circle me-1"></i> Añadir
                                     </button>
                                 </div>
+
                             </div>
                         </div>
 
-                        @* --- TABLA MINIMALISTA --- *@
-                        <div class="table-responsive custom-scrollbar" style="max-height: 350px;">
-                            <table class="table table-dark-minimal table-hover border-0 mb-0">
+                        <div class="table-responsive" style="max-height: 350px;">
+                            <table class="table table-dark-minimal table-hover">
                                 <thead>
                                     <tr class="text-emerald">
-                                        <th class="border-0 bg-transparent ps-0">Ítems</th>
-                                        <th class="border-0 bg-transparent text-center">Cant.</th>
-                                        <th class="border-0 bg-transparent text-end">Unitario</th>
-                                        <th class="border-0 bg-transparent text-end">Subtotal</th>
-                                        <th class="border-0 bg-transparent text-center"></th>
+                                        <th>Item</th>
+                                        <th class="text-center">Cant</th>
+                                        <th class="text-end">Unit</th>
+                                        <th class="text-end">Subtotal</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
+
                                 <tbody>
                                     @foreach (var item in detalles)
                                     {
                                         <tr>
-                                            <td class="ps-0 text-white">@productos.FirstOrDefault(p => p.Id == item.ProductoId)?.Nombre</td>
+                                            <td>@productos.FirstOrDefault(p => p.Id == item.ProductoId)?.Nombre</td>
                                             <td class="text-center">@item.Cantidad</td>
                                             <td class="text-end">@item.PrecioUnitario.ToString("N2")</td>
-                                            <td class="text-end fw-bold text-white">@((item.Cantidad * item.PrecioUnitario).ToString("N2"))</td>
-                                            <td class="text-center pe-0">
-                                                <button type="button" class="btn-remove" @onclick="() => detalles.Remove(item)">
+                                            <td class="text-end">
+                                                @((item.Cantidad * item.PrecioUnitario).ToString("N2"))
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn-remove"
+                                                        @onclick="() => detalles.Remove(item)">
                                                     <i class="bi bi-trash3"></i>
                                                 </button>
                                             </td>
@@ -102,26 +111,34 @@
                             </table>
                         </div>
 
-                        @* --- FOOTER CON TOTAL --- *@
                         <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top-custom">
                             <div>
-                                <span class="text-white-50 small text-uppercase">Total Acumulado</span>
-                                <h3 class="text-emerald fw-bold mb-0">@TotalCompra.ToString("C")</h3>
+                                <span class="text-white-50 small">Total</span>
+                                <h3 class="text-emerald">@TotalCompra.ToString("C")</h3>
                             </div>
+
                             <div class="d-flex gap-2">
-                                <button type="button" class="btn-outline-custom" @onclick="Close">Cancelar</button>
-                                <button type="submit" class="btn-save shadow-emerald" disabled="@(!detalles.Any())">
+                                <button type="button" class="btn-outline-custom" @onclick="Close">
+                                    Cancelar
+                                </button>
+
+                                <button type="submit" class="btn-save"
+                                        disabled="@(!detalles.Any())">
                                     Finalizar Compra
                                 </button>
                             </div>
                         </div>
+
                     </EditForm>
                 </div>
+
             </div>
         </div>
     </div>
+
     <div class="modal-backdrop-custom"></div>
 }
+
 
 <style>
     :root {
@@ -211,21 +228,29 @@
 </style>
 
 @code {
+
     [Parameter] public EventCallback OnSaved { get; set; }
+
     private bool isVisible = false;
+
     private List<Proveedor> proveedores = new();
     private List<Producto> productos = new();
+
     private CompraInventario compraInventario = new() { Fecha = DateTime.Now };
     private DetalleCompra nuevoDetalle = new();
     private List<DetalleCompra> detalles = new();
-    private decimal TotalCompra => detalles.Sum(x => x.Cantidad * x.PrecioUnitario);
 
-    protected override async Task OnInitializedAsync() {
+    private decimal TotalCompra =>
+        detalles.Sum(x => x.Cantidad * x.PrecioUnitario);
+
+    protected override async Task OnInitializedAsync()
+    {
         productos = await db.Producto.ToListAsync();
         proveedores = await db.Proveedores.ToListAsync();
     }
 
-    public void Show() {
+    public void Show()
+    {
         isVisible = true;
         compraInventario = new() { Fecha = DateTime.Now };
         detalles.Clear();
@@ -234,29 +259,54 @@
 
     private void Close() => isVisible = false;
 
-    private void AgregarAlDetalle() {
-        if (nuevoDetalle.ProductoId > 0 && nuevoDetalle.Cantidad > 0) {
-            detalles.Add(new DetalleCompra {
+    private void AgregarAlDetalle()
+    {
+        if (nuevoDetalle.ProductoId > 0 && nuevoDetalle.Cantidad > 0)
+        {
+            detalles.Add(new DetalleCompra
+            {
                 ProductoId = nuevoDetalle.ProductoId,
                 Cantidad = nuevoDetalle.Cantidad,
                 PrecioUnitario = nuevoDetalle.PrecioUnitario
             });
+
             nuevoDetalle = new DetalleCompra();
         }
     }
 
-    private async Task GuardarCompra() {
-        if (!detalles.Any() || compraInventario.ProveedorId == 0) return;
-        try {
+    private async Task GuardarCompra()
+    {
+        if (!detalles.Any() || compraInventario.ProveedorId == 0)
+            return;
+
+        try
+        {
             db.CompraInventario.Add(compraInventario);
             await db.SaveChangesAsync();
-            foreach (var item in detalles) {
+
+            foreach (var item in detalles)
+            {
                 item.CompraId = compraInventario.Id;
                 db.DetalleCompra.Add(item);
+
+                // 🔥 ACTUALIZACIÓN SEGURA DE STOCK
+                var producto = await db.Producto
+                    .FirstOrDefaultAsync(p => p.Id == item.ProductoId);
+
+                if (producto != null)
+                {
+                    producto.StockActual += item.Cantidad;
+                }
             }
+
             await db.SaveChangesAsync();
+
             await OnSaved.InvokeAsync();
             Close();
-        } catch (Exception ex) { Console.WriteLine(ex.Message); }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 }
