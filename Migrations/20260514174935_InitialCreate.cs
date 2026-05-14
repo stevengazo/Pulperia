@@ -25,7 +25,7 @@ namespace Pulperia.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Proveedor",
+                name: "Proveedores",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -36,7 +36,7 @@ namespace Pulperia.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Proveedor", x => x.Id);
+                    table.PrimaryKey("PK_Proveedores", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -97,9 +97,9 @@ namespace Pulperia.Migrations
                 {
                     table.PrimaryKey("PK_CompraInventario", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_CompraInventario_Proveedor_ProveedorId",
+                        name: "FK_CompraInventario_Proveedores_ProveedorId",
                         column: x => x.ProveedorId,
-                        principalTable: "Proveedor",
+                        principalTable: "Proveedores",
                         principalColumn: "Id");
                 });
 
@@ -210,7 +210,7 @@ namespace Pulperia.Migrations
                 name: "Venta");
 
             migrationBuilder.DropTable(
-                name: "Proveedor");
+                name: "Proveedores");
 
             migrationBuilder.DropTable(
                 name: "Categoria");

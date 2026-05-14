@@ -1,5 +1,8 @@
 @page "/inventario"
+@using Pulperia.Components.CompraInventario
 @inject NavigationManager Nav
+
+<AddCompraInventario />
 
 <div class="container-fluid py-4">
 
@@ -91,41 +94,7 @@
                             <th class="text-center pe-4">Acciones</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach (var p in productos.Where(x => string.IsNullOrEmpty(filtro) || x.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)))
-                        {
-                            <tr>
-                                <td class="ps-4 text-white-50 small">@p.Sku</td>
-                                <td>
-                                    <div class="fw-bold">@p.Nombre</div>
-                                    <div class="text-white-50 x-small" style="font-size: 0.7rem;">Modificado: @p.UltimaModificacion</div>
-                                </td>
-                                <td><span class="badge bg-secondary">@p.Categoria</span></td>
-                                <td class="text-end fw-bold text-info">@p.Precio.ToString("C0")</td>
-                                <td class="text-center">
-                                    @if (p.Stock <= 0)
-                                    {
-                                        <span class="badge bg-danger">Agotado</span>
-                                    }
-                                    else if (p.Stock <= 5)
-                                    {
-                                        <span class="badge bg-warning text-dark">@p.Stock unidades</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-success fw-bold">@p.Stock</span>
-                                    }
-                                </td>
-                                <td class="text-center pe-4">
-                                    <div class="btn-group border border-secondary rounded">
-                                        <button class="btn btn-sm btn-dark text-info"><i class="bi bi-pencil-square"></i></button>
-                                        <button class="btn btn-sm btn-dark text-success"><i class="bi bi-plus-circle"></i></button>
-                                        <button class="btn btn-sm btn-dark text-danger"><i class="bi bi-trash"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
+               
                 </table>
             </div>
         </div>
@@ -161,23 +130,8 @@
 @code {
     private string filtro = "";
 
-    private List<ProductoInv> productos = new()
-    {
-        new ProductoInv { Sku = "AB-001", Nombre = "Arroz Tío Pelón 1kg", Categoria = "Abarrotes", Precio = 750, Stock = 45, UltimaModificacion = "Hoy" },
-        new ProductoInv { Sku = "LA-012", Nombre = "Leche Pinito 400g", Categoria = "Lácteos", Precio = 2100, Stock = 4, UltimaModificacion = "Ayer" },
-        new ProductoInv { Sku = "BE-055", Nombre = "Coca Cola 2.5L", Categoria = "Bebidas", Precio = 1600, Stock = 0, UltimaModificacion = "Hace 3 días" },
-        new ProductoInv { Sku = "AB-088", Nombre = "Frijoles Rojos 500g", Categoria = "Abarrotes", Precio = 900, Stock = 15, UltimaModificacion = "Hoy" }
-    };
-
+  
     private void AbrirModalNuevo() { /* Lógica */ }
 
-    public class ProductoInv
-    {
-        public string Sku { get; set; } = "";
-        public string Nombre { get; set; } = "";
-        public string Categoria { get; set; } = "";
-        public decimal Precio { get; set; }
-        public int Stock { get; set; }
-        public string UltimaModificacion { get; set; } = "";
-    }
+
 }

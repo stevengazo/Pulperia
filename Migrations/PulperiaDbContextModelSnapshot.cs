@@ -184,7 +184,7 @@ namespace Pulperia.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Proveedor");
+                    b.ToTable("Proveedores");
                 });
 
             modelBuilder.Entity("Pulperia.Models.Venta", b =>

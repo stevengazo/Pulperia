@@ -1,0 +1,74 @@
+@page   "/agregar-proveedor"
+@inject PulperiaDbContext db
+@using Microsoft.EntityFrameworkCore
+
+<div class="card shadow-sm p-4" style="max-width: 500px;">
+    <h3>Nuevo Proveedor</h3>
+    <hr />
+
+    @* OnValidSubmit asegura que solo se guarde si los campos cumplen las reglas *@
+    <EditForm Model="@proveedor" OnValidSubmit="GuardarProveedor">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" />
+
+        <div class="mb-3">
+            <label class="form-label">Nombre del Proveedor</label>
+            <InputText @bind-Value="proveedor.Nombre" class="form-control" placeholder="Ej: Distribuidora Sol" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Correo Electrónico</label>
+            <InputText @bind-Value="proveedor.Email" class="form-control" placeholder="nombre@correo.com" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Teléfono</label>
+            <InputText @bind-Value="proveedor.Telefono" class="form-control" placeholder="8888-8888" />
+        </div>
+
+        <div class="d-flex justify-content-end">
+            <button type="submit" class="btn btn-primary">
+                <i class="oi oi-check"></i> Guardar Proveedor
+            </button>
+        </div>
+    </EditForm>
+</div>
+
+@if (mostrarMensajeExito)
+{
+    <div class="alert alert-success mt-3">
+        ¡Proveedor guardado correctamente!
+    </div>
+}
+
+@code {
+    private Proveedor proveedor = new();
+    private bool mostrarMensajeExito = false;
+
+    private async Task GuardarProveedor()
+    {
+        try
+        {
+            // 1. Agregamos el objeto al set de datos
+            db.Proveedores.Add(proveedor);
+
+            // 2. IMPORTANTE: Confirmamos los cambios en la base de datos de forma asíncrona
+            await db.SaveChangesAsync();
+
+            // 3. Limpiamos el formulario para un nuevo registro
+            proveedor = new();
+            
+            // Opcional: Feedback visual
+            mostrarMensajeExito = true;
+            StateHasChanged(); // Forzar refresco visual
+            
+            await Task.Delay(3000); // El mensaje desaparece tras 3 segundos
+            mostrarMensajeExito = false;
+        }
+        catch (Exception ex)
+        {
+            // Aquí capturarías el error de "Invalid object name" si la tabla aún no existe
+            Console.WriteLine($"Error al guardar: {ex.Message}");
+        }
+    }
+}

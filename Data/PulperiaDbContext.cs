@@ -18,5 +18,6 @@ public class PulperiaDbContext : DbContext
     public DbSet<DetalleCompra> DetalleCompra => Set<DetalleCompra>();
     public DbSet<DetalleVenta> DetalleVenta => Set<DetalleVenta>();
     public DbSet<Producto> Producto => Set<Producto>();
-    public DbSet<Venta> Venta => Set<Venta>();
+
+public DbSet<Proveedor> Proveedores => Set<Proveedor>();    public DbSet<Venta> Venta => Set<Venta>();
 }

@@ -1,0 +1,153 @@
+@inject PulperiaDbContext db
+@using Microsoft.EntityFrameworkCore
+
+<div class="container">
+    <h3>Registro de Compra</h3>
+
+    @* --- SECCIÓN DE ENCABEZADO --- *@
+    <EditForm Model="@compraInventario" OnValidSubmit="GuardarCompra">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label>Proveedor</label>
+                <InputSelect @bind-Value="compraInventario.ProveedorId" class="form-control">
+                    <option value="0">-- Seleccione Proveedor --</option>
+                    @foreach (var i in proveedores)
+                    {
+                        <option value="@i.Id"> @i.Nombre</option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="col-md-4">
+                <label>Fecha</label>
+                <InputDate @bind-Value="compraInventario.Fecha" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label>Notas</label>
+                <InputTextArea @bind-Value="compraInventario.Notas" class="form-control" rows="1" />
+            </div>
+        </div>
+
+        <hr />
+
+        @* --- SECCIÓN PARA AGREGAR PRODUCTOS (DETALLE) --- *@
+        <h5>Agregar Productos</h5>
+        <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label>Producto</label>
+                <select class="form-control" @bind="nuevoDetalle.ProductoId">
+                    <option value="0">-- Seleccione --</option>
+                    @foreach (var p in productos)
+                    {
+                        <option value="@p.Id">@p.Nombre</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label>Cantidad</label>
+                <input type="number" class="form-control" @bind="nuevoDetalle.Cantidad" />
+            </div>
+            <div class="col-md-2">
+                <label>Precio Unitario</label>
+                <input type="number" step="0.01" class="form-control" @bind="nuevoDetalle.PrecioUnitario" />
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-success w-100" @onclick="AgregarAlDetalle">Agregar</button>
+            </div>
+        </div>
+
+        @* --- TABLA DE ITEMS AGREGADOS --- *@
+        <table class="table mt-4">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                    <th>Subtotal</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in detalles)
+                {
+                    <tr>
+                        <td>@productos.FirstOrDefault(p => p.Id == item.ProductoId)?.Nombre</td>
+                        <td>@item.Cantidad</td>
+                        <td>@item.PrecioUnitario.ToString("C")</td>
+                        <td>@((item.Cantidad * item.PrecioUnitario).ToString("C"))</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm" @onclick="() => detalles.Remove(item)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-primary mt-3">Guardar Compra Completa</button>
+    </EditForm>
+</div>
+
+@code {
+    private List<Proveedor> proveedores = new();
+    private List<Producto> productos = new();
+    private CompraInventario compraInventario = new() { Fecha = DateTime.Now };
+    
+    // Objeto temporal para la línea que se está escribiendo
+    private DetalleCompra nuevoDetalle = new();
+    
+    // Lista de detalles que se guardarán
+    private List<DetalleCompra> detalles = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        productos = await db.Producto.ToListAsync();
+        proveedores = await db.Proveedores.ToListAsync();
+    }
+
+    private void AgregarAlDetalle()
+    {
+        if (nuevoDetalle.ProductoId > 0 && nuevoDetalle.Cantidad > 0)
+        {
+            // Agregamos una copia a la lista
+            detalles.Add(new DetalleCompra
+            {
+                ProductoId = nuevoDetalle.ProductoId,
+                Cantidad = nuevoDetalle.Cantidad,
+                PrecioUnitario = nuevoDetalle.PrecioUnitario
+            });
+
+            // Limpiamos el objeto temporal para el siguiente producto
+            nuevoDetalle = new DetalleCompra();
+        }
+    }
+
+    private async Task GuardarCompra()
+    {
+        if (detalles.Count == 0) return;
+
+        try
+        {
+            // 1. Guardar la compra principal
+            db.CompraInventario.Add(compraInventario);
+            await db.SaveChangesAsync();
+
+            // 2. Asignar el ID de la compra a cada detalle y guardar
+            foreach (var item in detalles)
+            {
+                item.CompraId = compraInventario.Id;
+                db.DetalleCompra.Add(item);
+            }
+            
+            await db.SaveChangesAsync();
+            
+            // Limpiar todo después de guardar
+            compraInventario = new() { Fecha = DateTime.Now };
+            detalles.Clear();
+            // Aquí podrías redirigir o mostrar un mensaje de éxito
+        }
+        catch (Exception ex)
+        {
+            // Manejar error
+            Console.WriteLine(ex.Message);
+        }
+    }
+}
