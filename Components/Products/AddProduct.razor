@@ -40,6 +40,21 @@
                             <label class="form-label">Stock</label>
                             <InputNumber class="form-control" @bind-Value="producto.StockActual" />
                         </div>
+                                <div class="col-md-4">
+                            <label class="form-label">Stock Minimo</label>
+                            <InputNumber class="form-control" @bind-Value="producto.StockMinimo" />
+                        </div>
+
+
+                        <div class="col-md-4">
+                            <label class="form-label">Categoria</label>
+                            <InputSelect class="form-control" @bind-Value="producto.CategoriaId" >
+                            @foreach(var i in Categorias){
+                                <option value="@i.Id" > @i.Nombre</option>
+                            }
+                            </InputSelect>
+                        </div>
+                        
 
                     </div>
 
@@ -67,6 +82,14 @@
 
     private Producto producto = new Producto();
     private bool isVisible = false;
+
+    private List<Categoria> Categorias =new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Categorias = db.Categoria.ToList();
+    }
+
 
     public void Show()
     {
