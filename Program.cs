@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Pulperia.Data;
 using Pulperia.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,19 +11,17 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
-
-// SQL Server
-//builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+// SQLite
+builder.Services.AddDbContext<PulperiaDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Supabase
 var supabaseUrl = builder.Configuration["Supabase:Url"];
 var supabaseKey = builder.Configuration["Supabase:AnonKey"];
 
-
-var supabasePublic = new Supabase.Client(supabaseUrl,supabaseKey,  new Supabase.SupabaseOptions { Schema = "public" });
+var supabasePublic = new Supabase.Client(supabaseUrl, supabaseKey, new Supabase.SupabaseOptions { Schema = "public" });
 await supabasePublic.InitializeAsync();
 builder.Services.AddSingleton(supabasePublic);
-
 
 builder.Services.AddScoped<EmpleadoService>();
 
@@ -32,14 +31,11 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.MapBlazorHub();
