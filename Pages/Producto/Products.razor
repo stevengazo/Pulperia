@@ -221,7 +221,7 @@
             <p>@productosFiltrados.Count resultado@(productosFiltrados.Count != 1 ? "s" : "")</p>
         </div>
         <button class="btn-new" @onclick="AbrirModal">
-            <i class="bi bi-plus"></i> Nuevo producto
+            <i class="bi bi-plus-lg"></i> Nuevo producto
         </button>
     </div>
 
@@ -243,8 +243,8 @@
                 <tr>
                     <th>Producto</th>
                     <th>Categoría</th>
-                    <th class="num">Costo</th>
-                    <th class="num">Venta</th>
+                    <th class="num">Costo Total</th>
+                    <th class="num">Ventas Total</th>
                     <th class="ctr">Stock</th>
                     <th class="ctr">Acciones</th>
                 </tr>
@@ -258,49 +258,52 @@
                 }
                 @foreach (var p in productosFiltrados)
                 {
-                    var stockBajo = p.StockActual <= p.StockMinimo;
                     <tr>
                         <td>
                             <div class="td-name">@p.Nombre</div>
                             <div class="td-pres">@p.Presentacion</div>
                         </td>
                         <td>
-                            <span class="td-badge">@(p.Categoria?.Nombre ?? "—")</span>
+                            <span class="td-badge">@p.Categoria?.Nombre</span>
                         </td>
-                        <td class="td-num">₡@p.PrecioCosto.ToString("N2")</td>
-                        <td class="td-num">₡@p.PrecioVenta.ToString("N2")</td>
+                        <td class="td-num">
+                            ₡@GetCompraCosto(p.DetalleCompras.ToList())
+                        </td>
+                        <td class="td-num">
+                            ₡@GetVentas(p.DetalleVentas.ToList())
+                        </td>
                         <td class="td-ctr">
-                            <span class="@(stockBajo ? "stock-low" : "stock-ok")">
-                                <span class="stock-dot @(stockBajo ? "dot-low" : "dot-ok")"></span>
+                            <span class="@(p.StockActual <= p.StockMinimo ? "stock-low" : "stock-ok")">
+                                <span class="stock-dot @(p.StockActual <= p.StockMinimo ? "dot-low" : "dot-ok")"></span>
                                 @p.StockActual
                             </span>
                         </td>
-                        <td>
+                        <td class="td-ctr">
                             <div class="actions">
-                           <a class="btn-icon" href="/producto/@p.Id">
-    <i class="bi bi-eye"></i>
-</a>
-                                <button class="btn-icon" title="Editar">
-                                    <i class="bi bi-pencil"></i>
+                                <button class="btn-icon" title="Editar" >
+                                    <i class="bi bi-pencil-square"></i>
                                 </button>
-                                <button class="btn-icon" title="Eliminar"
-                                      >
+                                <button class="btn-icon" title="Eliminar">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
                         </td>
-                    </tr>
+                    </tr>                  
                 }
             </tbody>
         </table>
-        <div class="pg-count">@productosFiltrados.Count de @productos.Count productos</div>
+        <div class="pg-count">Mostrando @productosFiltrados.Count de @productos.Count productos</div>
     </div>
-
 </div>
 
 @code {
     private string filtro = "";
-    private string categoriaFiltro = "";
+    private string _categoriaFiltro = "";
+    private string categoriaFiltro 
+    { 
+        get => _categoriaFiltro; 
+        set { _categoriaFiltro = value; InvokeAsync(StateHasChanged); } 
+    }
 
     private AddProduct addProductModal;
     private List<Producto> productos = new();
@@ -316,14 +319,27 @@
              p.CategoriaId.ToString() == categoriaFiltro)
         ).ToList();
 
-    protected override void OnInitialized()
+    // Métodos de cálculo corregidos para devolver string formateado o decimal
+    private string GetVentas(List<DetalleVenta> ventas)
     {
-        CargarDatos();
+        return ventas.Sum(v => v.Cantidad * v.PrecioUnitarioHistorico).ToString("N2");
     }
+
+    private string GetCompraCosto(List<DetalleCompra> detalles)
+    {
+        return detalles.Sum(d => d.Cantidad * d.PrecioUnitario).ToString("N2");
+    }
+
+    protected override void OnInitialized() => CargarDatos();
 
     private void CargarDatos()
     {
-        productos = db.Producto.Include(e => e.Categoria).ToList();
+        productos = db.Producto
+            .Include(e => e.Categoria)
+            .Include(e => e.DetalleVentas)
+            .Include(e => e.DetalleCompras)
+            .AsNoTracking() // Mejora rendimiento para listas
+            .ToList();
         Categorias = db.Categoria.ToList();
     }
 
@@ -333,6 +349,7 @@
 
     private async Task Eliminar(int id)
     {
+        // En un sistema real, mejor usar un Modal de confirmación
         var p = await db.Producto.FindAsync(id);
         if (p is not null)
         {

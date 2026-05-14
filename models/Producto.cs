@@ -28,4 +28,7 @@ public class Producto
 
     // Relación ventas
     public ICollection<DetalleVenta> DetalleVentas { get; set; } = new List<DetalleVenta>();
+
+    public ICollection<DetalleCompra> DetalleCompras { get; set; } = new List<DetalleCompra>();
+
 }
