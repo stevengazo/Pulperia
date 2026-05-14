@@ -1,8 +1,8 @@
 @page "/inventario"
-@using Pulperia.Components.CompraInventario
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<PulperiaDbContext> DbFactory
 @inject NavigationManager Nav
 
-@* 1. Agregamos la referencia al componente modal y el evento de refresco *@
 <AddCompraInventario @ref="modalCompra" OnSaved="ActualizarDatos" />
 
 <div class="container-fluid py-4 bg-dark min-vh-100">
@@ -11,154 +11,353 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="text-white fw-bold mb-0">📦 Control de Inventario</h2>
-            <p class="text-white-50 small mb-0">Gestione sus productos y niveles de existencias</p>
+            <p class="text-white-50 small mb-0">
+                Gestione sus productos y niveles de existencias
+            </p>
         </div>
-        @* 2. El botón ahora llama a AbrirModalNuevo *@
-        <button class="btn btn-primary d-flex align-items-center gap-2 shadow" @onclick="AbrirModalNuevo">
-            <i class="bi bi-plus-lg"></i> Registrar Compra
+
+        <button class="btn btn-primary d-flex align-items-center gap-2 shadow"
+                @onclick="AbrirModalNuevo">
+
+            <i class="bi bi-plus-lg"></i>
+            Registrar Compra
         </button>
     </div>
 
-    @* Tarjetas de Estado *@
+    @* Tarjetas *@
     <div class="row g-3 mb-4">
+
         <div class="col-md-4">
             <div class="card bg-dark text-white border-secondary h-100 shadow-sm">
+
                 <div class="card-body d-flex align-items-center gap-3">
+
                     <div class="stats-icon bg-primary bg-opacity-10 text-primary">
                         <i class="bi bi-box-seam fs-3"></i>
                     </div>
+
                     <div>
-                        <h6 class="text-white-50 small mb-0">Total Productos</h6>
-                        <h3 class="mb-0 fw-bold">154</h3>
+                        <h6 class="text-white-50 small mb-0">
+                            Total Productos
+                        </h6>
+
+                        <h3 class="mb-0 fw-bold">
+                            @detalleCompras.Count
+                        </h3>
                     </div>
+
                 </div>
+
             </div>
         </div>
+
         <div class="col-md-4">
             <div class="card bg-dark text-white border-warning border-opacity-25 h-100 shadow-sm">
+
                 <div class="card-body d-flex align-items-center gap-3">
+
                     <div class="stats-icon bg-warning bg-opacity-10 text-warning">
                         <i class="bi bi-exclamation-triangle fs-3"></i>
                     </div>
+
                     <div>
-                        <h6 class="text-white-50 small mb-0">Stock Bajo</h6>
-                        <h3 class="mb-0 fw-bold text-warning">12</h3>
+                        <h6 class="text-white-50 small mb-0">
+                            Stock Bajo
+                        </h6>
+
+                        <h3 class="mb-0 fw-bold text-warning">
+                            @detalleCompras.Count(x => x.Producto.StockActual <= x.Producto.StockMinimo && x.Producto.StockActual > 0)
+                        </h3>
                     </div>
+
                 </div>
+
             </div>
         </div>
+
         <div class="col-md-4">
             <div class="card bg-dark text-white border-danger border-opacity-25 h-100 shadow-sm">
+
                 <div class="card-body d-flex align-items-center gap-3">
+
                     <div class="stats-icon bg-danger bg-opacity-10 text-danger">
                         <i class="bi bi-x-octagon fs-3"></i>
                     </div>
+
                     <div>
-                        <h6 class="text-white-50 small mb-0">Agotados</h6>
-                        <h3 class="mb-0 fw-bold text-danger">3</h3>
+                        <h6 class="text-white-50 small mb-0">
+                            Agotados
+                        </h6>
+
+                        <h3 class="mb-0 fw-bold text-danger">
+                            @detalleCompras.Count(x => x.Producto.StockActual <= 0)
+                        </h3>
                     </div>
+
                 </div>
+
             </div>
         </div>
+
     </div>
 
-    @* Filtros y Tabla *@
+    @* Tabla *@
     <div class="card bg-dark text-white border-secondary shadow">
+
         <div class="card-header border-secondary bg-transparent py-3">
+
             <div class="row g-2">
+
                 <div class="col-md-8">
+
                     <div class="input-group">
-                        <span class="input-group-text bg-dark border-secondary text-white-50"><i class="bi bi-search"></i></span>
-                        <input type="text" class="form-control bg-dark text-white border-secondary" 
-                               placeholder="Buscar por nombre, SKU o categoría..." @bind="filtro" @bind:event="oninput" />
+
+                        <span class="input-group-text bg-dark border-secondary text-white-50">
+                            <i class="bi bi-search"></i>
+                        </span>
+
+                        <input type="text"
+                               class="form-control bg-dark text-white border-secondary"
+                               placeholder="Buscar por nombre, SKU o proveedor..."
+                               @bind="filtro"
+                               @bind:event="oninput" />
+
                     </div>
+
                 </div>
+
                 <div class="col-md-4">
+
                     <select class="form-select bg-dark text-white border-secondary">
+
                         <option value="">Todas las categorías</option>
                         <option value="Abarrotes">Abarrotes</option>
                         <option value="Lacteos">Lácteos</option>
                         <option value="Bebidas">Bebidas</option>
+
                     </select>
+
                 </div>
+
             </div>
+
         </div>
+
         <div class="card-body p-0">
+
             <div class="table-responsive">
+
                 <table class="table table-dark table-hover align-middle mb-0">
+
                     <thead class="text-white-50 small border-secondary">
+
                         <tr>
-                            <th class="ps-4">SKU</th>
+                            <th class="ps-4">Proveedor</th>
+                            <th>Fecha</th>
                             <th>Producto</th>
-                            <th>Categoría</th>
-                            <th class="text-end">Precio Venta</th>
-                            <th class="text-center">Stock</th>
-                            <th class="text-center pe-4">Acciones</th>
+                            <th class="text-center">Cantidad</th>
+                            <th class="text-end">Costo</th>
+                            <th class="text-end">Venta</th>
+                            <th class="text-center pe-4">Estado</th>
                         </tr>
+
                     </thead>
+
                     <tbody>
-                        @* Aquí iría el renderizado de tus productos *@
-                        <tr>
-                            <td class="ps-4 text-white-50">PROD-001</td>
-                            <td class="fw-bold">Leche Entera 1L</td>
-                            <td><span class="badge bg-secondary">Lácteos</span></td>
-                            <td class="text-end">₡950.00</td>
-                            <td class="text-center"><span class="badge bg-success">45</span></td>
-                            <td class="text-center pe-4">
-                                <button class="btn btn-sm btn-outline-light"><i class="bi bi-pencil"></i></button>
-                            </td>
-                        </tr>
+
+                        @foreach(var i in detalleCompras.Where(x =>
+                       string.IsNullOrWhiteSpace(filtro)
+                       || x.Producto.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)
+                       || x.CompraInventario.Proveedor.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)
+                       || x.Producto.Id.ToString().Contains(filtro)
+                       ))
+                        {
+                            <tr>
+
+                                <td class="ps-4 fw-semibold text-info">
+                                    @i.CompraInventario.Proveedor.Nombre
+                                </td>
+
+                                <td class="text-white-50">
+                                    @i.CompraInventario.Fecha.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td>
+
+                                    <div class="fw-semibold text-white">
+                                        @i.Producto.Nombre
+                                    </div>
+
+                                    <small class="text-white-50">
+                                        SKU: @i.Producto.Id
+                                    </small>
+
+                                </td>
+
+                                <td class="text-center fw-semibold">
+                                    @i.Cantidad
+                                </td>
+
+                                <td class="text-end text-warning fw-semibold">
+                                    ₡@i.PrecioUnitario.ToString("N2")
+                                </td>
+
+                                <td class="text-end text-success fw-bold">
+                                    ₡@i.Producto.PrecioVenta.ToString("N2")
+                                </td>
+
+                                <td class="text-center pe-4">
+
+                                    @if(i.Producto.StockActual <= 0)
+                                    {
+                                        <span class="badge bg-danger">
+                                            Agotado
+                                        </span>
+                                    }
+                                    else if(i.Producto.StockActual <= i.Producto.StockMinimo)
+                                    {
+                                        <span class="badge bg-warning text-dark">
+                                            Bajo
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success">
+                                            Disponible
+                                        </span>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+
                     </tbody>
+
                 </table>
+
             </div>
+
         </div>
+
     </div>
+
 </div>
 
 <style>
+
     .stats-icon {
         width: 50px;
         height: 50px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border-radius: 12px;
+        border-radius: 14px;
+    }
+
+    .card {
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .table {
+        margin-bottom: 0;
     }
 
     .table thead th {
-        font-weight: 500;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: .6px;
+        font-size: .75rem;
+        color: rgba(255,255,255,.65);
         border-top: none;
-        background-color: rgba(0,0,0,0.2);
+        border-bottom: 1px solid rgba(255,255,255,.08);
+        background: rgba(255,255,255,.02);
+        padding-top: 16px;
+        padding-bottom: 16px;
     }
 
     .table tbody tr {
-        border-color: rgba(255,255,255,0.05);
+        border-color: rgba(255,255,255,.05);
+        transition: all .15s ease-in-out;
     }
 
-    .btn-group .btn:hover {
-        background-color: rgba(255,255,255,0.1);
+    .table tbody tr:hover {
+        background: rgba(255,255,255,.03);
     }
+
+    .table tbody td {
+        padding-top: 16px;
+        padding-bottom: 16px;
+        vertical-align: middle;
+    }
+
+    .form-control,
+    .form-select,
+    .input-group-text {
+        min-height: 46px;
+    }
+
+    .form-control:focus,
+    .form-select:focus {
+        box-shadow: none;
+        border-color: #0d6efd;
+    }
+
+    .btn {
+        border-radius: 12px;
+    }
+
+    .badge {
+        padding: 8px 12px;
+        font-size: .72rem;
+        font-weight: 600;
+        border-radius: 10px;
+    }
+
 </style>
 
 @code {
+
     private string filtro = "";
-    
+
     // Referencia al componente modal
     private AddCompraInventario modalCompra;
 
-    private void AbrirModalNuevo() 
+    private PulperiaDbContext db;
+    private List<DetalleCompra> detalleCompras = new();
+
+    protected override async Task OnInitializedAsync()
     {
-        // 3. Llamamos al método Show() del componente hijo
+        db = DbFactory.CreateDbContext();
+        try
+        {
+            detalleCompras = await db.DetalleCompra
+                .Include(e => e.Producto)
+                .Include(e => e.CompraInventario)
+                .ThenInclude(e => e.Proveedor)
+                .ToListAsync();
+        }
+        catch(Exception f)
+        {
+            Console.WriteLine(f.Message);
+        }
+    }
+
+    private void AbrirModalNuevo()
+    {
         modalCompra.Show();
     }
 
     private async Task ActualizarDatos()
     {
-        // 4. Esta lógica se ejecuta cuando el modal guarda con éxito
-        // Aquí deberías volver a cargar la lista de productos de la DB
-        Console.WriteLine("La compra se guardó, refrescando inventario...");
+        detalleCompras = await db.DetalleCompra
+            .Include(e => e.Producto)
+            .Include(e => e.CompraInventario)
+            .ThenInclude(e => e.Proveedor)
+            .ToListAsync();
+
         StateHasChanged();
     }
+
 }

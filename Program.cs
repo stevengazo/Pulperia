@@ -12,7 +12,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
 // SQLite
-builder.Services.AddDbContext<PulperiaDbContext>(options =>
+builder.Services.AddDbContextFactory<PulperiaDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Supabase
