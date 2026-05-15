@@ -80,7 +80,9 @@ obj/Debug/net8.0/
  Pulperia.RazorAssemblyInfo.cs
 Pages/Error.cshtml.cs
 Program.cs
-Services/EmpleadoService.cs
+Services/
+ AppSessionService.cs
+ EmpleadoService.cs
 
 [metadataReferences]
 <DOTNET>/packs/Microsoft.AspNetCore.App.Ref/8.0.26/ref/net8.0/
@@ -469,6 +471,7 @@ Components/
  Products/AddProduct.razor
  Proveedor/AddProveedor.razor
 Pages/
+ Auth/LoginPage.razor
  Counter.razor
  Empleado/
   Empleado.razor
@@ -501,6 +504,7 @@ Components/
  Products/AddProduct.razor
  Proveedor/AddProveedor.razor
 Pages/
+ Auth/LoginPage.razor
  Counter.razor
  Empleado/
   Empleado.razor

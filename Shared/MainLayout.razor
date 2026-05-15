@@ -1,23 +1,40 @@
 ﻿@inherits LayoutComponentBase
 
+@inject AppSessionService Session
+
 <PageTitle>Pulpería - Sistema POS</PageTitle>
 
 <div class="layout">
-    <aside class="sidebar">
-        <div class="brand">
-            <span class="brand-icon">P</span>
-            <span class="brand-name">Pulpe<span class="brand-accent">POS</span></span>
-        </div>
-        <NavMenu />
-    </aside>
+
+    @if (Session.IsAuthenticated)
+    {
+        <aside class="sidebar">
+            <div class="brand">
+                <span class="brand-icon">P</span>
+                <span class="brand-name">Pulpe<span class="brand-accent">POS</span></span>
+            </div>
+            <NavMenu />
+        </aside>
+    }
+
 
     <div class="main-area">
-        <header class="topbar">
-            <div class="topbar-right">
-                <span class="user-label">
-                    <i class="bi bi-person-circle text-white "></i> Administrador
-                </span>
-                <a href="logout" class="btn-logout">Salir</a>
+
+        <header class="topbar p-2">
+
+            <div class="topbar-right d-flex flex-row gap-2">
+                @if (!Session.IsAuthenticated)
+                {
+                    <a href="/login">iniciar Sesion</a>
+                }
+                else
+                {
+                    <span class="user-label">
+                        <i class="bi bi-person-circle text-white "></i> @Session?.CurrentUser?.Email
+                    </span>
+                    <a href="logout" class="btn-logout">Salir</a>
+
+                }
             </div>
         </header>
 
@@ -28,20 +45,27 @@
 </div>
 
 <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-        --bg: #000000;
-        --surface: #0e0e11;
-        --border: #17171c;
-        --text: #d8d8e0;
-        --muted: #3a3a46;
-        --accent: #7c6bff;
-        --accent-dim: #16142a;
-        --sidebar-w: 220px;
-        --topbar-h: 50px;
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
     }
 
+:root {
+    --bg: #000000;
+    --surface: #0e0e11;
+    --border: #17171c;
+    --text: #d8d8e0;
+    --muted: #3a3a46;
+
+    --accent: #ffaa43;
+    --accent-dim: #2a1a06;
+
+    --sidebar-w: 220px;
+    --topbar-h: 50px;
+}
     .layout {
         display: flex;
         background: var(--bg);
@@ -54,7 +78,8 @@
         background: var(--surface);
         border-right: 0.5px solid var(--border);
         position: fixed;
-        top: 0; left: 0;
+        top: 0;
+        left: 0;
         height: 100vh;
         display: flex;
         flex-direction: column;
@@ -90,11 +115,13 @@
         letter-spacing: -0.01em;
     }
 
-    .brand-accent { color: var(--accent); }
+    .brand-accent {
+        color: var(--accent);
+    }
 
     .main-area {
         height: 100vh;
-       margin-left: var(--sidebar-w);
+        margin-left: var(--sidebar-w);
         flex: 1;
         display: flex;
         flex-direction: column;
@@ -134,7 +161,10 @@
         transition: color 0.15s, border-color 0.15s;
     }
 
-    .btn-logout:hover { color: #e2734a; border-color: #e2734a44; }
+    .btn-logout:hover {
+        color: #e2734a;
+        border-color: #e2734a44;
+    }
 
     .content {
         flex: 1;
@@ -142,8 +172,20 @@
         background: var(--bg);
     }
 
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: #202026; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+    ::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #202026;
+        border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: var(--muted);
+    }
 </style>
