@@ -1,4 +1,4 @@
-@page "/nueva-venta"
+   @page "/nueva-venta"
 
 @inject IDbContextFactory<PulperiaDbContext> DbFactory
 @inject EmpleadoService empleadoService
@@ -27,7 +27,7 @@
                                 <option value="0">Seleccione producto...</option>
                                 @foreach (var p in productos)
                                 {
-                                    <option value="@p.Id">@p.Nombre — @p.Presentacion</option>
+                                    <option value="@p.Id">@p.Nombre — @p.Presentacion (Stock: @p.StockActual)</option>
                                 }
                             </select>
                         </div>
@@ -78,7 +78,8 @@
                                                         @onclick="() => CambiarCantidad(item, -1)">−</button>
                                                 <span class="btn btn-dark disabled px-2">@item.Cantidad</span>
                                                 <button class="btn btn-outline-secondary px-2"
-                                                        @onclick="() => CambiarCantidad(item, 1)">+</button>
+                                                        @onclick="() => CambiarCantidad(item, 1)"
+                                                        disabled="@(item.Cantidad >= item.Producto.StockActual)">+</button>
                                             </div>
                                         </td>
                                         <td class="text-end small fw-semibold">
@@ -160,6 +161,7 @@
 
     </div>
 </div>
+
 @code {
     private PulperiaDbContext db = default!;
     private List<Empleado> empleados = new();
@@ -188,7 +190,6 @@
             .OrderBy(p => p.Nombre)
             .ToList();
 
-        // Calcular próximo folio
         ventaId = db.Venta.Any() ? db.Venta.Max(v => v.Id) + 1 : 1;
     }
 
@@ -198,7 +199,16 @@
         var producto = productos.FirstOrDefault(p => p.Id == productoSeleccionadoId);
         if (producto == null) return;
 
+        // Cantidad ya en carrito para este producto
         var existente = carrito.FirstOrDefault(c => c.ProductoId == producto.Id);
+        int cantidadActual = existente?.Cantidad ?? 0;
+
+        if (cantidadActual + cantidad > producto.StockActual)
+        {
+            errorMsg = $"Stock insuficiente. Disponible: {producto.StockActual - cantidadActual} unidad(es).";
+            return;
+        }
+
         if (existente != null)
         {
             existente.Cantidad += cantidad;
@@ -211,7 +221,7 @@
                 Producto = producto,
                 Cantidad = cantidad,
                 PrecioUnitarioHistorico = producto.PrecioVenta * cantidad,
-                 CostoUnitarioHistorico = producto.PrecioVenta
+                CostoUnitarioHistorico = producto.PrecioVenta
             });
         }
 
@@ -221,9 +231,22 @@
 
     void CambiarCantidad(DetalleVenta item, int delta)
     {
-        item.Cantidad += delta;
-        if (item.Cantidad <= 0)
+        int nueva = item.Cantidad + delta;
+
+        if (nueva <= 0)
+        {
             carrito.Remove(item);
+            return;
+        }
+
+        if (nueva > item.Producto.StockActual)
+        {
+            errorMsg = $"Stock máximo disponible: {item.Producto.StockActual} unidad(es).";
+            return;
+        }
+
+        errorMsg = "";
+        item.Cantidad = nueva;
     }
 
     async Task Procesar()
@@ -239,18 +262,17 @@
             MontoRecibido = metodoPago == "Efectivo" ? pagoCon : Total,
             Cambio = Cambio,
             Notas = "",
-            ClienteId = empleadoId == "" ? null : empleadoId.ToString() // ← aquí
+            ClienteId = empleadoId == "" ? null : empleadoId.ToString()
         };
 
         db.Venta.Add(venta);
-        await db.SaveChangesAsync(); // Para obtener el Id generado
+        await db.SaveChangesAsync();
 
         foreach (var item in carrito)
         {
             item.VentaId = venta.Id;
             db.DetalleVenta.Add(item);
 
-            // Descontar stock
             var prod = db.Producto.Find(item.ProductoId);
             if (prod != null)
                 prod.StockActual -= item.Cantidad;

@@ -156,23 +156,24 @@
                 }
             </div>
 
-            <!-- ITEMS -->
-            @foreach (var item in venta.DetalleVentas)
-            {
-                <div class="item">
+<!-- ITEMS -->
+@foreach (var item in venta.DetalleVentas)
+{
+    <div class="item">
 
-                    <div class="line">
-                        <div class="name">@item.Producto.Nombre</div>
-                        <div>₡@item.CostoUnitarioHistorico</div>
-                    </div>
+        <div class="line">
+            <div class="name">@item.Producto.Nombre</div>
+            <div>₡@item.CostoUnitarioHistorico</div>
+            <div>₡@(item.PrecioUnitarioHistorico * item.Cantidad)</div>
+        </div>
 
-                    <div class="line muted">
-                        <div>@item.Producto.Presentacion</div>
-                        <div>Cant: @item.Cantidad</div>
-                    </div>
+        <div class="line muted">
+            <div>@item.Producto.Presentacion</div>
+            <div>Cant: @item.Cantidad</div>
+        </div>
 
-                </div>
-            }
+    </div>
+}
 
             <!-- TOTAL -->
             <div class="total">
