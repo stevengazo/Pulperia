@@ -1,48 +1,73 @@
 ﻿@inherits LayoutComponentBase
 
 @inject AppSessionService Session
+@inject NavigationManager Navigation
 
 <PageTitle>Pulpería - Sistema POS</PageTitle>
 
-<div class="layout">
+@code {
+    private bool IsLoginPage =>
+        Navigation.Uri.Contains("/login", StringComparison.OrdinalIgnoreCase);
+}
 
-    @if (Session.IsAuthenticated)
-    {
-        <aside class="sidebar">
-            <div class="brand">
-                <span class="brand-icon">P</span>
-                <span class="brand-name">Pulpe<span class="brand-accent">POS</span></span>
-            </div>
-            <NavMenu />
-        </aside>
-    }
+@if (IsLoginPage)
+{
+    @Body
+}
+else
+{
+    <div class="layout">
 
-
-    <div class="main-area">
-
-        <header class="topbar p-2">
-
-            <div class="topbar-right d-flex flex-row gap-2">
-                @if (!Session.IsAuthenticated)
-                {
-                    <a href="/login">iniciar Sesion</a>
-                }
-                else
-                {
-                    <span class="user-label">
-                        <i class="bi bi-person-circle text-white "></i> @Session?.CurrentUser?.Email
+        @if (Session.IsAuthenticated)
+        {
+            <aside class="sidebar">
+                <div class="brand">
+                    <span class="brand-icon">P</span>
+                    <span class="brand-name">
+                        Pulpe<span class="brand-accent">POS</span>
                     </span>
-                    <a href="logout" class="btn-logout">Salir</a>
+                </div>
 
-                }
-            </div>
-        </header>
+                <NavMenu />
+            </aside>
+        }
 
-        <article class="content">
-            @Body
-        </article>
+        <div class="main-area @(Session.IsAuthenticated ? "" : "full-width")">
+
+            <header class="topbar p-2">
+
+                <div class="topbar-right d-flex flex-row gap-2">
+
+                    @if (!Session.IsAuthenticated)
+                    {
+                        <a href="/login" class="login-link">
+                            Iniciar Sesión
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="user-label">
+                            <i class="bi bi-person-circle text-white"></i>
+                            @Session?.CurrentUser?.Email
+                        </span>
+
+                        <a href="logout" class="btn-logout">
+                            Salir
+                        </a>
+                    }
+
+                </div>
+
+            </header>
+
+            <article class="content">
+                @Body
+            </article>
+
+        </div>
+
     </div>
-</div>
+}
 
 <style>
     *,
@@ -53,24 +78,26 @@
         padding: 0;
     }
 
-:root {
-    --bg: #000000;
-    --surface: #0e0e11;
-    --border: #17171c;
-    --text: #d8d8e0;
-    --muted: #3a3a46;
+    :root {
+        --bg: #000000;
+        --surface: #0e0e11;
+        --border: #17171c;
+        --text: #d8d8e0;
+        --muted: #3a3a46;
 
-    --accent: #ffaa43;
-    --accent-dim: #2a1a06;
+        --accent: #ffaa43;
+        --accent-dim: #2a1a06;
 
-    --sidebar-w: 220px;
-    --topbar-h: 50px;
-}
+        --sidebar-w: 220px;
+        --topbar-h: 50px;
+    }
+
     .layout {
         display: flex;
         background: var(--bg);
         color: var(--text);
         font-family: 'DM Sans', system-ui, sans-serif;
+        min-height: 100vh;
     }
 
     .sidebar {
@@ -127,6 +154,10 @@
         flex-direction: column;
     }
 
+    .main-area.full-width {
+        margin-left: 0;
+    }
+
     .topbar {
         height: var(--topbar-h);
         background: var(--surface);
@@ -134,7 +165,7 @@
         display: flex;
         align-items: center;
         justify-content: flex-end;
-        padding: 0 24px;
+        padding: 0 16px;
         position: sticky;
         top: 0;
         z-index: 50;
@@ -143,12 +174,15 @@
     .topbar-right {
         display: flex;
         align-items: center;
-        gap: 0px;
+        gap: 12px;
     }
 
     .user-label {
         font-size: 12px;
         color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .btn-logout {
@@ -164,6 +198,20 @@
     .btn-logout:hover {
         color: #e2734a;
         border-color: #e2734a44;
+    }
+
+    .login-link {
+        color: var(--accent);
+        text-decoration: none;
+        font-size: 13px;
+        border: 1px solid var(--accent);
+        padding: 6px 12px;
+        border-radius: 6px;
+    }
+
+    .login-link:hover {
+        background: var(--accent);
+        color: #000;
     }
 
     .content {

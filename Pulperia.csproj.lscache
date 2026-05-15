@@ -470,8 +470,10 @@ Components/
  CompraInventario/AddCompraInventario.razor
  Products/AddProduct.razor
  Proveedor/AddProveedor.razor
+Pages/Auth/
+ LoginPage.razor
+ UserValidator.razor
 Pages/
- Auth/LoginPage.razor
  Counter.razor
  Empleado/
   Empleado.razor
@@ -503,8 +505,10 @@ Components/
  CompraInventario/AddCompraInventario.razor
  Products/AddProduct.razor
  Proveedor/AddProveedor.razor
+Pages/Auth/
+ LoginPage.razor
+ UserValidator.razor
 Pages/
- Auth/LoginPage.razor
  Counter.razor
  Empleado/
   Empleado.razor

@@ -2,282 +2,463 @@
 @using Microsoft.EntityFrameworkCore
 @using Pulperia.Models
 @inject EmpleadoService emp;
-
 @inject IDbContextFactory<PulperiaDbContext> dbContextFactory
 
 <PageTitle>Dashboard</PageTitle>
+<UserValidator>
+<div class="dashboard-wrapper">
 
-<div class="container-fluid py-4 bg-dark text-light min-vh-100">
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- HEADER -->
+    <div class="dash-header">
         <div>
-            <h2 class="fw-bold mb-1">Dashboard</h2>
-            <p class="text-secondary mb-0">
-                Estadísticas generales de la pulpería
-            </p>
+            <h2 class="dash-title">Dashboard</h2>
+            <p class="dash-subtitle">Estadísticas generales de la pulpería</p>
+        </div>
+        <div class="dash-date">
+            <i class="bi bi-calendar3"></i>
+            @DateTime.Now.ToString("dd MMM yyyy")
         </div>
     </div>
 
-    <!-- CARDS -->
-    <div class="row g-4 mb-4">
+    <!-- CARDS SUPERIORES -->
+    <div class="row g-3 mb-4">
 
-        <div class="col-md-3">
-            <div class="card border-0 shadow-lg bg-dark-card h-100">
-                <div class="card-body">
-                    <p class="text-secondary mb-2">
-                        Productos
-                    </p>
-
-                    <h2 class="fw-bold text-info">
-                        @TotalProductos
-                    </h2>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(255,170,67,0.12); color: #ffaa43;">
+                    <i class="bi bi-box-seam-fill"></i>
                 </div>
+                <p class="stat-label">Productos</p>
+                <h3 class="stat-value" style="color: #ffaa43;">@TotalProductos</h3>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card border-0 shadow-lg bg-dark-card h-100">
-                <div class="card-body">
-                    <p class="text-secondary mb-2">
-                        Categorías
-                    </p>
-
-                    <h2 class="fw-bold text-warning">
-                        @TotalCategorias
-                    </h2>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(139,92,246,0.12); color: #a78bfa;">
+                    <i class="bi bi-tag-fill"></i>
                 </div>
+                <p class="stat-label">Categorías</p>
+                <h3 class="stat-value" style="color: #a78bfa;">@TotalCategorias</h3>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card border-0 shadow-lg bg-dark-card h-100">
-                <div class="card-body">
-                    <p class="text-secondary mb-2">
-                        Ventas
-                    </p>
-
-                    <h2 class="fw-bold text-success">
-                        ₡@TotalVentas.ToString("N2")
-                    </h2>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(34,197,94,0.12); color: #4ade80;">
+                    <i class="bi bi-graph-up-arrow"></i>
                 </div>
+                <p class="stat-label">Total Ventas</p>
+                <h3 class="stat-value" style="color: #4ade80;">₡@TotalVentas.ToString("N0")</h3>
             </div>
         </div>
 
-        <div class="col-md-3">
-            <div class="card border-0 shadow-lg bg-dark-card h-100">
-                <div class="card-body">
-                    <p class="text-secondary mb-2">
-                        Compras
-                    </p>
-
-                    <h2 class="fw-bold text-danger">
-                        ₡@TotalCompras.ToString("N2")
-                    </h2>
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(248,113,113,0.12); color: #f87171;">
+                    <i class="bi bi-cart-dash-fill"></i>
                 </div>
+                <p class="stat-label">Total Compras</p>
+                <h3 class="stat-value" style="color: #f87171;">₡@TotalCompras.ToString("N0")</h3>
             </div>
         </div>
 
     </div>
 
-    <!-- SEGUNDA FILA -->
-    <div class="row g-4">
+    <!-- SEGUNDA FILA: TABLAS -->
+    <div class="row g-3 mb-4">
 
-        <!-- PRODUCTOS BAJO STOCK -->
+        <!-- BAJO STOCK -->
         <div class="col-lg-6">
-            <div class="card border-0 shadow-lg bg-dark-card h-100">
-                <div class="card-header border-0 bg-transparent">
-                    <h5 class="fw-bold mb-0">
-                        Productos con bajo stock
-                    </h5>
+            <div class="dash-card h-100">
+                <div class="dash-card-header">
+                    <span class="dash-card-dot" style="background:#f87171;"></span>
+                    <h6 class="dash-card-title">Productos con bajo stock</h6>
                 </div>
 
-                <div class="card-body">
-
+                <div class="dash-card-body">
                     @if (ProductosBajoStock.Any())
                     {
-                        <div class="table-responsive">
-                            <table class="table table-dark table-hover align-middle">
-                                <thead>
+                        <table class="dash-table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Stock</th>
+                                    <th>Mínimo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in ProductosBajoStock)
+                                {
                                     <tr>
-                                        <th>Producto</th>
-                                        <th>Stock</th>
-                                        <th>Mínimo</th>
+                                        <td>@item.Nombre</td>
+                                        <td><span class="badge-danger">@item.StockActual</span></td>
+                                        <td class="text-muted-soft">@item.StockMinimo</td>
                                     </tr>
-                                </thead>
-
-                                <tbody>
-                                    @foreach (var item in ProductosBajoStock)
-                                    {
-                                        <tr>
-                                            <td>@item.Nombre</td>
-
-                                            <td>
-                                                <span class="badge bg-danger">
-                                                    @item.StockActual
-                                                </span>
-                                            </td>
-
-                                            <td>@item.StockMinimo</td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                                }
+                            </tbody>
+                        </table>
                     }
                     else
                     {
-                        <div class="text-secondary">
-                            No hay productos con bajo stock.
+                        <div class="empty-state">
+                            <i class="bi bi-check-circle"></i>
+                            <span>Todo el stock está bien</span>
                         </div>
                     }
-
                 </div>
             </div>
         </div>
 
-        <!-- PRODUCTOS MÁS VENDIDOS -->
+        <!-- TOP PRODUCTOS -->
         <div class="col-lg-6">
-            <div class="card border-0 shadow-lg bg-dark-card h-100">
-                <div class="card-header border-0 bg-transparent">
-                    <h5 class="fw-bold mb-0">
-                        Productos más vendidos
-                    </h5>
+            <div class="dash-card h-100">
+                <div class="dash-card-header">
+                    <span class="dash-card-dot" style="background:#ffaa43;"></span>
+                    <h6 class="dash-card-title">Productos más vendidos</h6>
                 </div>
 
-                <div class="card-body">
-
+                <div class="dash-card-body">
                     @if (TopProductos.Any())
                     {
-                        <div class="table-responsive">
-                            <table class="table table-dark table-hover align-middle">
-                                <thead>
+                        <table class="dash-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Producto</th>
+                                    <th>Vendidos</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @{int rank = 1;}
+                                @foreach (var item in TopProductos)
+                                {
                                     <tr>
-                                        <th>Producto</th>
-                                        <th>Vendidos</th>
+                                        <td class="rank-cell">@(rank++)</td>
+                                        <td>@item.Nombre</td>
+                                        <td><span class="badge-accent">@item.TotalVendido</span></td>
                                     </tr>
-                                </thead>
-
-                                <tbody>
-                                    @foreach (var item in TopProductos)
-                                    {
-                                        <tr>
-                                            <td>@item.Nombre</td>
-
-                                            <td>
-                                                <span class="badge bg-success">
-                                                    @item.TotalVendido
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                                }
+                            </tbody>
+                        </table>
                     }
                     else
                     {
-                        <div class="text-secondary">
-                            No hay ventas registradas.
+                        <div class="empty-state">
+                            <i class="bi bi-bar-chart"></i>
+                            <span>Sin ventas registradas</span>
                         </div>
                     }
-
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- VISUAL EMPLEADOS -->
-    <div class="row g-4 mt-1">
-
+    <!-- BARRAS EMPLEADOS -->
+    <div class="row g-3">
         <div class="col-12">
-            <div class="card border-0 shadow-lg bg-dark-card">
-                
-                <div class="card-header border-0 bg-transparent">
-                    <h5 class="fw-bold mb-0">
-                        Ventas realizadas a empleados
-                    </h5>
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <span class="dash-card-dot" style="background:#4ade80;"></span>
+                    <h6 class="dash-card-title">Ventas por empleado</h6>
                 </div>
 
-                <div class="card-body">
-
+                <div class="dash-card-body">
                     @if (comprasEmpleados.Any())
                     {
                         @foreach (var item in comprasEmpleados.OrderByDescending(e => e.Value))
                         {
-                            var porcentaje = TotalVentas > 0
-                            ? (item.Value / TotalVentas) * 100
-                            : 0;
+                            var porcentaje = TotalVentas > 0 ? (item.Value / TotalVentas) * 100 : 0;
 
-                            <div class="mb-4">
-
-                                <div class="d-flex justify-content-between mb-2">
-                                    <span class="fw-semibold">
-                                        @item.Key
-                                    </span>
-
-                                    <span class="text-success fw-bold">
-                                        ₡@item.Value.ToString("N2")
-                                    </span>
+                            <div class="emp-row">
+                                <div class="emp-info">
+                                    <span class="emp-name">@item.Key</span>
+                                    <span class="emp-amount">₡@item.Value.ToString("N2")</span>
                                 </div>
-
-                                <div class="progress custom-progress">
-                                    <div class="progress-bar bg-success"
-                                         role="progressbar"
-                                         style="width: @porcentaje%">
-                                    </div>
+                                <div class="emp-bar-track">
+                                    <div class="emp-bar-fill" style="width: @porcentaje%"></div>
                                 </div>
-
                             </div>
                         }
                     }
                     else
                     {
-                        <div class="text-secondary">
-                            No hay ventas registradas para empleados.
+                        <div class="empty-state">
+                            <i class="bi bi-people"></i>
+                            <span>Sin ventas a empleados</span>
                         </div>
                     }
-
                 </div>
-
             </div>
         </div>
-
     </div>
 
 </div>
+</UserValidator>
 
 <style>
-    body {
-        background-color: #0f1115;
+    :root {
+        --accent:       #ffaa43;
+        --accent-glow:  rgba(255, 170, 67, 0.12);
+        --bg:           #0f1117;
+        --surface:      #181c27;
+        --surface-2:    #1e2333;
+        --border:       rgba(255,255,255,0.06);
+        --text:         rgba(255,255,255,0.85);
+        --text-muted:   rgba(255,255,255,0.4);
     }
 
-    .bg-dark-card {
-        background-color: #1a1d24;
-        border-radius: 18px;
+    /* Layout */
+    .dashboard-wrapper {
+        padding: 2rem;
+        background-color: var(--bg);
+        min-height: 100vh;
+        color: var(--text);
     }
 
-    .table {
+    /* Header */
+    .dash-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 2rem;
+    }
+
+    .dash-title {
+        font-size: 1.6rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--text);
+        margin-bottom: 0.15rem;
+    }
+
+    .dash-subtitle {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    .dash-date {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 0.4rem 0.85rem;
+        border-radius: 20px;
+    }
+
+    /* Stat cards */
+    .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.25rem;
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(255,255,255,0.12);
+    }
+
+    .stat-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        font-size: 1.05rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .stat-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        margin-bottom: 0.25rem;
+    }
+
+    .stat-value {
+        font-size: 1.55rem;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -0.02em;
+    }
+
+    /* Dash card contenedor */
+    .dash-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+        transition: transform 0.2s ease;
+    }
+
+    .dash-card:hover {
+        transform: translateY(-2px);
+    }
+
+    .dash-card-header {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .dash-card-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .dash-card-title {
+        font-size: 0.875rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text);
+        letter-spacing: 0.01em;
+    }
+
+    .dash-card-body {
+        padding: 1.25rem;
+    }
+
+    /* Tabla */
+    .dash-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+    }
+
+    .dash-table thead tr {
+        border-bottom: 1px solid var(--border);
+    }
+
+    .dash-table th {
+        padding: 0.5rem 0.75rem;
+        color: var(--text-muted);
+        font-weight: 600;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+    }
+
+    .dash-table td {
+        padding: 0.65rem 0.75rem;
+        color: var(--text);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .dash-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .dash-table tbody tr:hover td {
+        background: rgba(255,255,255,0.03);
+    }
+
+    .rank-cell {
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        font-weight: 700;
+        width: 30px;
+    }
+
+    .text-muted-soft {
+        color: var(--text-muted);
+    }
+
+    /* Badges */
+    .badge-danger {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        background: rgba(248,113,113,0.15);
+        color: #f87171;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    .badge-accent {
+        display: inline-block;
+        padding: 0.2rem 0.6rem;
+        background: var(--accent-glow);
+        color: var(--accent);
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+
+    /* Empty state */
+    .empty-state {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        padding: 0.5rem 0;
+    }
+
+    /* Barras empleados */
+    .emp-row {
+        margin-bottom: 1.1rem;
+    }
+
+    .emp-row:last-child {
         margin-bottom: 0;
     }
 
-    .card {
-        transition: .2s ease-in-out;
+    .emp-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.4rem;
     }
 
-    .card:hover {
-        transform: translateY(-3px);
+    .emp-name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text);
     }
 
-    .custom-progress {
-        height: 14px;
-        background-color: #2b3038;
-        border-radius: 20px;
+    .emp-amount {
+        font-size: 0.875rem;
+        font-weight: 700;
+        color: var(--accent);
+    }
+
+    .emp-bar-track {
+        height: 6px;
+        background: var(--surface-2);
+        border-radius: 99px;
         overflow: hidden;
     }
 
-    .progress-bar {
-        border-radius: 20px;
+    .emp-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--accent), #ffcc80);
+        border-radius: 99px;
+        transition: width 0.6s ease;
+    }
+
+    /* Responsive */
+    @@media (max-width: 767.98px) {
+        .dashboard-wrapper {
+            padding: 1rem;
+        }
+
+        .dash-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
     }
 </style>
 
@@ -323,7 +504,6 @@
             if (ventasPorEmpleado.Any())
             {
                 var montoVendido = ventasPorEmpleado.Sum(e => e.MontoRecibido);
-
                 comprasEmpleados.Add($"{e.Nombre} {e.Apellido}", montoVendido);
             }
         }
@@ -357,8 +537,6 @@
     public class TopProductoDto
     {
         public string Nombre { get; set; }
-
         public int TotalVendido { get; set; }
     }
-
 }

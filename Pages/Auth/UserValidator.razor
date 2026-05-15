@@ -1,0 +1,100 @@
+@inject IDbContextFactory<PulperiaDbContext> DbContextFactory
+@inject AppSessionService Session
+
+@if (Session?.CurrentUser == null)
+{
+    <div class="auth-required">
+        <h3>Sesión requerida</h3>
+
+        <p>
+            Debes iniciar sesión para acceder a este contenido.
+        </p>
+
+        <a href="/login" class="login-btn">
+            Ir a login
+        </a>
+    </div>
+}
+else
+{
+    @ChildContent
+}
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        ValidateProps();
+    }
+
+    private void ValidateProps()
+    {
+        if (ChildContent is null)
+        {
+            throw new ArgumentException(
+                "Este componente requiere ChildContent."
+            );
+        }
+
+        if (DbContextFactory == null)
+        {
+            throw new Exception(
+                "DbContextFactory no fue inyectado correctamente."
+            );
+        }
+
+        if (Session == null)
+        {
+            throw new Exception(
+                "AppSessionService no fue inyectado correctamente."
+            );
+        }
+    }
+}
+
+<style>
+    .auth-required {
+        width: 100%;
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+
+        background: #0e0e11;
+        border: 1px solid #1b1b22;
+        border-radius: 12px;
+
+        padding: 32px;
+        color: #d8d8e0;
+        text-align: center;
+    }
+
+    .auth-required h3 {
+        font-size: 20px;
+        margin: 0;
+    }
+
+    .auth-required p {
+        color: #8d8d99;
+        font-size: 14px;
+    }
+
+    .login-btn {
+        padding: 10px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        background: #ffaa43;
+        color: #000;
+        font-weight: 600;
+        transition: 0.2s;
+    }
+
+    .login-btn:hover {
+        opacity: 0.9;
+    }
+</style>

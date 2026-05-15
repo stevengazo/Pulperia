@@ -1,5 +1,4 @@
 @page "/configuracion"
-@inject DbContextFactory<PulperiaDbContext> DbContextFactory
 
 
 <h2>Configuracion</h2>
@@ -8,11 +7,5 @@
 
 
 @code{
-    private PulperiaDbContext db;
-
-    protected override async Task OnInitializedAsync()
-    {
-        db =  DbContextFactory.CreateDbContext();
-        
-    }
+    
 }
