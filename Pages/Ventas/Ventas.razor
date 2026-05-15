@@ -3,152 +3,659 @@
 @inject EmpleadoService empleadoService
 @inject NavigationManager Nav
 
-<div class="container-fluid py-4">
+<style>
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="text-white fw-bold mb-0">📊 Historial de Ventas</h2>
-        <button class="btn btn-primary btn-lg shadow" @onclick='() => Nav.NavigateTo("nueva-venta")'>
-            <i class="bi bi-plus-circle-fill me-2"></i> Nueva Venta
+    .sales-root {
+        min-height: 100vh;
+        padding: 2rem 2.5rem;
+        background: #0b0d11;
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .sales-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .sales-title h2 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #f5f7fa;
+        letter-spacing: -0.04em;
+    }
+
+    .sales-title p {
+        margin: 6px 0 0;
+        color: #707887;
+        font-size: .92rem;
+    }
+
+    .btn-sale {
+        border: none;
+        background: linear-gradient(135deg,#7c6bff,#5b4df5);
+        color: white;
+        padding: 12px 18px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: .9rem;
+        font-weight: 600;
+        transition: .2s ease;
+        box-shadow: 0 10px 25px rgba(92,77,245,.25);
+    }
+
+    .btn-sale:hover {
+        transform: translateY(-2px);
+        opacity: .95;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4,1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+        background: #11151b;
+        border: 1px solid #1b1f27;
+        border-radius: 22px;
+        padding: 1.4rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,.35);
+        transition: .2s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-3px);
+    }
+
+    .stat-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+
+    .icon-blue {
+        background: rgba(59,130,246,.12);
+        color: #60a5fa;
+    }
+
+    .icon-green {
+        background: rgba(34,197,94,.12);
+        color: #4ade80;
+    }
+
+    .icon-red {
+        background: rgba(239,68,68,.12);
+        color: #f87171;
+    }
+
+    .icon-yellow {
+        background: rgba(250,204,21,.12);
+        color: #facc15;
+    }
+
+    .stat-label {
+        color: #707887;
+        font-size: .84rem;
+        margin-bottom: 6px;
+    }
+
+    .stat-value {
+        color: #f5f7fa;
+        font-size: 1.7rem;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+    }
+
+    .sales-card {
+        background: #11151b;
+        border: 1px solid #1b1f27;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,.35);
+    }
+
+    .sales-toolbar {
+        padding: 1.4rem;
+        border-bottom: 1px solid #1b1f27;
+    }
+
+    .sales-search {
+        background: #0f1318;
+        border: 1px solid #1b1f27;
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .sales-search .input-group-text {
+        background: transparent;
+        border: none;
+        color: #707887;
+    }
+
+    .sales-search .form-control {
+        background: transparent;
+        border: none;
+        color: #f5f7fa;
+        box-shadow: none;
+    }
+
+    .sales-search .form-control::placeholder {
+        color: #5f6775;
+    }
+
+    .filter-group {
+        display: flex;
+        gap: 10px;
+        justify-content: end;
+        flex-wrap: wrap;
+    }
+
+    .filter-btn {
+        border: 1px solid #232936;
+        background: #151922;
+        color: #9099a8;
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-size: .85rem;
+        font-weight: 600;
+        transition: .18s ease;
+    }
+
+    .filter-btn:hover {
+        border-color: #5b4df5;
+        color: #fff;
+    }
+
+    .filter-active {
+        background: rgba(124,107,255,.14);
+        color: #c9c3ff;
+        border-color: #7c6bff;
+    }
+
+    .table {
+        margin: 0;
+    }
+
+    .table thead {
+        background: #0f1318;
+    }
+
+    .table thead th {
+        border: none;
+        color: #7e8796;
+        font-size: .72rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        padding: 18px 16px;
+    }
+
+    .table tbody tr {
+        border-top: 1px solid #1a1f27;
+        transition: .15s ease;
+    }
+
+    .table tbody tr:hover {
+        background: rgba(255,255,255,.02);
+    }
+
+    .table tbody td {
+        border: none;
+        padding: 18px 16px;
+        color: #d7dde7;
+        vertical-align: middle;
+    }
+
+    .folio {
+        color: #f5f7fa;
+        font-weight: 700;
+    }
+
+    .date-main {
+        color: #f5f7fa;
+        font-size: .9rem;
+    }
+
+    .date-sub {
+        color: #6b7280;
+        font-size: .75rem;
+    }
+
+    .employee-name {
+        color: #f5f7fa;
+        font-weight: 500;
+    }
+
+    .payment-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: .82rem;
+        font-weight: 600;
+    }
+
+    .pay-cash {
+        background: rgba(34,197,94,.12);
+        color: #4ade80;
+    }
+
+    .pay-sinpe {
+        background: rgba(59,130,246,.12);
+        color: #60a5fa;
+    }
+
+    .pay-credit {
+        background: rgba(239,68,68,.12);
+        color: #f87171;
+    }
+
+    .pay-card {
+        background: rgba(250,204,21,.12);
+        color: #facc15;
+    }
+
+    .total {
+        font-weight: 700;
+        color: #f5f7fa;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: .78rem;
+        font-weight: 700;
+    }
+
+    .status-paid {
+        background: rgba(34,197,94,.12);
+        color: #4ade80;
+    }
+
+    .status-pending {
+        background: rgba(239,68,68,.12);
+        color: #f87171;
+    }
+
+    .action-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-action {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        border: 1px solid #232936;
+        background: #151922;
+        color: #7e8796;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: .18s ease;
+    }
+
+    .btn-action:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-view:hover {
+        color: #7c6bff;
+        border-color: #7c6bff;
+        background: rgba(124,107,255,.12);
+    }
+
+    .btn-print:hover {
+        color: #60a5fa;
+        border-color: #60a5fa;
+        background: rgba(59,130,246,.12);
+    }
+
+</style>
+
+<div class="sales-root">
+
+    <div class="sales-head">
+
+        <div class="sales-title">
+            <h2>Historial de Ventas</h2>
+            <p>@ventas.Count ventas registradas</p>
+        </div>
+
+        <button class="btn-sale"
+                @onclick='() => Nav.NavigateTo("nueva-venta")'>
+
+            <i class="fa-solid fa-plus"></i>
+            Nueva Venta
+
         </button>
+
     </div>
 
-    <div class="row g-3 mb-4">
-        <div class="col-md-3">
-            <div class="card bg-dark text-white border-start border-4 border-info shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-white-50 small mb-1">Ventas de Hoy</h6>
-                    <h3 class="mb-0">@VentasHoy.ToString("C0")</h3>
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+                <div class="stat-icon icon-blue">
+                    <i class="fa-solid fa-chart-line"></i>
                 </div>
             </div>
+
+            <div class="stat-label">
+                Ventas de Hoy
+            </div>
+
+            <div class="stat-value">
+                @VentasHoy.ToString("C0")
+            </div>
+
         </div>
-        <div class="col-md-3">
-            <div class="card bg-dark text-white border-start border-4 border-success shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-white-50 small mb-1">Cobrado (Efectivo/SINPE)</h6>
-                    <h3 class="mb-0">@Cobrado.ToString("C0")</h3>
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+                <div class="stat-icon icon-green">
+                    <i class="fa-solid fa-wallet"></i>
                 </div>
             </div>
+
+            <div class="stat-label">
+                Cobrado
+            </div>
+
+            <div class="stat-value">
+                @Cobrado.ToString("C0")
+            </div>
+
         </div>
-        <div class="col-md-3">
-            <div class="card bg-dark text-white border-start border-4 border-danger shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-white-50 small mb-1">Pendiente (Fiados)</h6>
-                    <h3 class="mb-0 text-danger">@Fiados.ToString("C0")</h3>
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+                <div class="stat-icon icon-red">
+                    <i class="fa-solid fa-file-invoice-dollar"></i>
                 </div>
             </div>
+
+            <div class="stat-label">
+                Fiados
+            </div>
+
+            <div class="stat-value">
+                @Fiados.ToString("C0")
+            </div>
+
         </div>
-        <div class="col-md-3">
-            <div class="card bg-dark text-white border-start border-4 border-warning shadow-sm">
-                <div class="card-body">
-                    <h6 class="text-white-50 small mb-1">Transacciones</h6>
-                    <h3 class="mb-0">@Transacciones</h3>
+
+        <div class="stat-card">
+
+            <div class="stat-top">
+                <div class="stat-icon icon-yellow">
+                    <i class="fa-solid fa-receipt"></i>
                 </div>
             </div>
+
+            <div class="stat-label">
+                Transacciones
+            </div>
+
+            <div class="stat-value">
+                @Transacciones
+            </div>
+
         </div>
+
     </div>
 
-    <div class="card bg-dark text-white border-secondary shadow">
-        <div class="card-header border-secondary bg-transparent py-3">
-            <div class="row align-items-center">
+    <div class="sales-card">
+
+        <div class="sales-toolbar">
+
+            <div class="row g-3 align-items-center">
+
                 <div class="col-md-6">
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-secondary text-white-50">
-                            <i class="bi bi-filter"></i>
+
+                    <div class="input-group sales-search">
+
+                        <span class="input-group-text">
+                            <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
-                        <input type="text" class="form-control bg-transparent text-white border-secondary"
-                               placeholder="Buscar por folio o empleado..." @bind="filtro" @bind:event="oninput" />
+
+                        <input type="text"
+                               class="form-control"
+                               placeholder="Buscar por folio o empleado..."
+                               @bind="filtro"
+                               @bind:event="oninput" />
+
                     </div>
+
                 </div>
-                <div class="col-md-6 text-md-end mt-2 mt-md-0">
-                    <div class="btn-group border border-secondary rounded">
-                        <button class="btn btn-sm @(filtroEstado == "Todas" ? "btn-secondary" : "btn-outline-secondary")"
-                                @onclick='() => filtroEstado = "Todas"'>Todas</button>
-                        <button class="btn btn-sm @(filtroEstado == "Fiado" ? "btn-danger" : "btn-outline-secondary") text-danger"
-                                @onclick='() => filtroEstado = "Fiado"'>Fiados</button>
-                        <button class="btn btn-sm @(filtroEstado == "Hoy" ? "btn-secondary" : "btn-outline-secondary")"
-                                @onclick='() => filtroEstado = "Hoy"'>Hoy</button>
+
+                <div class="col-md-6">
+
+                    <div class="filter-group">
+
+                        <button class="filter-btn @(filtroEstado == "Todas" ? "filter-active" : "")"
+                                @onclick='() => filtroEstado = "Todas"'>
+
+                            Todas
+
+                        </button>
+
+                        <button class="filter-btn @(filtroEstado == "Fiado" ? "filter-active" : "")"
+                                @onclick='() => filtroEstado = "Fiado"'>
+
+                            Fiados
+
+                        </button>
+
+                        <button class="filter-btn @(filtroEstado == "Hoy" ? "filter-active" : "")"
+                                @onclick='() => filtroEstado = "Hoy"'>
+
+                            Hoy
+
+                        </button>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-dark table-hover align-middle mb-0">
-                    <thead class="text-white-50 small">
+        <div class="table-responsive">
+
+            <table class="table align-middle">
+
+                <thead>
+
+                    <tr>
+                        <th class="ps-4">Folio</th>
+                        <th>Fecha/Hora</th>
+                        <th>Empleado</th>
+                        <th>Método</th>
+                        <th class="text-end">Total</th>
+                        <th class="text-center">Estado</th>
+                        <th class="text-center pe-4">Acciones</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var venta in VentasFiltradas)
+                    {
+                        var empleado = empleados.FirstOrDefault(e => e.Id.ToString() == venta.ClienteId);
+
                         <tr>
-                            <th class="ps-4">Folio</th>
-                            <th>Fecha/Hora</th>
-                            <th>Empleado</th>
-                            <th>Método</th>
-                            <th class="text-end">Total</th>
-                            <th class="text-center">Estado</th>
-                            <th class="text-center pe-4">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var venta in VentasFiltradas)
-                        {
-                            var empleado = empleados.FirstOrDefault(e => e.Id.ToString() == venta.ClienteId);
-                            <tr>
-                                <td class="ps-4 fw-bold">#@venta.Id.ToString("D5")</td>
-                                <td>
-                                    <div class="small">@venta.Fecha.ToShortDateString()</div>
-                                    <div class="text-white-50" style="font-size:0.75rem">@venta.Fecha.ToShortTimeString()</div>
-                                </td>
-                                <td class="small">
-                                    @if (empleado != null)
-                                    {
-                                        <span>@empleado.Nombre @empleado.Apellido</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="text-white-50">—</span>
-                                    }
-                                </td>
-                                <td>
-                                    @switch (venta.MetodoPago)
-                                    {
-                                        case "Efectivo": <span>💵 Efectivo</span> break;
-                                        case "SINPE":    <span class="text-info">📱 SINPE</span> break;
-                                        case "Fiado":    <span class="text-danger">📋 Fiado</span> break;
-                                        case "Tarjeta":  <span class="text-warning">💳 Tarjeta</span> break;
-                                        default:         <span>@venta.MetodoPago</span> break;
-                                    }
-                                </td>
-                                <td class="text-end fw-bold">@venta.Total.ToString("C0")</td>
-                                <td class="text-center">
-                                    @if (venta.MetodoPago == "Fiado")
-                                    {
-                                        <span class="badge bg-danger bg-opacity-10 text-danger border border-danger">Pendiente</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-success bg-opacity-10 text-success border border-success">Pagado</span>
-                                    }
-                                </td>
-                                <td class="text-center pe-4">
-                                    <button class="btn btn-sm btn-outline-light border-secondary">
-                                      <i class="fa-solid fa-eye"></i>
+
+                            <td class="ps-4">
+                                <span class="folio">
+                                    #@venta.Id.ToString("D5")
+                                </span>
+                            </td>
+
+                            <td>
+
+                                <div class="date-main">
+                                    @venta.Fecha.ToShortDateString()
+                                </div>
+
+                                <div class="date-sub">
+                                    @venta.Fecha.ToShortTimeString()
+                                </div>
+
+                            </td>
+
+                            <td>
+
+                                @if (empleado != null)
+                                {
+                                    <span class="employee-name">
+                                        @empleado.Nombre @empleado.Apellido
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-secondary">—</span>
+                                }
+
+                            </td>
+
+                            <td>
+
+                                @switch (venta.MetodoPago)
+                                {
+                                    case "Efectivo":
+
+                                        <span class="payment-tag pay-cash">
+                                            <i class="fa-solid fa-money-bill-wave"></i>
+                                            Efectivo
+                                        </span>
+
+                                        break;
+
+                                    case "SINPE":
+
+                                        <span class="payment-tag pay-sinpe">
+                                            <i class="fa-solid fa-mobile-screen"></i>
+                                            SINPE
+                                        </span>
+
+                                        break;
+
+                                    case "Fiado":
+
+                                        <span class="payment-tag pay-credit">
+                                            <i class="fa-solid fa-file-invoice"></i>
+                                            Fiado
+                                        </span>
+
+                                        break;
+
+                                    case "Tarjeta":
+
+                                        <span class="payment-tag pay-card">
+                                            <i class="fa-solid fa-credit-card"></i>
+                                            Tarjeta
+                                        </span>
+
+                                        break;
+
+                                    default:
+
+                                        <span class="payment-tag">
+                                            @venta.MetodoPago
+                                        </span>
+
+                                        break;
+                                }
+
+                            </td>
+
+                            <td class="text-end total">
+                                @venta.Total.ToString("C0")
+                            </td>
+
+                            <td class="text-center">
+
+                                @if (venta.MetodoPago == "Fiado")
+                                {
+                                    <span class="status-badge status-pending">
+                                        Pendiente
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-badge status-paid">
+                                        Pagado
+                                    </span>
+                                }
+
+                            </td>
+
+                            <td class="text-center pe-4">
+
+                                <div class="action-buttons">
+
+                                    <button class="btn-action btn-view">
+                                        <i class="fa-solid fa-eye"></i>
                                     </button>
-                                    <button class="btn btn-sm btn-outline-light border-secondary">
+
+                                    <button class="btn-action btn-print">
                                         <i class="fa-solid fa-print"></i>
                                     </button>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
         </div>
+
     </div>
+
 </div>
 
 @code {
+
     private PulperiaDbContext db = default!;
+
     private List<Venta> ventas = new();
+
     private List<Empleado> empleados = new();
+
     private string filtro = "";
+
     private string filtroEstado = "Todas";
 
     private decimal VentasHoy => ventas
@@ -170,18 +677,24 @@
         (string.IsNullOrEmpty(filtro) ||
             v.Id.ToString().Contains(filtro) ||
             empleados.Any(e => e.Id.ToString() == v.ClienteId &&
-                ($"{e.Nombre} {e.Apellido}").Contains(filtro, StringComparison.OrdinalIgnoreCase))) &&
+                ($"{e.Nombre} {e.Apellido}")
+                .Contains(filtro, StringComparison.OrdinalIgnoreCase))) &&
         filtroEstado switch
         {
             "Fiado" => v.MetodoPago == "Fiado",
-            "Hoy"   => v.Fecha.Date == DateTime.Today,
-            _       => true
+            "Hoy" => v.Fecha.Date == DateTime.Today,
+            _ => true
         });
 
     protected override async Task OnInitializedAsync()
     {
         db = DbFactory.CreateDbContext();
-        ventas = db.Venta.OrderByDescending(v => v.Fecha).ToList();
+
+        ventas = db.Venta
+            .OrderByDescending(v => v.Fecha)
+            .ToList();
+
         empleados = await empleadoService.GetAllAsync();
     }
+
 }

@@ -4,211 +4,256 @@
 @inject NavigationManager Nav
 
 <style>
-    .pg-root {
 
+    .pg-root {
         min-height: 100vh;
         padding: 2rem 2.5rem;
-        font-family: 'DM Sans', system-ui, sans-serif;
+        background: #0b0d11;
+        font-family: 'Inter', system-ui, sans-serif;
     }
 
     .pg-head {
         display: flex;
-        align-items: flex-end;
+        align-items: center;
         justify-content: space-between;
         margin-bottom: 2rem;
     }
 
     .pg-head h1 {
-        font-size: 20px;
-        font-weight: 600;
-        color: #e2e2e6;
-        margin: 0 0 2px;
-        letter-spacing: -0.01em;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #f5f7fa;
+        margin: 0;
+        letter-spacing: -0.04em;
     }
 
     .pg-head p {
-        font-size: 12px;
-        color: #45454f;
-        margin: 0;
-        letter-spacing: 0.02em;
+        margin: 6px 0 0;
+        color: #707887;
+        font-size: .92rem;
     }
 
     .btn-new {
+        border: none;
+        background: linear-gradient(135deg,#7c6bff,#5b4df5);
+        color: white;
+        padding: 12px 18px;
+        border-radius: 14px;
         display: inline-flex;
         align-items: center;
-        gap: 7px;
-        background: #7c6bff;
-        color: #fff;
-        font-size: 12px;
-        font-weight: 500;
-        padding: 8px 16px;
-        border-radius: 7px;
-        border: none;
-        cursor: pointer;
-        letter-spacing: 0.02em;
-        transition: opacity 0.15s;
+        gap: 10px;
+        font-size: .9rem;
+        font-weight: 600;
+        transition: .2s ease;
+        box-shadow: 0 10px 25px rgba(92,77,245,.25);
     }
 
-    .btn-new:hover { opacity: 0.85; }
+    .btn-new:hover {
+        transform: translateY(-2px);
+        opacity: .95;
+    }
 
     .pg-toolbar {
         display: grid;
-        grid-template-columns: 1fr 200px;
-        gap: 10px;
-        margin-bottom: 1.25rem;
+        grid-template-columns: 1fr 260px;
+        gap: 14px;
+        margin-bottom: 1.5rem;
     }
 
     .pg-input {
-        background: #111114;
-        border: 0.5px solid #1e1e23;
-        border-radius: 7px;
-        color: #e2e2e6;
-        font-size: 13px;
-        padding: 9px 14px;
-        outline: none;
-        transition: border-color 0.15s;
         width: 100%;
-        box-sizing: border-box;
+        border: 1px solid #1b1f27;
+        background: #11151b;
+        color: #eef2f7;
+        border-radius: 14px;
+        padding: 13px 16px;
+        font-size: .92rem;
+        outline: none;
+        transition: .2s ease;
     }
 
-    .pg-input:focus { border-color: #2e2e38; }
-    .pg-input::placeholder { color: #35353f; }
+    .pg-input:focus {
+        border-color: #5b4df5;
+        box-shadow: 0 0 0 4px rgba(91,77,245,.15);
+    }
+
+    .pg-input::placeholder {
+        color: #5f6775;
+    }
 
     .pg-table-wrap {
-        background: #0e0e11;
-        border: 0.5px solid #1a1a1f;
-        border-radius: 10px;
+        background: #11151b;
+        border: 1px solid #1b1f27;
+        border-radius: 22px;
         overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,.35);
     }
 
     table {
         width: 100%;
         border-collapse: collapse;
-        font-size: 13px;
     }
 
-    thead tr {
-        border-bottom: 0.5px solid #1a1a1f;
+    thead {
+        background: #0f1318;
     }
 
     thead th {
-        padding: 11px 16px;
-        font-size: 10px;
-        font-weight: 500;
-        letter-spacing: 0.07em;
+        padding: 18px 16px;
+        color: #7e8796;
+        font-size: .72rem;
+        font-weight: 700;
         text-transform: uppercase;
-        color: #3a3a46;
-        text-align: left;
-        white-space: nowrap;
+        letter-spacing: .08em;
+        border-bottom: 1px solid #1d222b;
     }
 
-    thead th.num { text-align: right; }
-    thead th.ctr { text-align: center; }
+    thead th.num {
+        text-align: right;
+    }
+
+    thead th.ctr {
+        text-align: center;
+    }
 
     tbody tr {
-        border-bottom: 0.5px solid #131316;
-        transition: background 0.1s;
+        border-bottom: 1px solid #1a1f27;
+        transition: .15s ease;
     }
 
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: #111115; }
+    tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    tbody tr:hover {
+        background: rgba(255,255,255,.02);
+    }
 
     tbody td {
-        padding: 12px 16px;
-        color: #b0b0be;
+        padding: 18px 16px;
+        color: #c7cfdb;
+        font-size: .92rem;
     }
 
     .td-name {
-        color: #e2e2e6;
-        font-weight: 500;
+        color: #f5f7fa;
+        font-weight: 600;
+        margin-bottom: 3px;
     }
 
     .td-pres {
-        color: #55555f;
-        font-size: 11px;
+        color: #667080;
+        font-size: .8rem;
     }
 
     .td-badge {
-        display: inline-block;
-        background: #16161a;
-        border: 0.5px solid #222228;
-        border-radius: 4px;
-        padding: 3px 8px;
-        font-size: 11px;
-        color: #60606c;
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: rgba(124,107,255,.12);
+        color: #b7b0ff;
+        font-size: .78rem;
+        font-weight: 600;
+        border: 1px solid rgba(124,107,255,.15);
     }
 
     .td-num {
         text-align: right;
+        font-weight: 600;
+        color: #eef2f7;
         font-variant-numeric: tabular-nums;
-        font-size: 12px;
     }
 
-    .td-ctr { text-align: center; }
+    .td-ctr {
+        text-align: center;
+    }
+
+    .stock-ok,
+    .stock-low {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: .82rem;
+    }
 
     .stock-ok {
-        color: #4caf88;
-        font-weight: 500;
+        background: rgba(34,197,94,.12);
+        color: #4ade80;
     }
 
     .stock-low {
-        color: #e2734a;
-        font-weight: 500;
+        background: rgba(239,68,68,.12);
+        color: #f87171;
     }
 
     .stock-dot {
-        display: inline-block;
-        width: 6px;
-        height: 6px;
+        width: 8px;
+        height: 8px;
         border-radius: 50%;
-        margin-right: 6px;
-        vertical-align: middle;
     }
 
-    .dot-ok { background: #4caf88; }
-    .dot-low { background: #e2734a; }
+    .dot-ok {
+        background: #4ade80;
+    }
+
+    .dot-low {
+        background: #f87171;
+    }
 
     .actions {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: 10px;
     }
 
     .btn-icon {
-        background: none;
-        border: 0.5px solid #1e1e23;
-        border-radius: 5px;
-        color: #45454f;
-        cursor: pointer;
-        width: 28px;
-        height: 28px;
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        border: 1px solid #232936;
+        background: #151922;
+        color: #7e8796;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 13px;
-        transition: border-color 0.15s, color 0.15s;
+        transition: .18s ease;
+        font-size: .92rem;
     }
 
     .btn-icon:hover {
-        border-color: #7c6bff;
+        transform: translateY(-2px);
+    }
+
+    .btn-edit:hover {
         color: #7c6bff;
+        border-color: #7c6bff;
+        background: rgba(124,107,255,.12);
+    }
+
+    .btn-delete:hover {
+        color: #ff6b6b;
+        border-color: #ff6b6b;
+        background: rgba(255,107,107,.12);
     }
 
     .pg-empty {
         text-align: center;
-        padding: 3rem;
-        color: #2e2e38;
-        font-size: 13px;
+        padding: 4rem;
+        color: #5c6472;
     }
 
     .pg-count {
-        font-size: 11px;
-        color: #2e2e38;
-        padding: 10px 16px;
-        border-top: 0.5px solid #1a1a1f;
-        letter-spacing: 0.03em;
+        padding: 16px 20px;
+        border-top: 1px solid #1b1f27;
+        color: #6f7786;
+        font-size: .84rem;
     }
+
 </style>
 
 <div class="pg-root">
@@ -220,16 +265,22 @@
             <h1>Catálogo de productos</h1>
             <p>@productosFiltrados.Count resultado@(productosFiltrados.Count != 1 ? "s" : "")</p>
         </div>
+
         <button class="btn-new" @onclick="AbrirModal">
-            <i class="bi bi-plus-lg"></i> Nuevo producto
+            <i class="fa-solid fa-plus"></i>
+            Nuevo producto
         </button>
     </div>
 
     <div class="pg-toolbar">
-        <input class="pg-input" placeholder="Buscar por nombre o presentación..."
-               @bind="filtro" @bind:event="oninput" />
+        <input class="pg-input"
+               placeholder="Buscar por nombre o presentación..."
+               @bind="filtro"
+               @bind:event="oninput" />
+
         <select class="pg-input" @bind="categoriaFiltro">
             <option value="">Todas las categorías</option>
+
             @foreach (var c in Categorias)
             {
                 <option value="@c.Id">@c.Nombre</option>
@@ -238,7 +289,9 @@
     </div>
 
     <div class="pg-table-wrap">
+
         <table>
+
             <thead>
                 <tr>
                     <th>Producto</th>
@@ -251,73 +304,107 @@
                     <th class="ctr">Acciones</th>
                 </tr>
             </thead>
+
             <tbody>
+
                 @if (!productosFiltrados.Any())
                 {
                     <tr>
-                        <td colspan="6" class="pg-empty">Sin resultados</td>
+                        <td colspan="8" class="pg-empty">
+                            <i class="fa-solid fa-box-open mb-3 d-block" style="font-size:2rem;"></i>
+                            Sin resultados
+                        </td>
                     </tr>
                 }
+
                 @foreach (var p in productosFiltrados)
                 {
                     <tr>
+
                         <td>
                             <div class="td-name">@p.Nombre</div>
                             <div class="td-pres">@p.Presentacion</div>
                         </td>
+
                         <td>
-                            <span class="td-badge">@p.Categoria?.Nombre</span>
+                            <span class="td-badge">
+                                @p.Categoria?.Nombre
+                            </span>
                         </td>
+
                         <td class="td-ctr">
-                            @p.DetalleCompras.Sum(d=>d.Cantidad).ToString()
+                            @p.DetalleCompras.Sum(d => d.Cantidad).ToString()
                         </td>
+
                         <td class="td-num">
                             ₡@GetCompraCosto(p.DetalleCompras.ToList())
                         </td>
+
                         <td class="td-ctr">
-                            @p.DetalleVentas.Sum(d=>d.Cantidad).ToString()
+                            @p.DetalleVentas.Sum(d => d.Cantidad).ToString()
                         </td>
+
                         <td class="td-num">
                             ₡@GetVentas(p.DetalleVentas.ToList())
                         </td>
 
+                        <td class="td-ctr">
 
-         
-                        <td class="td-ctr">
                             <span class="@(p.StockActual <= p.StockMinimo ? "stock-low" : "stock-ok")">
+
                                 <span class="stock-dot @(p.StockActual <= p.StockMinimo ? "dot-low" : "dot-ok")"></span>
+
                                 @p.StockActual
+
                             </span>
+
                         </td>
+
                         <td class="td-ctr">
+
                             <div class="actions">
-                                <button class="btn-icon" title="Editar" >
-                                    <i class="bi bi-pencil-square"></i>
+
+                                <button class="btn-icon btn-edit" title="Editar">
+                                    <i class="fa-solid fa-pen"></i>
                                 </button>
-                                <button class="btn-icon" title="Eliminar">
-                                    <i class="bi bi-trash"></i>
+
+                                <button class="btn-icon btn-delete" title="Eliminar">
+                                    <i class="fa-solid fa-trash"></i>
                                 </button>
+
                             </div>
+
                         </td>
-                    </tr>                  
+
+                    </tr>
                 }
+
             </tbody>
+
         </table>
-        <div class="pg-count">Mostrando @productosFiltrados.Count de @productos.Count productos</div>
+
+        <div class="pg-count">
+            Mostrando @productosFiltrados.Count de @productos.Count productos
+        </div>
+
     </div>
+
 </div>
 
 @code {
     private string filtro = "";
     private string _categoriaFiltro = "";
-    private string categoriaFiltro 
-    { 
-        get => _categoriaFiltro; 
-        set { _categoriaFiltro = value; InvokeAsync(StateHasChanged); } 
+
+    private string categoriaFiltro
+    {
+        get => _categoriaFiltro;
+        set { _categoriaFiltro = value; InvokeAsync(StateHasChanged); }
     }
 
     private AddProduct addProductModal;
+
     private List<Producto> productos = new();
+
     private List<Categoria> Categorias = new();
 
     private List<Producto> productosFiltrados => productos
@@ -330,7 +417,6 @@
              p.CategoriaId.ToString() == categoriaFiltro)
         ).ToList();
 
-    // Métodos de cálculo corregidos para devolver string formateado o decimal
     private string GetVentas(List<DetalleVenta> ventas)
     {
         return ventas.Sum(v => v.Cantidad * v.PrecioUnitarioHistorico).ToString("N2");
@@ -349,8 +435,9 @@
             .Include(e => e.Categoria)
             .Include(e => e.DetalleVentas)
             .Include(e => e.DetalleCompras)
-            .AsNoTracking() // Mejora rendimiento para listas
+            .AsNoTracking()
             .ToList();
+
         Categorias = db.Categoria.ToList();
     }
 
@@ -360,8 +447,8 @@
 
     private async Task Eliminar(int id)
     {
-        // En un sistema real, mejor usar un Modal de confirmación
         var p = await db.Producto.FindAsync(id);
+
         if (p is not null)
         {
             db.Producto.Remove(p);

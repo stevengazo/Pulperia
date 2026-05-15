@@ -4,227 +4,522 @@
 @if (isVisible)
 {
     <div class="modal fade show d-block" tabindex="-1" role="dialog">
+
         <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
-            <div class="modal-content bg-dark-custom border-secondary-custom shadow-2xl">
 
-                <div class="modal-header border-bottom-custom px-4">
-                    <h5 class="modal-title text-white fw-bold">
-                        <i class="bi bi-cart-plus me-2 text-emerald"></i>Registro de Compra
-                    </h5>
-                    <button type="button" class="btn-close-custom" @onclick="Close">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-                </div>
+            <div class="modal-content modal-modern">
 
-                <div class="modal-body p-4 text-white-50">
-                    <EditForm Model="@compraInventario" OnValidSubmit="GuardarCompra">
+                <div class="modal-header modal-header-modern">
 
-                        <div class="row g-4 mb-4">
-                            <div class="col-md-4">
-                                <label class="small text-uppercase mb-2 d-block">Proveedor</label>
-                                <InputSelect @bind-Value="compraInventario.ProveedorId" class="form-control-custom">
-                                    <option value="0">Seleccionar...</option>
-                                    @foreach (var i in proveedores)
-                                    {
-                                        <option value="@i.Id">@i.Nombre</option>
-                                    }
-                                </InputSelect>
-                            </div>
+                    <div class="d-flex align-items-center gap-3">
 
-                            <div class="col-md-4">
-                                <label class="small text-uppercase mb-2 d-block">Fecha</label>
-                                <InputDate @bind-Value="compraInventario.Fecha" class="form-control-custom" />
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="small text-uppercase mb-2 d-block">Notas</label>
-                                <InputTextArea @bind-Value="compraInventario.Notas" class="form-control-custom" rows="1" />
-                            </div>
+                        <div class="header-icon">
+                            <i class="fa-solid fa-cart-shopping"></i>
                         </div>
 
-                        <div class="add-product-zone p-3 mb-4 rounded-3">
+                        <div>
+                            <h5 class="modal-title text-white fw-bold mb-0">
+                                Registro de Compra
+                            </h5>
+
+                            <small class="text-secondary">
+                                Gestión de inventario y abastecimiento
+                            </small>
+                        </div>
+
+                    </div>
+
+                    <button type="button"
+                            class="btn-close-modern"
+                            @onclick="Close">
+
+                        <i class="fa-solid fa-xmark"></i>
+
+                    </button>
+
+                </div>
+
+                <div class="modal-body p-4 text-light">
+
+                    <EditForm Model="@compraInventario"
+                              OnValidSubmit="GuardarCompra">
+
+                        <!-- DATOS -->
+                        <div class="row g-4 mb-4">
+
+                            <div class="col-md-4">
+
+                                <label class="label-modern">
+                                    Proveedor
+                                </label>
+
+                                <InputSelect @bind-Value="compraInventario.ProveedorId"
+                                             class="input-modern">
+
+                                    <option value="0">
+                                        Seleccionar proveedor...
+                                    </option>
+
+                                    @foreach (var i in proveedores)
+                                    {
+                                        <option value="@i.Id">
+                                            @i.Nombre
+                                        </option>
+                                    }
+
+                                </InputSelect>
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <label class="label-modern">
+                                    Fecha
+                                </label>
+
+                                <InputDate @bind-Value="compraInventario.Fecha"
+                                           class="input-modern" />
+
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <label class="label-modern">
+                                    Notas
+                                </label>
+
+                                <InputTextArea @bind-Value="compraInventario.Notas"
+                                               class="input-modern"
+                                               rows="1" />
+
+                            </div>
+
+                        </div>
+
+                        <!-- AGREGAR PRODUCTO -->
+                        <div class="product-zone mb-4">
+
                             <div class="row g-3 align-items-end">
 
                                 <div class="col-md-5">
-                                    <label class="x-small text-emerald fw-bold mb-1">PRODUCTO</label>
-                                    <select class="form-control-custom" @bind="nuevoDetalle.ProductoId">
-                                        <option value="0">Buscar producto...</option>
+
+                                    <label class="mini-label">
+                                        PRODUCTO
+                                    </label>
+
+                                    <select class="input-modern"
+                                            @bind="nuevoDetalle.ProductoId">
+
+                                        <option value="0">
+                                            Buscar producto...
+                                        </option>
+
                                         @foreach (var p in productos)
                                         {
-                                            <option value="@p.Id">@p.Nombre</option>
+                                            <option value="@p.Id">
+                                                @p.Nombre
+                                            </option>
                                         }
+
                                     </select>
+
                                 </div>
 
                                 <div class="col-md-2">
-                                    <label class="x-small text-emerald fw-bold mb-1">CANT</label>
-                                    <input type="number" class="form-control-custom text-center"
+
+                                    <label class="mini-label">
+                                        CANTIDAD
+                                    </label>
+
+                                    <input type="number"
+                                           class="input-modern text-center"
                                            @bind="nuevoDetalle.Cantidad" />
+
                                 </div>
 
                                 <div class="col-md-2">
-                                    <label class="x-small text-emerald fw-bold mb-1">PRECIO</label>
-                                    <input type="number" step="0.01" class="form-control-custom text-end"
+
+                                    <label class="mini-label">
+                                        PRECIO
+                                    </label>
+
+                                    <input type="number"
+                                           step="0.01"
+                                           class="input-modern text-end"
                                            @bind="nuevoDetalle.PrecioUnitario" />
+
                                 </div>
 
                                 <div class="col-md-3">
-                                    <button type="button" class="btn-emerald w-100" @onclick="AgregarAlDetalle">
-                                        <i class="bi bi-plus-circle me-1"></i> Añadir
+
+                                    <button type="button"
+                                            class="btn-primary-modern w-100"
+                                            @onclick="AgregarAlDetalle">
+
+                                        <i class="fa-solid fa-plus"></i>
+                                        Añadir Producto
+
                                     </button>
+
                                 </div>
 
                             </div>
+
                         </div>
 
-                        <div class="table-responsive" style="max-height: 350px;">
-                            <table class="table table-dark-minimal table-hover">
-                                <thead>
-                                    <tr class="text-emerald">
-                                        <th>Item</th>
-                                        <th class="text-center">Cant</th>
-                                        <th class="text-end">Unit</th>
-                                        <th class="text-end">Subtotal</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
+                        <!-- TABLA -->
+                        <div class="table-modern-wrap">
 
-                                <tbody>
-                                    @foreach (var item in detalles)
-                                    {
+                            <div class="table-responsive"
+                                 style="max-height: 350px;">
+
+                                <table class="table table-modern align-middle">
+
+                                    <thead>
+
                                         <tr>
-                                            <td>@productos.FirstOrDefault(p => p.Id == item.ProductoId)?.Nombre</td>
-                                            <td class="text-center">@item.Cantidad</td>
-                                            <td class="text-end">@item.PrecioUnitario.ToString("N2")</td>
-                                            <td class="text-end">
-                                                @((item.Cantidad * item.PrecioUnitario).ToString("N2"))
-                                            </td>
-                                            <td>
-                                                <button type="button" class="btn-remove"
-                                                        @onclick="() => detalles.Remove(item)">
-                                                    <i class="bi bi-trash3"></i>
-                                                </button>
-                                            </td>
+                                            <th>Producto</th>
+                                            <th class="text-center">Cantidad</th>
+                                            <th class="text-end">Precio</th>
+                                            <th class="text-end">Subtotal</th>
+                                            <th class="text-center"></th>
                                         </tr>
-                                    }
-                                </tbody>
-                            </table>
+
+                                    </thead>
+
+                                    <tbody>
+
+                                        @foreach (var item in detalles)
+                                        {
+                                            <tr>
+
+                                                <td class="fw-semibold text-light">
+                                                    @productos.FirstOrDefault(p => p.Id == item.ProductoId)?.Nombre
+                                                </td>
+
+                                                <td class="text-center text-secondary">
+                                                    @item.Cantidad
+                                                </td>
+
+                                                <td class="text-end text-secondary">
+                                                    ₡@item.PrecioUnitario.ToString("N2")
+                                                </td>
+
+                                                <td class="text-end fw-bold text-light">
+                                                    ₡@((item.Cantidad * item.PrecioUnitario).ToString("N2"))
+                                                </td>
+
+                                                <td class="text-center">
+
+                                                    <button type="button"
+                                                            class="btn-delete-modern"
+                                                            @onclick="() => detalles.Remove(item)">
+
+                                                        <i class="fa-solid fa-trash"></i>
+
+                                                    </button>
+
+                                                </td>
+
+                                            </tr>
+                                        }
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+
                         </div>
 
-                        <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top-custom">
+                        <!-- FOOTER -->
+                        <div class="footer-modern">
+
                             <div>
-                                <span class="text-white-50 small">Total</span>
-                                <h3 class="text-emerald">@TotalCompra.ToString("C")</h3>
+
+                                <div class="text-secondary small mb-1">
+                                    Total de la compra
+                                </div>
+
+                                <h2 class="total-modern">
+                                    ₡@TotalCompra.ToString("N2")
+                                </h2>
+
                             </div>
 
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn-outline-custom" @onclick="Close">
+                            <div class="d-flex gap-3">
+
+                                <button type="button"
+                                        class="btn-cancel-modern"
+                                        @onclick="Close">
+
                                     Cancelar
+
                                 </button>
 
-                                <button type="submit" class="btn-save"
+                                <button type="submit"
+                                        class="btn-save-modern"
                                         disabled="@(!detalles.Any())">
+
+                                    <i class="fa-solid fa-check"></i>
                                     Finalizar Compra
+
                                 </button>
+
                             </div>
+
                         </div>
 
                     </EditForm>
+
                 </div>
 
             </div>
+
         </div>
+
     </div>
 
-    <div class="modal-backdrop-custom"></div>
+    <div class="modal-backdrop-modern"></div>
 }
 
-
 <style>
+
     :root {
-        --bg-dark: #121212;
-        --bg-card: #1e1e1e;
-        --emerald: #10b981;
-        --border-color: rgba(255,255,255,0.08);
+
+        --bg-main: #0b0d11;
+        --bg-card: #11151b;
+        --bg-input: #151922;
+
+        --border: #1b1f27;
+
+        --primary: #7c6bff;
+        --primary-soft: rgba(124,107,255,.14);
+
+        --text-main: #f5f7fa;
+        --text-muted: #707887;
     }
 
-    .bg-dark-custom { background-color: var(--bg-dark); }
-    .border-secondary-custom { border: 1px solid var(--border-color); }
-    .border-bottom-custom { border-bottom: 1px solid var(--border-color); }
-    .border-top-custom { border-top: 1px solid var(--border-color); }
-    .text-emerald { color: var(--emerald) !important; }
-    .x-small { font-size: 0.65rem; letter-spacing: 1px; }
+    .modal-modern {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 30px 60px rgba(0,0,0,.45);
+    }
 
-    /* Inputs */
-    .form-control-custom {
-        background: rgba(255,255,255,0.05);
-        border: 1px solid var(--border-color);
+    .modal-header-modern {
+        padding: 1.5rem 1.8rem;
+        border-bottom: 1px solid var(--border);
+        background: rgba(255,255,255,.015);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 18px;
+        background: var(--primary-soft);
+        color: #bdb5ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .btn-close-modern {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: #151922;
+        color: #7e8796;
+        transition: .18s ease;
+    }
+
+    .btn-close-modern:hover {
+        background: rgba(255,255,255,.04);
         color: white;
-        padding: 0.6rem 0.8rem;
-        border-radius: 8px;
+    }
+
+    .label-modern {
+        color: #9aa3b2;
+        font-size: .82rem;
+        font-weight: 700;
+        margin-bottom: .7rem;
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+    }
+
+    .mini-label {
+        color: #bdb5ff;
+        font-size: .7rem;
+        font-weight: 700;
+        margin-bottom: .5rem;
+        display: block;
+        letter-spacing: .08em;
+    }
+
+    .input-modern {
         width: 100%;
-        transition: all 0.2s;
-    }
-    .form-control-custom:focus {
-        background: rgba(255,255,255,0.08);
-        border-color: var(--emerald);
+        background: var(--bg-input);
+        border: 1px solid var(--border);
+        color: var(--text-main);
+        padding: .85rem 1rem;
+        border-radius: 16px;
+        transition: .18s ease;
         outline: none;
-        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
     }
 
-    /* Botones */
-    .btn-emerald {
-        background: var(--emerald);
-        color: #000;
+    .input-modern:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(124,107,255,.12);
+        background: rgba(255,255,255,.02);
+    }
+
+    .product-zone {
+        background: rgba(255,255,255,.015);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 1.3rem;
+    }
+
+    .btn-primary-modern {
         border: none;
-        padding: 0.6rem;
-        border-radius: 8px;
+        background: linear-gradient(135deg,#7c6bff,#5b4df5);
+        color: white;
+        padding: .9rem 1rem;
+        border-radius: 16px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: .18s ease;
+        box-shadow: 0 12px 24px rgba(92,77,245,.25);
+    }
+
+    .btn-primary-modern:hover {
+        transform: translateY(-2px);
+    }
+
+    .table-modern-wrap {
+        background: rgba(255,255,255,.015);
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        overflow: hidden;
+    }
+
+    .table-modern {
+        margin: 0;
+    }
+
+    .table-modern thead {
+        background: #0f1318;
+    }
+
+    .table-modern thead th {
+        border: none;
+        color: #7e8796;
+        font-size: .72rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        padding: 18px 16px;
+    }
+
+    .table-modern tbody tr {
+        border-top: 1px solid #1a1f27;
+        transition: .15s ease;
+    }
+
+    .table-modern tbody tr:hover {
+        background: rgba(255,255,255,.02);
+    }
+
+    .table-modern tbody td {
+        border: none;
+        padding: 18px 16px;
+    }
+
+    .btn-delete-modern {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        border: 1px solid rgba(239,68,68,.2);
+        background: rgba(239,68,68,.08);
+        color: #f87171;
+        transition: .18s ease;
+    }
+
+    .btn-delete-modern:hover {
+        transform: translateY(-2px);
+        background: rgba(239,68,68,.14);
+    }
+
+    .footer-modern {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1.5rem;
+        margin-top: 1.5rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .total-modern {
+        color: #bdb5ff;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -0.04em;
+    }
+
+    .btn-cancel-modern {
+        border: 1px solid var(--border);
+        background: #151922;
+        color: #d7dde7;
+        padding: .9rem 1.4rem;
+        border-radius: 16px;
         font-weight: 600;
-        transition: transform 0.1s;
-    }
-    .btn-save {
-        background: var(--emerald);
-        color: #000;
-        border: none;
-        padding: 0.7rem 2rem;
-        border-radius: 8px;
-        font-weight: bold;
-    }
-    .btn-outline-custom {
-        background: transparent;
-        border: 1px solid var(--border-color);
-        color: white;
-        padding: 0.7rem 1.5rem;
-        border-radius: 8px;
-    }
-    .btn-close-custom {
-        background: none;
-        border: none;
-        color: white;
-        font-size: 1.2rem;
-        opacity: 0.5;
-    }
-    .btn-remove {
-        background: none;
-        border: none;
-        color: #ef4444;
-        opacity: 0.7;
+        transition: .18s ease;
     }
 
-    /* Tablas */
-    .table-dark-minimal tbody tr { border-bottom: 1px solid rgba(255,255,255,0.03); }
-    .table-dark-minimal td { padding: 1rem 0.5rem; color: #a1a1aa; }
+    .btn-cancel-modern:hover {
+        background: rgba(255,255,255,.03);
+    }
 
-    .add-product-zone { background: rgba(0,0,0,0.2); }
-    .modal-backdrop-custom {
+    .btn-save-modern {
+        border: none;
+        background: linear-gradient(135deg,#7c6bff,#5b4df5);
+        color: white;
+        padding: .9rem 1.8rem;
+        border-radius: 16px;
+        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        transition: .18s ease;
+        box-shadow: 0 12px 24px rgba(92,77,245,.25);
+    }
+
+    .btn-save-modern:hover {
+        transform: translateY(-2px);
+    }
+
+    .btn-save-modern:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+    }
+
+    .modal-backdrop-modern {
         position: fixed;
-        top: 0; left: 0;
-        width: 100vw; height: 100vh;
-        background: rgba(0,0,0,0.85);
-        backdrop-filter: blur(4px);
+        inset: 0;
+        background: rgba(0,0,0,.82);
+        backdrop-filter: blur(6px);
         z-index: 1040;
     }
-    .shadow-emerald { box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2); }
+
 </style>
 
 @code {
@@ -234,10 +529,16 @@
     private bool isVisible = false;
 
     private List<Proveedor> proveedores = new();
+
     private List<Producto> productos = new();
 
-    private CompraInventario compraInventario = new() { Fecha = DateTime.Now };
+    private CompraInventario compraInventario = new()
+    {
+        Fecha = DateTime.Now
+    };
+
     private DetalleCompra nuevoDetalle = new();
+
     private List<DetalleCompra> detalles = new();
 
     private decimal TotalCompra =>
@@ -252,8 +553,14 @@
     public void Show()
     {
         isVisible = true;
-        compraInventario = new() { Fecha = DateTime.Now };
+
+        compraInventario = new()
+        {
+            Fecha = DateTime.Now
+        };
+
         detalles.Clear();
+
         StateHasChanged();
     }
 
@@ -261,7 +568,8 @@
 
     private void AgregarAlDetalle()
     {
-        if (nuevoDetalle.ProductoId > 0 && nuevoDetalle.Cantidad > 0)
+        if (nuevoDetalle.ProductoId > 0 &&
+            nuevoDetalle.Cantidad > 0)
         {
             detalles.Add(new DetalleCompra
             {
@@ -276,20 +584,22 @@
 
     private async Task GuardarCompra()
     {
-        if (!detalles.Any() || compraInventario.ProveedorId == 0)
+        if (!detalles.Any() ||
+            compraInventario.ProveedorId == 0)
             return;
 
         try
         {
             db.CompraInventario.Add(compraInventario);
+
             await db.SaveChangesAsync();
 
             foreach (var item in detalles)
             {
                 item.CompraId = compraInventario.Id;
+
                 db.DetalleCompra.Add(item);
 
-                // 🔥 ACTUALIZACIÓN SEGURA DE STOCK
                 var producto = await db.Producto
                     .FirstOrDefaultAsync(p => p.Id == item.ProductoId);
 
@@ -302,6 +612,7 @@
             await db.SaveChangesAsync();
 
             await OnSaved.InvokeAsync();
+
             Close();
         }
         catch (Exception ex)
@@ -309,4 +620,5 @@
             Console.WriteLine(ex.Message);
         }
     }
+
 }
