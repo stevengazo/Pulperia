@@ -70,6 +70,8 @@ models/
  Producto.cs
  ProductoCosto.cs
  Proveedor.cs
+ RolSystem.cs
+ RolUser.cs
  Venta.cs
 obj/Debug/net8.0/
  .NETCoreApp,Version=v8.0.AssemblyAttributes.cs
@@ -478,6 +480,7 @@ Pages/
  Producto/
   Products.razor
   ViewProduct.razor
+ Settings/SettingsPage.razor
  Ventas/
   NuevaVenta.razor
   Venta-info.razor
@@ -509,6 +512,7 @@ Pages/
  Producto/
   Products.razor
   ViewProduct.razor
+ Settings/SettingsPage.razor
  Ventas/
   NuevaVenta.razor
   Venta-info.razor

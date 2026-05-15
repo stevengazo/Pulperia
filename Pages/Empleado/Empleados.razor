@@ -214,11 +214,6 @@
                                         <a class="btn-action" href="/empleado/@i.Id">
                                             <i class="fa-solid fa-eye"></i>
                                         </a>
-
-                                        <button class="btn-action">
-                                            <i class="fa-solid fa-trash"></i>
-                                        </button>
-
                                     </div>
                                 </td>
 
@@ -255,7 +250,7 @@
         try
         {
             empleados = await emp.GetAllAsync();
-            empleados = empleados.OrderBy(e=> e.Nombre).ToList();
+            empleados = empleados.Where(e=>e.Activo).OrderBy(e=> e.Nombre).ToList();
         }
         catch (Exception e)
         {
