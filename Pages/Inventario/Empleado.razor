@@ -1,0 +1,210 @@
+@page "/empleado/{id}"
+@inject EmpleadoService emp
+@inject IDbContextFactory<PulperiaDbContext> DbFactory
+
+<PageTitle>Empleado</PageTitle>
+
+<style>
+    .employee-page {
+        min-height: 100vh;
+        background: #0b0d11;
+        padding: 2rem;
+        color: #f5f7fa;
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .container-max {
+        max-width: 900px;
+        margin: auto;
+    }
+
+    .invoice {
+        background: #11151b;
+        border: 1px solid #1b1f27;
+        border-radius: 18px;
+        padding: 2rem;
+        box-shadow: 0 24px 60px rgba(0,0,0,.35);
+    }
+
+    .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 1px solid #1b1f27;
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .invoice-title h2 {
+        margin: 0;
+        font-size: 1.6rem;
+    }
+
+    .muted {
+        color: #707887;
+        font-size: .85rem;
+    }
+
+    .badge {
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(124,107,255,.12);
+        border: 1px solid rgba(124,107,255,.18);
+        color: #c9c3ff;
+        font-size: .75rem;
+    }
+
+    .sale {
+        border: 1px solid #1b1f27;
+        background: #0f1318;
+        border-radius: 14px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .sale-top {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: .8rem;
+    }
+
+    .total {
+        color: #7c6bff;
+        font-weight: 700;
+    }
+
+    .row {
+        display: flex;
+        justify-content: space-between;
+        padding: .3rem 0;
+        font-size: .85rem;
+        border-top: 1px solid #1b1f27;
+    }
+
+    .product {
+        font-weight: 600;
+        color: #f5f7fa;
+    }
+
+    .loading, .empty {
+        text-align: center;
+        color: #707887;
+        padding: 3rem;
+    }
+
+    @@media print {
+        body {
+            background: white !important;
+            color: black !important;
+        }
+
+        .employee-page {
+            background: white !important;
+            padding: 0;
+        }
+
+        .invoice {
+            box-shadow: none !important;
+            border: none !important;
+        }
+    }
+</style>
+
+<div class="employee-page">
+    <div class="container-max">
+
+        @if (isLoading)
+        {
+            <div class="loading">Cargando...</div>
+        }
+        else if (empleado is null)
+        {
+            <div class="empty">Empleado no encontrado</div>
+        }
+        else
+        {
+            <!-- FACTURA -->
+            <div class="invoice">
+
+                <!-- HEADER -->
+                <div class="invoice-header">
+                    <div class="invoice-title">
+                        <h2>@empleado.Nombre @empleado.Apellido</h2>
+                        <div class="muted">Detalle de ventas del empleado</div>
+                    </div>
+
+                    <div class="badge">
+                        ID: @empleado.Id
+                    </div>
+                </div>
+
+                <!-- VENTAS -->
+                @if (!Ventas.Any())
+                {
+                    <div class="empty">No hay ventas registradas</div>
+                }
+                else
+                {
+                    @foreach (var v in Ventas)
+                    {
+                        <div class="sale">
+
+                            <div class="sale-top">
+                                <div>
+                                    <strong>Venta #@v.Id</strong>
+                                    <div class="muted">@v.Fecha</div>
+                                </div>
+
+                                <div class="total">
+                                    ₡@v.Total
+                                </div>
+                            </div>
+
+                            @foreach (var i in v.DetalleVentas)
+                            {
+                                <div class="row">
+                                    <div class="product">@i.Producto.Nombre</div>
+                                    <div>@i.Cantidad</div>
+                                    <div>₡@i.CostoUnitarioHistorico</div>
+                                </div>
+                            }
+
+                        </div>
+                    }
+                }
+
+            </div>
+        }
+
+    </div>
+</div>
+@code {
+
+    [Parameter] public string id { get; set; } = string.Empty;
+
+    private List<Venta> Ventas = new();
+    private Pulperia.Models.Empleado? empleado;
+    private bool isLoading = true;
+    private PulperiaDbContext db;
+
+    protected override async Task OnInitializedAsync()
+    {
+        db = DbFactory.CreateDbContext();
+
+        empleado = await emp.GetByIdAsync(id);
+
+        if (empleado != null)
+        {
+            Ventas = await Task.Run(() =>
+                db.Venta
+                    .Include(v => v.DetalleVentas)
+                    .ThenInclude(d => d.Producto)
+                    .Where(v => v.ClienteId == empleado.Id.ToString())
+                    .OrderByDescending(v => v.Fecha)
+                    .ToList()
+            );
+        }
+
+        isLoading = false;
+    }
+}

@@ -15,6 +15,16 @@ public class EmpleadoService
             .Where(e => e.Activo == true)
             .Get();
 
-        return result.Models;
+        return result.Models.ToList();
+    }
+
+    public async Task<Empleado?> GetByIdAsync(string id)
+    {
+        var result = await _supabase
+            .From<Empleado>()
+            .Filter("id", Supabase.Postgrest.Constants.Operator.Equals, id)
+            .Single();
+
+        return result;
     }
 }

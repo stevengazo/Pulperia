@@ -1,0 +1,264 @@
+@page "/empleados"
+@using System.Reactive.Threading.Tasks
+
+@inject EmpleadoService emp
+
+<style>
+    /* --- (TU CSS SIN CAMBIOS) --- */
+    .employees-page {
+        min-height: 100vh;
+        background: #0b0d11;
+        padding: 2rem;
+        font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .employees-container {
+        max-width: 1200px;
+        margin: auto;
+    }
+
+    .employees-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .employees-title h2 {
+        color: #f5f7fa;
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+    }
+
+    .employees-title p {
+        margin: 6px 0 0;
+        color: #707887;
+        font-size: .92rem;
+    }
+
+    .employees-card {
+        background: #11151b;
+        border: 1px solid #1b1f27;
+        border-radius: 28px;
+        overflow: hidden;
+        box-shadow: 0 24px 60px rgba(0,0,0,.35);
+    }
+
+    .table-modern thead {
+        background: #0f1318;
+    }
+
+    .table-modern thead th {
+        border: none;
+        color: #7e8796;
+        font-size: .72rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        padding: 20px 18px;
+    }
+
+    .table-modern tbody tr {
+        border-top: 1px solid #1a1f27;
+    }
+
+    .table-modern tbody td {
+        border: none;
+        padding: 20px 18px;
+        color: #d7dde7;
+    }
+
+    .employee-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        background: rgba(124,107,255,.12);
+        color: #c9c3ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .employee-name {
+        color: #f5f7fa;
+        font-weight: 700;
+    }
+
+    .employee-id {
+        color: #707887;
+        font-size: .82rem;
+        font-family: monospace;
+    }
+
+    .badge-modern {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(124,107,255,.12);
+        color: #c9c3ff;
+        border: 1px solid rgba(124,107,255,.18);
+        padding: 8px 14px;
+        border-radius: 999px;
+        font-size: .8rem;
+        font-weight: 700;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .btn-action {
+        width: 38px;
+        height: 38px;
+        border-radius: 12px;
+        border: 1px solid #232936;
+        background: #151922;
+        color: #7e8796;
+        display: inline-flex;
+    }
+
+    .search-box {
+        width: 320px;
+        background: #11151b;
+        border: 1px solid #1b1f27;
+        border-radius: 12px;
+        padding: 10px 14px;
+        color: #f5f7fa;
+        outline: none;
+    }
+</style>
+
+<div class="employees-page">
+
+    <div class="employees-container">
+
+        <div class="employees-header">
+
+            <div class="employees-title">
+                <h2>Empleados</h2>
+                <p>Administración y listado de empleados registrados</p>
+            </div>
+
+            <div class="d-flex gap-3 align-items-center">
+
+                <input class="search-box"
+                       placeholder="Buscar por nombre o apellido..."
+                       @bind="searchText"
+                       @bind:event="oninput" />
+
+                <div class="badge-modern">
+                    <i class="fa-solid fa-users"></i>
+                    @filtered.Count empleado@(filtered.Count != 1 ? "s" : "")
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="employees-card">
+
+            <div class="table-responsive">
+
+                <table class="table table-modern align-middle">
+
+                    <thead>
+                        <tr>
+                            <th class="ps-4">Empleado</th>
+                            <th>Apellido</th>
+                    
+                            <th class="text-center pe-4">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @if (!filtered.Any())
+                        {
+                            <tr>
+                                <td colspan="4">
+                                    <div class="empty-state">
+                                        <i class="fa-solid fa-users-slash"></i>
+                                        <div>No hay empleados que coincidan</div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+
+                        @foreach (var i in filtered)
+                        {
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center gap-3">
+
+                                        <div class="employee-avatar">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+
+                                        <div>
+                                            <div class="employee-name">@i.Nombre</div>
+                                           
+                                        </div>
+
+                                    </div>
+                                </td>
+
+                                <td>@i.Apellido</td>
+
+
+                                <td class="text-center pe-4">
+                                    <div class="actions">
+
+                                        <a class="btn-action" href="/empleado/@i.Id">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+
+                                        <button class="btn-action">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+
+                                    </div>
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@code {
+
+    private List<Pulperia.Models.Empleado> empleados = new();
+    private string searchText = string.Empty;
+
+    private List<Pulperia.Models.Empleado> filtered =>
+        string.IsNullOrWhiteSpace(searchText)
+            ? empleados
+            : empleados.Where(e =>
+                (e.Nombre?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false)
+                || (e.Apellido?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false)
+            ).ToList();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            empleados = await emp.GetAllAsync();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+    }
+}

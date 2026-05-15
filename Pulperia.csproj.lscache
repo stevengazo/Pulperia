@@ -471,7 +471,10 @@ Pages/
  Error.cshtml
  FetchData.razor
  Index.razor
- Inventario/Inventario.razor
+ Inventario/
+  Empleado.razor
+  Empleados.razor
+  Inventario.razor
  Producto/
   Products.razor
   ViewProduct.razor
@@ -498,7 +501,10 @@ Pages/
  Error.cshtml
  FetchData.razor
  Index.razor
- Inventario/Inventario.razor
+ Inventario/
+  Empleado.razor
+  Empleados.razor
+  Inventario.razor
  Producto/
   Products.razor
   ViewProduct.razor
