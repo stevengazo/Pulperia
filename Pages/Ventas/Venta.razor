@@ -1,0 +1,196 @@
+@page "/venta/{id:int}"
+
+@inject IDbContextFactory<PulperiaDbContext> DbContextFactory
+@inject IJSRuntime JS
+
+<style>
+    .page {
+        min-height: 100vh;
+        background: #0b0d11;
+        padding: 2rem;
+        color: #f5f7fa;
+        font-family: system-ui, sans-serif;
+    }
+
+    .actions {
+        max-width: 420px;
+        margin: auto;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .btn-print {
+        background: #7c6bff;
+        border: none;
+        padding: 10px 14px;
+        border-radius: 10px;
+        color: white;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    /* RECEIPT */
+    .receipt {
+        max-width: 420px;
+        margin: auto;
+        background: #11151b;
+        border: 1px solid #1b1f27;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 20px 50px rgba(0,0,0,.4);
+    }
+
+    .receipt-header {
+        text-align: center;
+        border-bottom: 1px dashed #2a2f3a;
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .receipt-header h3 {
+        margin: 0;
+    }
+
+    .muted {
+        color: #707887;
+        font-size: .85rem;
+    }
+
+    .line {
+        display: flex;
+        justify-content: space-between;
+        padding: .3rem 0;
+        font-size: .9rem;
+    }
+
+    .item {
+        border-bottom: 1px dashed #2a2f3a;
+        padding-bottom: .5rem;
+        margin-bottom: .5rem;
+    }
+
+    .total {
+        margin-top: 1rem;
+        border-top: 1px solid #2a2f3a;
+        padding-top: 1rem;
+        display: flex;
+        justify-content: space-between;
+        font-weight: 700;
+        color: #7c6bff;
+    }
+
+    /* PRINT ONLY RECEIPT */
+    @@media print {
+        body * {
+            visibility: hidden;
+        }
+
+        .receipt, .receipt * {
+            visibility: visible;
+        }
+
+        .receipt {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            box-shadow: none;
+            border: none;
+        }
+
+        .actions {
+            display: none;
+        }
+
+        body {
+            background: white;
+        }
+    }
+</style>
+
+<div class="page">
+
+    @if (isLoading)
+    {
+        <p>Cargando...</p>
+    }
+    else if (venta is null)
+    {
+        <p>No se encontró la venta</p>
+    }
+    else
+    {
+        <div class="actions">
+            <button class="btn-print" @onclick="Print">
+                🧾 Imprimir recibo
+            </button>
+        </div>
+
+        <!-- RECEIPT AREA -->
+        <div class="receipt" id="receipt">
+
+            <div class="receipt-header">
+                <h3>RECIBO DE VENTA</h3>
+                <div class="muted">Venta #@venta.Id</div>
+                <div class="muted">@venta.Fecha</div>
+            </div>
+
+            @foreach (var item in venta.DetalleVentas)
+            {
+                <div class="item">
+
+                    <div class="line">
+                        <div><b>@item.Producto.Nombre</b></div>
+                        <div>₡@item.CostoUnitarioHistorico</div>
+                    </div>
+
+                    <div class="line muted">
+                        <div>@item.Producto.Presentacion</div>
+                        <div>Cant: @item.Cantidad</div>
+                    </div>
+
+                </div>
+            }
+
+            <div class="total">
+                <div>TOTAL</div>
+                <div>₡@venta.Total</div>
+            </div>
+
+        </div>
+    }
+
+</div>
+
+@code {
+
+    [Parameter]
+    public int id { get; set; }
+
+    private PulperiaDbContext db;
+    private Pulperia.Models.Venta? venta;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            db = DbContextFactory.CreateDbContext();
+
+            venta = await db.Venta
+                .Include(v => v.DetalleVentas)
+                    .ThenInclude(d => d.Producto)
+                .FirstOrDefaultAsync(v => v.Id == id);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task Print()
+    {
+        await JS.InvokeVoidAsync("print");
+    }
+}

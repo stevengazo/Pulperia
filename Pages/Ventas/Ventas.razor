@@ -621,9 +621,9 @@
 
                                 <div class="action-buttons">
 
-                                    <button class="btn-action btn-view">
+                                    <a class="btn-action btn-view" href="/venta/@venta.Id">
                                         <i class="fa-solid fa-eye"></i>
-                                    </button>
+                                    </a>
 
                                     <button class="btn-action btn-print">
                                         <i class="fa-solid fa-print"></i>
@@ -650,7 +650,7 @@
 
     private PulperiaDbContext db = default!;
 
-    private List<Venta> ventas = new();
+    private List<Pulperia.Models.Venta> ventas = new();
 
     private List<Empleado> empleados = new();
 
@@ -673,7 +673,7 @@
     private int Transacciones => ventas
         .Count(v => v.Fecha.Date == DateTime.Today);
 
-    private IEnumerable<Venta> VentasFiltradas => ventas.Where(v =>
+    private IEnumerable<Pulperia.Models.Venta> VentasFiltradas => ventas.Where(v =>
         (string.IsNullOrEmpty(filtro) ||
             v.Id.ToString().Contains(filtro) ||
             empleados.Any(e => e.Id.ToString() == v.ClienteId &&

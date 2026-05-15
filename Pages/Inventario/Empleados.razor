@@ -255,6 +255,7 @@
         try
         {
             empleados = await emp.GetAllAsync();
+            empleados = empleados.OrderBy(e=> e.Nombre).ToList();
         }
         catch (Exception e)
         {
