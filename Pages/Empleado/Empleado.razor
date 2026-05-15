@@ -1,4 +1,5 @@
 @page "/empleado/{id}"
+
 @inject EmpleadoService emp
 @inject IDbContextFactory<PulperiaDbContext> DbFactory
 
@@ -14,7 +15,7 @@
     }
 
     .container-max {
-        max-width: 900px;
+        max-width: 1000px;
         margin: auto;
     }
 
@@ -54,18 +55,45 @@
         font-size: .75rem;
     }
 
-    .sale {
-        border: 1px solid #1b1f27;
-        background: #0f1318;
-        border-radius: 14px;
-        padding: 1rem;
-        margin-bottom: 1rem;
+    .loading, .empty {
+        text-align: center;
+        color: #707887;
+        padding: 3rem;
     }
 
-    .sale-top {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: .8rem;
+    /* TABLE */
+    .table-wrap {
+        overflow-x: auto;
+        margin-top: 1rem;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #0f1318;
+        border: 1px solid #1b1f27;
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    thead {
+        background: #11151b;
+        color: #cbd5e1;
+    }
+
+    th, td {
+        padding: 12px;
+        text-align: left;
+        font-size: .9rem;
+    }
+
+    tbody tr {
+        border-top: 1px solid #1b1f27;
+        color: #f5f7fa;
+    }
+
+    tbody tr:hover {
+        background: rgba(124,107,255,.05);
     }
 
     .total {
@@ -73,23 +101,14 @@
         font-weight: 700;
     }
 
-    .row {
-        display: flex;
-        justify-content: space-between;
-        padding: .3rem 0;
-        font-size: .85rem;
-        border-top: 1px solid #1b1f27;
-    }
-
-    .product {
+    .link {
+        color: #7c6bff;
+        text-decoration: none;
         font-weight: 600;
-        color: #f5f7fa;
     }
 
-    .loading, .empty {
-        text-align: center;
-        color: #707887;
-        padding: 3rem;
+    .link:hover {
+        text-decoration: underline;
     }
 
     @@media print {
@@ -103,9 +122,12 @@
             padding: 0;
         }
 
-        .invoice {
-            box-shadow: none !important;
+        table {
             border: none !important;
+        }
+
+        .link {
+            display: none;
         }
     }
 </style>
@@ -123,14 +145,13 @@
         }
         else
         {
-            <!-- FACTURA -->
+            <!-- HEADER -->
             <div class="invoice">
 
-                <!-- HEADER -->
                 <div class="invoice-header">
                     <div class="invoice-title">
                         <h2>@empleado.Nombre @empleado.Apellido</h2>
-                        <div class="muted">Detalle de ventas del empleado</div>
+                        <div class="muted">Historial de ventas del empleado</div>
                     </div>
 
                     <div class="badge">
@@ -138,39 +159,45 @@
                     </div>
                 </div>
 
-                <!-- VENTAS -->
+                <!-- TABLE -->
                 @if (!Ventas.Any())
                 {
                     <div class="empty">No hay ventas registradas</div>
                 }
                 else
                 {
-                    @foreach (var v in Ventas)
-                    {
-                        <div class="sale">
+                    <div class="table-wrap">
 
-                            <div class="sale-top">
-                                <div>
-                                    <strong>Venta #@v.Id</strong>
-                                    <div class="muted">@v.Fecha</div>
-                                </div>
+                        <table>
 
-                                <div class="total">
-                                    ₡@v.Total
-                                </div>
-                            </div>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Fecha</th>
+                                    <th>Total</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
 
-                            @foreach (var i in v.DetalleVentas)
-                            {
-                                <div class="row">
-                                    <div class="product">@i.Producto.Nombre</div>
-                                    <div>@i.Cantidad</div>
-                                    <div>₡@i.CostoUnitarioHistorico</div>
-                                </div>
-                            }
+                            <tbody>
+                                @foreach (var v in Ventas)
+                                {
+                                    <tr>
+                                        <td>#@v.Id</td>
+                                        <td style="color:#707887;">@v.Fecha</td>
+                                        <td class="total">₡@v.Total</td>
+                                        <td>
+                                            <a class="link" href="/venta/@v.Id">
+                                                Ver recibo →
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
 
-                        </div>
-                    }
+                        </table>
+
+                    </div>
                 }
 
             </div>
@@ -178,14 +205,16 @@
 
     </div>
 </div>
+
 @code {
 
-    [Parameter] public string id { get; set; } = string.Empty;
+    [Parameter]
+    public string id { get; set; } = string.Empty;
 
     private List<Venta> Ventas = new();
     private Pulperia.Models.Empleado? empleado;
     private bool isLoading = true;
-    private PulperiaDbContext db;
+    private PulperiaDbContext? db;
 
     protected override async Task OnInitializedAsync()
     {

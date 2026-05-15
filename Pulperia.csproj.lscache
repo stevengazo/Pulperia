@@ -468,19 +468,19 @@ Components/
  Proveedor/AddProveedor.razor
 Pages/
  Counter.razor
+ Empleado/
+  Empleado.razor
+  Empleados.razor
  Error.cshtml
  FetchData.razor
  Index.razor
- Inventario/
-  Empleado.razor
-  Empleados.razor
-  Inventario.razor
+ Inventario/Inventario.razor
  Producto/
   Products.razor
   ViewProduct.razor
  Ventas/
   NuevaVenta.razor
-  Venta.razor
+  Venta-info.razor
   Ventas.razor
  _Host.cshtml
  _Layout.cshtml
@@ -499,19 +499,19 @@ Components/
  Proveedor/AddProveedor.razor
 Pages/
  Counter.razor
+ Empleado/
+  Empleado.razor
+  Empleados.razor
  Error.cshtml
  FetchData.razor
  Index.razor
- Inventario/
-  Empleado.razor
-  Empleados.razor
-  Inventario.razor
+ Inventario/Inventario.razor
  Producto/
   Products.razor
   ViewProduct.razor
  Ventas/
   NuevaVenta.razor
-  Venta.razor
+  Venta-info.razor
   Ventas.razor
  _Host.cshtml
  _Layout.cshtml

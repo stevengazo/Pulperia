@@ -210,7 +210,8 @@
                 ProductoId = producto.Id,
                 Producto = producto,
                 Cantidad = cantidad,
-                PrecioUnitarioHistorico = producto.PrecioVenta
+                PrecioUnitarioHistorico = producto.PrecioVenta * cantidad,
+                 CostoUnitarioHistorico = producto.PrecioVenta
             });
         }
 
