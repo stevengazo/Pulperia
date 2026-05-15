@@ -22,7 +22,7 @@ var supabaseKey = builder.Configuration["Supabase:AnonKey"];
 var supabasePublic = new Supabase.Client(supabaseUrl, supabaseKey, new Supabase.SupabaseOptions { Schema = "public" });
 await supabasePublic.InitializeAsync();
 builder.Services.AddSingleton(supabasePublic);
-builder.Services.AddSingleton<AppSessionService>();
+builder.Services.AddScoped<AppSessionService>();
 builder.Services.AddScoped<EmpleadoService>();
 
 var app = builder.Build();

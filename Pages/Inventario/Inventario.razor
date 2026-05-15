@@ -5,308 +5,361 @@
 
 <AddCompraInventario @ref="modalCompra" OnSaved="ActualizarDatos" />
 
-<div class="container-fluid py-4 bg-dark min-vh-100">
+<style>
+    .inv-root {
+        min-height: 100vh;
+        padding: 2rem 2.5rem;
+        font-family: 'Inter', system-ui, sans-serif;
+    }
 
-    @* Cabecera *@
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    .inv-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .inv-head h2 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        color: #f5f7fa;
+        letter-spacing: -0.04em;
+    }
+
+    .inv-head p {
+        margin: 6px 0 0;
+        color: #707887;
+        font-size: .92rem;
+    }
+
+    .btn-compra {
+        border: none;
+        background: #ffaa43;
+        color: #0f1117;
+        padding: 12px 18px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: .9rem;
+        font-weight: 700;
+        transition: .2s ease;
+        box-shadow: 0 10px 25px rgba(255,170,67,.25);
+        cursor: pointer;
+    }
+
+    .btn-compra:hover {
+        transform: translateY(-2px);
+        background: #ffc266;
+        box-shadow: 0 14px 30px rgba(255,170,67,.35);
+    }
+
+    /* Stat cards */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+        background: #181c27;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 18px;
+        padding: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: .2s ease;
+    }
+
+    .stat-card:hover { transform: translateY(-3px); }
+
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+    }
+
+    .icon-orange { background: rgba(255,170,67,.12); color: #ffaa43; }
+    .icon-yellow { background: rgba(250,204,21,.12); color: #facc15; }
+    .icon-red    { background: rgba(239,68,68,.12);  color: #f87171; }
+
+    .stat-label {
+        color: #707887;
+        font-size: .8rem;
+        margin-bottom: 4px;
+    }
+
+    .stat-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #f5f7fa;
+        letter-spacing: -0.04em;
+        line-height: 1;
+    }
+
+    .stat-value.yellow { color: #facc15; }
+    .stat-value.red    { color: #f87171; }
+
+    /* Main card */
+    .inv-card {
+        background: #181c27;
+        border: 1px solid rgba(255,255,255,0.06);
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,.35);
+    }
+
+    .inv-toolbar {
+        padding: 1.4rem;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        display: grid;
+        grid-template-columns: 1fr 220px;
+        gap: 14px;
+    }
+
+    .inv-input {
+        width: 100%;
+        background: #0f1117;
+        border: 1px solid rgba(255,255,255,0.07);
+        border-radius: 14px;
+        color: #eef2f7;
+        padding: 12px 16px;
+        font-size: .92rem;
+        outline: none;
+        transition: .2s;
+    }
+
+    .inv-input:focus {
+        border-color: #ffaa43;
+        box-shadow: 0 0 0 4px rgba(255,170,67,.1);
+    }
+
+    .inv-input::placeholder { color: #5f6775; }
+
+    .search-wrap {
+        position: relative;
+    }
+
+    .search-wrap .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #707887;
+        pointer-events: none;
+    }
+
+    .search-wrap .inv-input {
+        padding-left: 40px;
+    }
+
+    /* Table */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead { background: #0f1117; }
+
+    thead th {
+        padding: 16px;
+        color: #7e8796;
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    thead th.r { text-align: right; }
+    thead th.c { text-align: center; }
+
+    tbody tr {
+        border-bottom: 1px solid rgba(255,255,255,0.04);
+        transition: .15s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,.02); }
+
+    tbody td {
+        padding: 16px;
+        color: #c7cfdb;
+        font-size: .9rem;
+        vertical-align: middle;
+    }
+
+    .td-proveedor {
+        color: #ffaa43;
+        font-weight: 600;
+        font-size: .85rem;
+    }
+
+    .td-fecha { color: #707887; }
+
+    .td-nombre {
+        color: #f5f7fa;
+        font-weight: 600;
+    }
+
+    .td-sku {
+        color: #707887;
+        font-size: .78rem;
+    }
+
+    .td-ctr { text-align: center; font-weight: 600; color: #eef2f7; }
+    .td-r   { text-align: right; font-variant-numeric: tabular-nums; }
+
+    .costo  { color: #facc15; font-weight: 600; }
+    .venta  { color: #4ade80; font-weight: 700; }
+
+    .ganancia {
+        text-align: center;
+        font-weight: 700;
+        color: #ffaa43;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .ganancia.neg { color: #f87171; }
+</style>
+
+<div class="inv-root">
+
+    <div class="inv-head">
         <div>
-            <h2 class="text-white fw-bold mb-0">📦 Control de Inventario</h2>
-            <p class="text-white-50 small mb-0">
-                Gestione sus productos y niveles de existencias
-            </p>
+            <h2>Control de Inventario</h2>
+            <p>Gestione sus productos y niveles de existencias</p>
         </div>
-
-        <button class="btn btn-primary d-flex align-items-center gap-2 shadow"
-                @onclick="AbrirModalNuevo">
-
+        <button class="btn-compra" @onclick="AbrirModalNuevo">
             <i class="bi bi-plus-lg"></i>
             Registrar Compra
         </button>
     </div>
 
-    @* Tarjetas *@
-    <div class="row g-3 mb-4">
+    <div class="stats-grid">
 
-        <div class="col-md-4">
-            <div class="card bg-dark text-white border-secondary h-100 shadow-sm">
-
-                <div class="card-body d-flex align-items-center gap-3">
-
-                    <div class="stats-icon bg-primary bg-opacity-10 text-primary">
-                        <i class="bi bi-box-seam fs-3"></i>
-                    </div>
-
-                    <div>
-                        <h6 class="text-white-50 small mb-0">
-                            Total Productos
-                        </h6>
-
-                        <h3 class="mb-0 fw-bold">
-                            @detalleCompras.Count
-                        </h3>
-                    </div>
-
-                </div>
-
+        <div class="stat-card">
+            <div class="stat-icon icon-orange">
+                <i class="bi bi-box-seam"></i>
+            </div>
+            <div>
+                <div class="stat-label">Total Registros</div>
+                <div class="stat-value">@detalleCompras.Count</div>
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card bg-dark text-white border-warning border-opacity-25 h-100 shadow-sm">
-
-                <div class="card-body d-flex align-items-center gap-3">
-
-                    <div class="stats-icon bg-warning bg-opacity-10 text-warning">
-                        <i class="bi bi-exclamation-triangle fs-3"></i>
-                    </div>
-
-                    <div>
-                        <h6 class="text-white-50 small mb-0">
-                            Stock Bajo
-                        </h6>
-
-                        <h3 class="mb-0 fw-bold text-warning">
-                            @detalleCompras.Count(x => x.Producto.StockActual <= x.Producto.StockMinimo && x.Producto.StockActual > 0)
-                        </h3>
-                    </div>
-
+        <div class="stat-card">
+            <div class="stat-icon icon-yellow">
+                <i class="bi bi-exclamation-triangle"></i>
+            </div>
+            <div>
+                <div class="stat-label">Stock Bajo</div>
+                <div class="stat-value yellow">
+                    @detalleCompras.Count(x => x.Producto.StockActual <= x.Producto.StockMinimo && x.Producto.StockActual > 0)
                 </div>
-
             </div>
         </div>
 
-        <div class="col-md-4">
-            <div class="card bg-dark text-white border-danger border-opacity-25 h-100 shadow-sm">
-
-                <div class="card-body d-flex align-items-center gap-3">
-
-                    <div class="stats-icon bg-danger bg-opacity-10 text-danger">
-                        <i class="bi bi-x-octagon fs-3"></i>
-                    </div>
-
-                    <div>
-                        <h6 class="text-white-50 small mb-0">
-                            Agotados
-                        </h6>
-
-                        <h3 class="mb-0 fw-bold text-danger">
-                            @detalleCompras.Count(x => x.Producto.StockActual <= 0)
-                        </h3>
-                    </div>
-
+        <div class="stat-card">
+            <div class="stat-icon icon-red">
+                <i class="bi bi-x-octagon"></i>
+            </div>
+            <div>
+                <div class="stat-label">Agotados</div>
+                <div class="stat-value red">
+                    @detalleCompras.Count(x => x.Producto.StockActual <= 0)
                 </div>
-
             </div>
         </div>
 
     </div>
 
-    @* Tabla *@
-    <div class="card bg-dark text-white border-secondary shadow">
+    <div class="inv-card">
 
-        <div class="card-header border-secondary bg-transparent py-3">
-
-            <div class="row g-2">
-
-                <div class="col-md-8">
-
-                    <div class="input-group">
-
-                        <span class="input-group-text bg-dark border-secondary text-white-50">
-                            <i class="bi bi-search"></i>
-                        </span>
-
-                        <input type="text"
-                               class="form-control bg-dark text-white border-secondary"
-                               placeholder="Buscar por nombre, SKU o proveedor..."
-                               @bind="filtro"
-                               @bind:event="oninput" />
-
-                    </div>
-
-                </div>
-
-                <div class="col-md-4">
-
-                    <select class="form-select bg-dark text-white border-secondary">
-
-                        <option value="">Todas las categorías</option>
-                        <option value="Abarrotes">Abarrotes</option>
-                        <option value="Lacteos">Lácteos</option>
-                        <option value="Bebidas">Bebidas</option>
-
-                    </select>
-
-                </div>
-
+        <div class="inv-toolbar">
+            <div class="search-wrap">
+                <i class="bi bi-search search-icon"></i>
+                <input class="inv-input"
+                       placeholder="Buscar por nombre, SKU o proveedor..."
+                       @bind="filtro"
+                       @bind:event="oninput" />
             </div>
 
+            <select class="inv-input">
+                <option value="">Todas las categorías</option>
+                <option value="Abarrotes">Abarrotes</option>
+                <option value="Lacteos">Lácteos</option>
+                <option value="Bebidas">Bebidas</option>
+            </select>
         </div>
 
-        <div class="card-body p-0">
-
-            <div class="table-responsive">
-
-                <table class="table table-dark table-hover align-middle mb-0">
-
-                    <thead class="text-white-50 small border-secondary">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Proveedor</th>
+                        <th>Fecha</th>
+                        <th>Producto</th>
+                        <th class="c">Cantidad</th>
+                        <th class="r">Costo Unit.</th>
+                        <th class="r">Precio Venta</th>
+                        <th class="c">Ganancia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var i in detalleCompras.Where(x =>
+                        string.IsNullOrWhiteSpace(filtro)
+                        || x.Producto.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)
+                        || x.CompraInventario.Proveedor.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)
+                        || x.Producto.Id.ToString().Contains(filtro)))
+                    {
+                        var ganancia = i.Producto.PrecioVenta - i.PrecioUnitario;
 
                         <tr>
-                            <th class="ps-4">Proveedor</th>
-                            <th>Fecha</th>
-                            <th>Producto</th>
-                            <th class="text-center">Cantidad</th>
-                            <th class="text-end">Costo</th>
-                            <th class="text-end">Venta</th>
-                            <th class="text-center pe-4">Ganacia</th>
+                            <td class="td-proveedor">
+                                @i.CompraInventario?.Proveedor?.Nombre
+                            </td>
+
+                            <td class="td-fecha">
+                                @i.CompraInventario.Fecha.ToString("dd/MM/yyyy")
+                            </td>
+
+                            <td>
+                                <div class="td-nombre">@i.Producto.Nombre</div>
+                                <div class="td-sku">SKU: @i.Producto.Id</div>
+                            </td>
+
+                            <td class="td-ctr">@i.Cantidad</td>
+
+                            <td class="td-r costo">₡@i.PrecioUnitario.ToString("N2")</td>
+
+                            <td class="td-r venta">₡@i.Producto.PrecioVenta.ToString("N2")</td>
+
+                            <td class="ganancia @(ganancia < 0 ? "neg" : "")">
+                                ₡@ganancia.ToString("N2")
+                            </td>
                         </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        @foreach(var i in detalleCompras.Where(x =>
-                       string.IsNullOrWhiteSpace(filtro)
-                       || x.Producto.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)
-                       || x.CompraInventario.Proveedor.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)
-                       || x.Producto.Id.ToString().Contains(filtro)
-                       ))
-                        {
-                            <tr>
-
-                                <td class="ps-4 fw-semibold text-info">
-                     
-                                </td>
-
-                                <td class="text-white-50">
-                                    @i.CompraInventario.Fecha.ToString("dd/MM/yyyy")
-                                </td>
-
-                                <td>
-
-                                    <div class="fw-semibold text-white">
-                                        @i.Producto.Nombre
-                                    </div>
-
-                                    <small class="text-white-50">
-                                        SKU: @i.Producto.Id
-                                    </small>
-
-                                </td>
-
-                                <td class="text-center fw-semibold">
-                                    @i.Cantidad
-                                </td>
-
-                                <td class="text-end text-warning fw-semibold">
-                                    ₡@i.PrecioUnitario.ToString("N2")
-                                </td>
-
-                                <td class="text-end text-success fw-bold">
-                                    ₡@i.Producto.PrecioVenta.ToString("N2")
-                                </td>
-
-                                <td class="text-center pe-4">
-
-                                 ₡  @(i.Producto.PrecioVenta - i.PrecioUnitario )
-
-                                </td>
-
-                            </tr>
-                        }
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
+                    }
+                </tbody>
+            </table>
         </div>
 
     </div>
 
 </div>
 
-<style>
-
-    .stats-icon {
-        width: 50px;
-        height: 50px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 14px;
-    }
-
-    .card {
-        border-radius: 18px;
-        overflow: hidden;
-    }
-
-    .table {
-        margin-bottom: 0;
-    }
-
-    .table thead th {
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: .6px;
-        font-size: .75rem;
-        color: rgba(255,255,255,.65);
-        border-top: none;
-        border-bottom: 1px solid rgba(255,255,255,.08);
-        background: rgba(255,255,255,.02);
-        padding-top: 16px;
-        padding-bottom: 16px;
-    }
-
-    .table tbody tr {
-        border-color: rgba(255,255,255,.05);
-        transition: all .15s ease-in-out;
-    }
-
-    .table tbody tr:hover {
-        background: rgba(255,255,255,.03);
-    }
-
-    .table tbody td {
-        padding-top: 16px;
-        padding-bottom: 16px;
-        vertical-align: middle;
-    }
-
-    .form-control,
-    .form-select,
-    .input-group-text {
-        min-height: 46px;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        box-shadow: none;
-        border-color: #0d6efd;
-    }
-
-    .btn {
-        border-radius: 12px;
-    }
-
-    .badge {
-        padding: 8px 12px;
-        font-size: .72rem;
-        font-weight: 600;
-        border-radius: 10px;
-    }
-
-</style>
-
 @code {
 
     private string filtro = "";
-
-    // Referencia al componente modal
     private AddCompraInventario modalCompra;
-
     private PulperiaDbContext db;
     private List<DetalleCompra> detalleCompras = new();
 
@@ -321,16 +374,13 @@
                 .ThenInclude(e => e.Proveedor)
                 .ToListAsync();
         }
-        catch(Exception f)
+        catch (Exception f)
         {
             Console.WriteLine(f.Message);
         }
     }
 
-    private void AbrirModalNuevo()
-    {
-        modalCompra.Show();
-    }
+    private void AbrirModalNuevo() => modalCompra.Show();
 
     private async Task ActualizarDatos()
     {
@@ -342,5 +392,4 @@
 
         StateHasChanged();
     }
-
 }

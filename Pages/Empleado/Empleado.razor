@@ -8,7 +8,6 @@
 <style>
     .employee-page {
         min-height: 100vh;
-        background: #0b0d11;
         padding: 2rem;
         color: #f5f7fa;
         font-family: 'Inter', system-ui, sans-serif;
@@ -20,8 +19,8 @@
     }
 
     .invoice {
-        background: #11151b;
-        border: 1px solid #1b1f27;
+        background: #181c27;
+        border: 1px solid rgba(255,255,255,0.06);
         border-radius: 18px;
         padding: 2rem;
         box-shadow: 0 24px 60px rgba(0,0,0,.35);
@@ -31,28 +30,33 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        border-bottom: 1px solid #1b1f27;
-        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        padding-bottom: 1.25rem;
         margin-bottom: 1.5rem;
     }
 
     .invoice-title h2 {
         margin: 0;
         font-size: 1.6rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
     }
 
     .muted {
         color: #707887;
         font-size: .85rem;
+        margin-top: 4px;
     }
 
-    .badge {
-        padding: 6px 12px;
+    .emp-badge {
+        padding: 6px 14px;
         border-radius: 999px;
-        background: rgba(124,107,255,.12);
-        border: 1px solid rgba(124,107,255,.18);
-        color: #c9c3ff;
+        background: rgba(255,170,67,.1);
+        border: 1px solid rgba(255,170,67,.2);
+        color: #ffaa43;
         font-size: .75rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
     }
 
     .loading, .empty {
@@ -70,65 +74,74 @@
     table {
         width: 100%;
         border-collapse: collapse;
-        background: #0f1318;
-        border: 1px solid #1b1f27;
+        background: #0f1117;
+        border: 1px solid rgba(255,255,255,0.06);
         border-radius: 12px;
         overflow: hidden;
     }
 
     thead {
-        background: #11151b;
-        color: #cbd5e1;
+        background: #181c27;
     }
 
-    th, td {
-        padding: 12px;
+    th {
+        padding: 14px 16px;
         text-align: left;
+        font-size: .72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #7e8796;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    td {
+        padding: 14px 16px;
         font-size: .9rem;
+        color: #c7cfdb;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
     }
 
-    tbody tr {
-        border-top: 1px solid #1b1f27;
-        color: #f5f7fa;
+    tbody tr:last-child td {
+        border-bottom: none;
     }
 
-    tbody tr:hover {
-        background: rgba(124,107,255,.05);
+    tbody tr:hover td {
+        background: rgba(255,255,255,.02);
     }
 
     .total {
-        color: #7c6bff;
+        color: #ffaa43;
         font-weight: 700;
+        font-variant-numeric: tabular-nums;
     }
 
     .link {
-        color: #7c6bff;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        color: #ffaa43;
         text-decoration: none;
         font-weight: 600;
+        font-size: .85rem;
+        transition: opacity .15s;
     }
 
     .link:hover {
-        text-decoration: underline;
+        opacity: .75;
+    }
+
+    .id-cell {
+        color: #707887;
+        font-size: .82rem;
+        font-variant-numeric: tabular-nums;
     }
 
     @@media print {
-        body {
-            background: white !important;
-            color: black !important;
-        }
-
-        .employee-page {
-            background: white !important;
-            padding: 0;
-        }
-
-        table {
-            border: none !important;
-        }
-
-        .link {
-            display: none;
-        }
+        body { background: white !important; color: black !important; }
+        .employee-page { background: white !important; padding: 0; }
+        table { border: none !important; }
+        .link { display: none; }
     }
 </style>
 
@@ -145,7 +158,6 @@
         }
         else
         {
-            <!-- HEADER -->
             <div class="invoice">
 
                 <div class="invoice-header">
@@ -154,12 +166,9 @@
                         <div class="muted">Historial de ventas del empleado</div>
                     </div>
 
-                    <div class="badge">
-                        ID: @empleado.Id
-                    </div>
+                    <div class="emp-badge">ID: @empleado.Id</div>
                 </div>
 
-                <!-- TABLE -->
                 @if (!Ventas.Any())
                 {
                     <div class="empty">No hay ventas registradas</div>
@@ -167,9 +176,7 @@
                 else
                 {
                     <div class="table-wrap">
-
                         <table>
-
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -183,9 +190,9 @@
                                 @foreach (var v in Ventas)
                                 {
                                     <tr>
-                                        <td>#@v.Id</td>
-                                        <td style="color:#707887;">@v.Fecha</td>
-                                        <td class="total">₡@v.Total</td>
+                                        <td class="id-cell">#@v.Id</td>
+                                        <td style="color:#707887;">@v.Fecha.ToString("dd MMM yyyy, hh:mm tt")</td>
+                                        <td class="total">₡@v.Total.ToString("N2")</td>
                                         <td>
                                             <a class="link" href="/venta/@v.Id">
                                                 Ver recibo →
@@ -194,9 +201,7 @@
                                     </tr>
                                 }
                             </tbody>
-
                         </table>
-
                     </div>
                 }
 

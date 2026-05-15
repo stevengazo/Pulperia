@@ -10,3 +10,16 @@
         </LayoutView>
     </NotFound>
 </Router>
+
+@inject AppSessionService Session
+@code{
+    
+protected override async Task OnAfterRenderAsync(bool firstRender)
+{
+    if (firstRender)
+    {
+        await Session.TryRestoreSessionAsync();
+        StateHasChanged();
+    }
+}
+}

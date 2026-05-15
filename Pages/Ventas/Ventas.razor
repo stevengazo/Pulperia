@@ -8,7 +8,7 @@
     .sales-root {
         min-height: 100vh;
         padding: 2rem 2.5rem;
-        background: #0b0d11;
+
         font-family: 'Inter', system-ui, sans-serif;
     }
 
@@ -35,22 +35,23 @@
 
     .btn-sale {
         border: none;
-        background: linear-gradient(135deg,#7c6bff,#5b4df5);
-        color: white;
+        background: #ffaa43;
+        color: #0f1117;
         padding: 12px 18px;
         border-radius: 14px;
         display: inline-flex;
         align-items: center;
         gap: 10px;
         font-size: .9rem;
-        font-weight: 600;
+        font-weight: 700;
         transition: .2s ease;
-        box-shadow: 0 10px 25px rgba(92,77,245,.25);
+        box-shadow: 0 10px 25px rgba(255,170,67,.25);
     }
 
     .btn-sale:hover {
         transform: translateY(-2px);
-        opacity: .95;
+        background: #ffc266;
+        box-shadow: 0 14px 30px rgba(255,170,67,.35);
     }
 
     .stats-grid {
@@ -61,17 +62,15 @@
     }
 
     .stat-card {
-        background: #11151b;
-        border: 1px solid #1b1f27;
+        background: #181c27;
+        border: 1px solid rgba(255,255,255,0.06);
         border-radius: 22px;
         padding: 1.4rem;
         box-shadow: 0 20px 40px rgba(0,0,0,.35);
         transition: .2s ease;
     }
 
-    .stat-card:hover {
-        transform: translateY(-3px);
-    }
+    .stat-card:hover { transform: translateY(-3px); }
 
     .stat-top {
         display: flex;
@@ -90,25 +89,10 @@
         font-size: 1rem;
     }
 
-    .icon-blue {
-        background: rgba(59,130,246,.12);
-        color: #60a5fa;
-    }
-
-    .icon-green {
-        background: rgba(34,197,94,.12);
-        color: #4ade80;
-    }
-
-    .icon-red {
-        background: rgba(239,68,68,.12);
-        color: #f87171;
-    }
-
-    .icon-yellow {
-        background: rgba(250,204,21,.12);
-        color: #facc15;
-    }
+    .icon-orange  { background: rgba(255,170,67,.12);  color: #ffaa43; }
+    .icon-green   { background: rgba(34,197,94,.12);   color: #4ade80; }
+    .icon-red     { background: rgba(239,68,68,.12);   color: #f87171; }
+    .icon-yellow  { background: rgba(250,204,21,.12);  color: #facc15; }
 
     .stat-label {
         color: #707887;
@@ -124,8 +108,8 @@
     }
 
     .sales-card {
-        background: #11151b;
-        border: 1px solid #1b1f27;
+        background: #181c27;
+        border: 1px solid rgba(255,255,255,0.06);
         border-radius: 22px;
         overflow: hidden;
         box-shadow: 0 20px 40px rgba(0,0,0,.35);
@@ -133,14 +117,20 @@
 
     .sales-toolbar {
         padding: 1.4rem;
-        border-bottom: 1px solid #1b1f27;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
     }
 
     .sales-search {
-        background: #0f1318;
-        border: 1px solid #1b1f27;
+        background: #0f1117;
+        border: 1px solid rgba(255,255,255,0.07);
         border-radius: 14px;
         overflow: hidden;
+        transition: .2s ease;
+    }
+
+    .sales-search:focus-within {
+        border-color: #ffaa43;
+        box-shadow: 0 0 0 4px rgba(255,170,67,.1);
     }
 
     .sales-search .input-group-text {
@@ -156,9 +146,7 @@
         box-shadow: none;
     }
 
-    .sales-search .form-control::placeholder {
-        color: #5f6775;
-    }
+    .sales-search .form-control::placeholder { color: #5f6775; }
 
     .filter-group {
         display: flex;
@@ -168,8 +156,8 @@
     }
 
     .filter-btn {
-        border: 1px solid #232936;
-        background: #151922;
+        border: 1px solid rgba(255,255,255,0.07);
+        background: #1e2333;
         color: #9099a8;
         padding: 10px 16px;
         border-radius: 12px;
@@ -179,23 +167,19 @@
     }
 
     .filter-btn:hover {
-        border-color: #5b4df5;
-        color: #fff;
+        border-color: #ffaa43;
+        color: #ffaa43;
     }
 
     .filter-active {
-        background: rgba(124,107,255,.14);
-        color: #c9c3ff;
-        border-color: #7c6bff;
+        background: rgba(255,170,67,.12);
+        color: #ffaa43;
+        border-color: #ffaa43;
     }
 
-    .table {
-        margin: 0;
-    }
+    .table { margin: 0; }
 
-    .table thead {
-        background: #0f1318;
-    }
+    .table thead { background: #0f1117; }
 
     .table thead th {
         border: none;
@@ -207,13 +191,11 @@
     }
 
     .table tbody tr {
-        border-top: 1px solid #1a1f27;
+        border-top: 1px solid rgba(255,255,255,0.04);
         transition: .15s ease;
     }
 
-    .table tbody tr:hover {
-        background: rgba(255,255,255,.02);
-    }
+    .table tbody tr:hover { background: rgba(255,255,255,.02); }
 
     .table tbody td {
         border: none;
@@ -222,25 +204,12 @@
         vertical-align: middle;
     }
 
-    .folio {
-        color: #f5f7fa;
-        font-weight: 700;
-    }
+    .folio { color: #f5f7fa; font-weight: 700; }
 
-    .date-main {
-        color: #f5f7fa;
-        font-size: .9rem;
-    }
+    .date-main { color: #f5f7fa; font-size: .9rem; }
+    .date-sub  { color: #6b7280; font-size: .75rem; }
 
-    .date-sub {
-        color: #6b7280;
-        font-size: .75rem;
-    }
-
-    .employee-name {
-        color: #f5f7fa;
-        font-weight: 500;
-    }
+    .employee-name { color: #f5f7fa; font-weight: 500; }
 
     .payment-tag {
         display: inline-flex;
@@ -252,29 +221,15 @@
         font-weight: 600;
     }
 
-    .pay-cash {
-        background: rgba(34,197,94,.12);
-        color: #4ade80;
-    }
-
-    .pay-sinpe {
-        background: rgba(59,130,246,.12);
-        color: #60a5fa;
-    }
-
-    .pay-credit {
-        background: rgba(239,68,68,.12);
-        color: #f87171;
-    }
-
-    .pay-card {
-        background: rgba(250,204,21,.12);
-        color: #facc15;
-    }
+    .pay-cash   { background: rgba(34,197,94,.12);  color: #4ade80; }
+    .pay-sinpe  { background: rgba(59,130,246,.12); color: #60a5fa; }
+    .pay-credit { background: rgba(239,68,68,.12);  color: #f87171; }
+    .pay-card   { background: rgba(250,204,21,.12); color: #facc15; }
 
     .total {
         font-weight: 700;
-        color: #f5f7fa;
+        color: #ffaa43;
+        font-variant-numeric: tabular-nums;
     }
 
     .status-badge {
@@ -287,15 +242,8 @@
         font-weight: 700;
     }
 
-    .status-paid {
-        background: rgba(34,197,94,.12);
-        color: #4ade80;
-    }
-
-    .status-pending {
-        background: rgba(239,68,68,.12);
-        color: #f87171;
-    }
+    .status-paid    { background: rgba(34,197,94,.12); color: #4ade80; }
+    .status-pending { background: rgba(239,68,68,.12); color: #f87171; }
 
     .action-buttons {
         display: flex;
@@ -307,8 +255,8 @@
         width: 38px;
         height: 38px;
         border-radius: 12px;
-        border: 1px solid #232936;
-        background: #151922;
+        border: 1px solid rgba(255,255,255,0.07);
+        background: #1e2333;
         color: #7e8796;
         display: inline-flex;
         align-items: center;
@@ -316,14 +264,12 @@
         transition: .18s ease;
     }
 
-    .btn-action:hover {
-        transform: translateY(-2px);
-    }
+    .btn-action:hover { transform: translateY(-2px); }
 
     .btn-view:hover {
-        color: #7c6bff;
-        border-color: #7c6bff;
-        background: rgba(124,107,255,.12);
+        color: #ffaa43;
+        border-color: #ffaa43;
+        background: rgba(255,170,67,.12);
     }
 
     .btn-print:hover {
@@ -337,94 +283,57 @@
 <div class="sales-root">
 
     <div class="sales-head">
-
         <div class="sales-title">
             <h2>Historial de Ventas</h2>
             <p>@ventas.Count ventas registradas</p>
         </div>
 
-        <button class="btn-sale"
-                @onclick='() => Nav.NavigateTo("nueva-venta")'>
-
+        <button class="btn-sale" @onclick='() => Nav.NavigateTo("nueva-venta")'>
             <i class="fa-solid fa-plus"></i>
             Nueva Venta
-
         </button>
-
     </div>
 
     <div class="stats-grid">
 
         <div class="stat-card">
-
             <div class="stat-top">
-                <div class="stat-icon icon-blue">
+                <div class="stat-icon icon-orange">
                     <i class="fa-solid fa-chart-line"></i>
                 </div>
             </div>
-
-            <div class="stat-label">
-                Ventas de Hoy
-            </div>
-
-            <div class="stat-value">
-                @VentasHoy.ToString("C0")
-            </div>
-
+            <div class="stat-label">Ventas de Hoy</div>
+            <div class="stat-value">@VentasHoy.ToString("C0")</div>
         </div>
 
         <div class="stat-card">
-
             <div class="stat-top">
                 <div class="stat-icon icon-green">
                     <i class="fa-solid fa-wallet"></i>
                 </div>
             </div>
-
-            <div class="stat-label">
-                Cobrado
-            </div>
-
-            <div class="stat-value">
-                @Cobrado.ToString("C0")
-            </div>
-
+            <div class="stat-label">Cobrado</div>
+            <div class="stat-value">@Cobrado.ToString("C0")</div>
         </div>
 
         <div class="stat-card">
-
             <div class="stat-top">
                 <div class="stat-icon icon-red">
                     <i class="fa-solid fa-file-invoice-dollar"></i>
                 </div>
             </div>
-
-            <div class="stat-label">
-                Fiados
-            </div>
-
-            <div class="stat-value">
-                @Fiados.ToString("C0")
-            </div>
-
+            <div class="stat-label">Fiados</div>
+            <div class="stat-value">@Fiados.ToString("C0")</div>
         </div>
 
         <div class="stat-card">
-
             <div class="stat-top">
                 <div class="stat-icon icon-yellow">
                     <i class="fa-solid fa-receipt"></i>
                 </div>
             </div>
-
-            <div class="stat-label">
-                Transacciones
-            </div>
-
-            <div class="stat-value">
-                @Transacciones
-            </div>
-
+            <div class="stat-label">Transacciones</div>
+            <div class="stat-value">@Transacciones</div>
         </div>
 
     </div>
@@ -432,66 +341,41 @@
     <div class="sales-card">
 
         <div class="sales-toolbar">
-
             <div class="row g-3 align-items-center">
 
                 <div class="col-md-6">
-
                     <div class="input-group sales-search">
-
                         <span class="input-group-text">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
-
                         <input type="text"
                                class="form-control"
                                placeholder="Buscar por folio o empleado..."
                                @bind="filtro"
                                @bind:event="oninput" />
-
                     </div>
-
                 </div>
 
                 <div class="col-md-6">
-
                     <div class="filter-group">
-
                         <button class="filter-btn @(filtroEstado == "Todas" ? "filter-active" : "")"
-                                @onclick='() => filtroEstado = "Todas"'>
-
-                            Todas
-
-                        </button>
+                                @onclick='() => filtroEstado = "Todas"'>Todas</button>
 
                         <button class="filter-btn @(filtroEstado == "Fiado" ? "filter-active" : "")"
-                                @onclick='() => filtroEstado = "Fiado"'>
-
-                            Fiados
-
-                        </button>
+                                @onclick='() => filtroEstado = "Fiado"'>Fiados</button>
 
                         <button class="filter-btn @(filtroEstado == "Hoy" ? "filter-active" : "")"
-                                @onclick='() => filtroEstado = "Hoy"'>
-
-                            Hoy
-
-                        </button>
-
+                                @onclick='() => filtroEstado = "Hoy"'>Hoy</button>
                     </div>
-
                 </div>
 
             </div>
-
         </div>
 
         <div class="table-responsive">
-
             <table class="table align-middle">
 
                 <thead>
-
                     <tr>
                         <th class="ps-4">Folio</th>
                         <th>Fecha/Hora</th>
@@ -501,145 +385,91 @@
                         <th class="text-center">Estado</th>
                         <th class="text-center pe-4">Acciones</th>
                     </tr>
-
                 </thead>
 
                 <tbody>
-
                     @foreach (var venta in VentasFiltradas)
                     {
                         var empleado = empleados.FirstOrDefault(e => e.Id.ToString() == venta.ClienteId);
 
                         <tr>
-
                             <td class="ps-4">
-                                <span class="folio">
-                                    #@venta.Id.ToString("D5")
-                                </span>
+                                <span class="folio">#@venta.Id.ToString("D5")</span>
                             </td>
 
                             <td>
-
-                                <div class="date-main">
-                                    @venta.Fecha.ToShortDateString()
-                                </div>
-
-                                <div class="date-sub">
-                                    @venta.Fecha.ToShortTimeString()
-                                </div>
-
+                                <div class="date-main">@venta.Fecha.ToShortDateString()</div>
+                                <div class="date-sub">@venta.Fecha.ToShortTimeString()</div>
                             </td>
 
                             <td>
-
                                 @if (empleado != null)
                                 {
-                                    <span class="employee-name">
-                                        @empleado.Nombre @empleado.Apellido
-                                    </span>
+                                    <span class="employee-name">@empleado.Nombre @empleado.Apellido</span>
                                 }
                                 else
                                 {
                                     <span class="text-secondary">—</span>
                                 }
-
                             </td>
 
                             <td>
-
                                 @switch (venta.MetodoPago)
                                 {
                                     case "Efectivo":
-
                                         <span class="payment-tag pay-cash">
-                                            <i class="fa-solid fa-money-bill-wave"></i>
-                                            Efectivo
+                                            <i class="fa-solid fa-money-bill-wave"></i> Efectivo
                                         </span>
-
                                         break;
-
                                     case "SINPE":
-
                                         <span class="payment-tag pay-sinpe">
-                                            <i class="fa-solid fa-mobile-screen"></i>
-                                            SINPE
+                                            <i class="fa-solid fa-mobile-screen"></i> SINPE
                                         </span>
-
                                         break;
-
                                     case "Fiado":
-
                                         <span class="payment-tag pay-credit">
-                                            <i class="fa-solid fa-file-invoice"></i>
-                                            Fiado
+                                            <i class="fa-solid fa-file-invoice"></i> Fiado
                                         </span>
-
                                         break;
-
                                     case "Tarjeta":
-
                                         <span class="payment-tag pay-card">
-                                            <i class="fa-solid fa-credit-card"></i>
-                                            Tarjeta
+                                            <i class="fa-solid fa-credit-card"></i> Tarjeta
                                         </span>
-
                                         break;
-
                                     default:
-
-                                        <span class="payment-tag">
-                                            @venta.MetodoPago
-                                        </span>
-
+                                        <span class="payment-tag">@venta.MetodoPago</span>
                                         break;
                                 }
-
                             </td>
 
-                            <td class="text-end total">
-                                @venta.Total.ToString("C0")
-                            </td>
+                            <td class="text-end total">@venta.Total.ToString("C0")</td>
 
                             <td class="text-center">
-
                                 @if (venta.MetodoPago == "Fiado")
                                 {
-                                    <span class="status-badge status-pending">
-                                        Pendiente
-                                    </span>
+                                    <span class="status-badge status-pending">Pendiente</span>
                                 }
                                 else
                                 {
-                                    <span class="status-badge status-paid">
-                                        Pagado
-                                    </span>
+                                    <span class="status-badge status-paid">Pagado</span>
                                 }
-
                             </td>
 
                             <td class="text-center pe-4">
-
                                 <div class="action-buttons">
-
                                     <a class="btn-action btn-view" href="/venta/@venta.Id">
                                         <i class="fa-solid fa-eye"></i>
                                     </a>
-
                                     <button class="btn-action btn-print">
                                         <i class="fa-solid fa-print"></i>
                                     </button>
-
                                 </div>
-
                             </td>
-
                         </tr>
                     }
-
                 </tbody>
 
             </table>
-
         </div>
 
     </div>
@@ -649,13 +479,9 @@
 @code {
 
     private PulperiaDbContext db = default!;
-
     private List<Pulperia.Models.Venta> ventas = new();
-
     private List<Empleado> empleados = new();
-
     private string filtro = "";
-
     private string filtroEstado = "Todas";
 
     private decimal VentasHoy => ventas
@@ -682,19 +508,14 @@
         filtroEstado switch
         {
             "Fiado" => v.MetodoPago == "Fiado",
-            "Hoy" => v.Fecha.Date == DateTime.Today,
-            _ => true
+            "Hoy"   => v.Fecha.Date == DateTime.Today,
+            _       => true
         });
 
     protected override async Task OnInitializedAsync()
     {
         db = DbFactory.CreateDbContext();
-
-        ventas = db.Venta
-            .OrderByDescending(v => v.Fecha)
-            .ToList();
-
+        ventas = db.Venta.OrderByDescending(v => v.Fecha).ToList();
         empleados = await empleadoService.GetAllAsync();
     }
-
 }

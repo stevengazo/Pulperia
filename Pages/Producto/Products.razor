@@ -8,7 +8,7 @@
     .pg-root {
         min-height: 100vh;
         padding: 2rem 2.5rem;
-        background: #0b0d11;
+       
         font-family: 'Inter', system-ui, sans-serif;
     }
 
@@ -35,22 +35,23 @@
 
     .btn-new {
         border: none;
-        background: linear-gradient(135deg,#7c6bff,#5b4df5);
-        color: white;
+        background: #ffaa43;
+        color: #0f1117;
         padding: 12px 18px;
         border-radius: 14px;
         display: inline-flex;
         align-items: center;
         gap: 10px;
         font-size: .9rem;
-        font-weight: 600;
+        font-weight: 700;
         transition: .2s ease;
-        box-shadow: 0 10px 25px rgba(92,77,245,.25);
+        box-shadow: 0 10px 25px rgba(255,170,67,.25);
     }
 
     .btn-new:hover {
         transform: translateY(-2px);
-        opacity: .95;
+        background: #ffc266;
+        box-shadow: 0 14px 30px rgba(255,170,67,.35);
     }
 
     .pg-toolbar {
@@ -63,7 +64,7 @@
     .pg-input {
         width: 100%;
         border: 1px solid #1b1f27;
-        background: #11151b;
+        background: #181c27;
         color: #eef2f7;
         border-radius: 14px;
         padding: 13px 16px;
@@ -73,8 +74,8 @@
     }
 
     .pg-input:focus {
-        border-color: #5b4df5;
-        box-shadow: 0 0 0 4px rgba(91,77,245,.15);
+        border-color: #ffaa43;
+        box-shadow: 0 0 0 4px rgba(255,170,67,.12);
     }
 
     .pg-input::placeholder {
@@ -82,8 +83,8 @@
     }
 
     .pg-table-wrap {
-        background: #11151b;
-        border: 1px solid #1b1f27;
+        background: #181c27;
+        border: 1px solid rgba(255,255,255,0.06);
         border-radius: 22px;
         overflow: hidden;
         box-shadow: 0 20px 40px rgba(0,0,0,.35);
@@ -95,7 +96,7 @@
     }
 
     thead {
-        background: #0f1318;
+        background: #0f1117;
     }
 
     thead th {
@@ -105,29 +106,20 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: .08em;
-        border-bottom: 1px solid #1d222b;
+        border-bottom: 1px solid rgba(255,255,255,0.06);
     }
 
-    thead th.num {
-        text-align: right;
-    }
-
-    thead th.ctr {
-        text-align: center;
-    }
+    thead th.num { text-align: right; }
+    thead th.ctr { text-align: center; }
 
     tbody tr {
-        border-bottom: 1px solid #1a1f27;
+        border-bottom: 1px solid rgba(255,255,255,0.04);
         transition: .15s ease;
     }
 
-    tbody tr:last-child {
-        border-bottom: none;
-    }
+    tbody tr:last-child { border-bottom: none; }
 
-    tbody tr:hover {
-        background: rgba(255,255,255,.02);
-    }
+    tbody tr:hover { background: rgba(255,255,255,.02); }
 
     tbody td {
         padding: 18px 16px;
@@ -151,11 +143,11 @@
         align-items: center;
         padding: 7px 12px;
         border-radius: 999px;
-        background: rgba(124,107,255,.12);
-        color: #b7b0ff;
+        background: rgba(255,170,67,.1);
+        color: #ffaa43;
         font-size: .78rem;
         font-weight: 600;
-        border: 1px solid rgba(124,107,255,.15);
+        border: 1px solid rgba(255,170,67,.18);
     }
 
     .td-num {
@@ -165,9 +157,7 @@
         font-variant-numeric: tabular-nums;
     }
 
-    .td-ctr {
-        text-align: center;
-    }
+    .td-ctr { text-align: center; }
 
     .stock-ok,
     .stock-low {
@@ -196,13 +186,8 @@
         border-radius: 50%;
     }
 
-    .dot-ok {
-        background: #4ade80;
-    }
-
-    .dot-low {
-        background: #f87171;
-    }
+    .dot-ok  { background: #4ade80; }
+    .dot-low { background: #f87171; }
 
     .actions {
         display: flex;
@@ -215,8 +200,8 @@
         width: 38px;
         height: 38px;
         border-radius: 12px;
-        border: 1px solid #232936;
-        background: #151922;
+        border: 1px solid rgba(255,255,255,0.07);
+        background: #1e2333;
         color: #7e8796;
         display: inline-flex;
         align-items: center;
@@ -225,20 +210,18 @@
         font-size: .92rem;
     }
 
-    .btn-icon:hover {
-        transform: translateY(-2px);
-    }
+    .btn-icon:hover { transform: translateY(-2px); }
 
     .btn-edit:hover {
-        color: #7c6bff;
-        border-color: #7c6bff;
-        background: rgba(124,107,255,.12);
+        color: #ffaa43;
+        border-color: #ffaa43;
+        background: rgba(255,170,67,.12);
     }
 
     .btn-delete:hover {
-        color: #ff6b6b;
-        border-color: #ff6b6b;
-        background: rgba(255,107,107,.12);
+        color: #f87171;
+        border-color: #f87171;
+        background: rgba(248,113,113,.12);
     }
 
     .pg-empty {
@@ -249,7 +232,7 @@
 
     .pg-count {
         padding: 16px 20px;
-        border-top: 1px solid #1b1f27;
+        border-top: 1px solid rgba(255,255,255,0.06);
         color: #6f7786;
         font-size: .84rem;
     }
@@ -280,7 +263,6 @@
 
         <select class="pg-input" @bind="categoriaFiltro">
             <option value="">Todas las categorías</option>
-
             @foreach (var c in Categorias)
             {
                 <option value="@c.Id">@c.Nombre</option>
@@ -291,7 +273,6 @@
     <div class="pg-table-wrap">
 
         <table>
-
             <thead>
                 <tr>
                     <th>Producto</th>
@@ -306,7 +287,6 @@
             </thead>
 
             <tbody>
-
                 @if (!productosFiltrados.Any())
                 {
                     <tr>
@@ -320,16 +300,13 @@
                 @foreach (var p in productosFiltrados)
                 {
                     <tr>
-
                         <td>
                             <div class="td-name">@p.Nombre</div>
                             <div class="td-pres">@p.Presentacion</div>
                         </td>
 
                         <td>
-                            <span class="td-badge">
-                                @p.Categoria?.Nombre
-                            </span>
+                            <span class="td-badge">@p.Categoria?.Nombre</span>
                         </td>
 
                         <td class="td-ctr">
@@ -349,38 +326,25 @@
                         </td>
 
                         <td class="td-ctr">
-
                             <span class="@(p.StockActual <= p.StockMinimo ? "stock-low" : "stock-ok")">
-
                                 <span class="stock-dot @(p.StockActual <= p.StockMinimo ? "dot-low" : "dot-ok")"></span>
-
                                 @p.StockActual
-
                             </span>
-
                         </td>
 
                         <td class="td-ctr">
-
                             <div class="actions">
-
                                 <button class="btn-icon btn-edit" title="Editar">
                                     <i class="fa-solid fa-pen"></i>
                                 </button>
-
-                                <button class="btn-icon btn-delete" title="Eliminar">
+                                <button class="btn-icon btn-delete" title="Eliminar" @onclick="() => Eliminar(p.Id)">
                                     <i class="fa-solid fa-trash"></i>
                                 </button>
-
                             </div>
-
                         </td>
-
                     </tr>
                 }
-
             </tbody>
-
         </table>
 
         <div class="pg-count">
@@ -404,7 +368,6 @@
     private AddProduct addProductModal;
 
     private List<Producto> productos = new();
-
     private List<Categoria> Categorias = new();
 
     private List<Producto> productosFiltrados => productos
@@ -417,15 +380,11 @@
              p.CategoriaId.ToString() == categoriaFiltro)
         ).ToList();
 
-    private string GetVentas(List<DetalleVenta> ventas)
-    {
-        return ventas.Sum(v => v.Cantidad * v.PrecioUnitarioHistorico).ToString("N2");
-    }
+    private string GetVentas(List<DetalleVenta> ventas) =>
+        ventas.Sum(v => v.Cantidad * v.PrecioUnitarioHistorico).ToString("N2");
 
-    private string GetCompraCosto(List<DetalleCompra> detalles)
-    {
-        return detalles.Sum(d => d.Cantidad * d.PrecioUnitario).ToString("N2");
-    }
+    private string GetCompraCosto(List<DetalleCompra> detalles) =>
+        detalles.Sum(d => d.Cantidad * d.PrecioUnitario).ToString("N2");
 
     protected override void OnInitialized() => CargarDatos();
 
@@ -448,7 +407,6 @@
     private async Task Eliminar(int id)
     {
         var p = await db.Producto.FindAsync(id);
-
         if (p is not null)
         {
             db.Producto.Remove(p);
