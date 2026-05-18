@@ -1,180 +1,674 @@
 @page "/configuracion"
+
 @inject IDbContextFactory<PulperiaDbContext> dbContextFactory
+
+@using Microsoft.EntityFrameworkCore
 @using System.Text.Json
 
-
-
 <UserValidator>
-    <h2 class="text-light">Configuración</h2>
-    <hr class="border-secondary" />
 
-    <ul class="nav nav-pills mb-4 gap-2">
-        <li class="nav-item">
-            <button class="btn @(tab == 0 ? "btn-primary" : "btn-outline-light")" @onclick="() => tab = 0">
-                Logs
-            </button>
-        </li>
+    <div class="settings-page">
 
-        <li class="nav-item">
-            <button class="btn @(tab == 1 ? "btn-primary" : "btn-outline-light")" @onclick="() => tab = 1">
-                Categorías
-            </button>
-        </li>
+        <div class="settings-header">
 
-        <li class="nav-item">
-            <button class="btn @(tab == 2 ? "btn-primary" : "btn-outline-light")" @onclick="() => tab = 2">
-                Proveedores
-            </button>
-        </li>
-    </ul>
+            <div>
+                <div class="settings-title">
+                    Configuración
+                </div>
 
-    <!-- ================= LOGS ================= -->
-    @if (tab == 0)
-    {
-        <div class="card bg-dark text-light border-secondary p-3">
-            <h4>Logs del sistema</h4>
-
-            <div class="table-responsive">
-                <table class="table table-dark table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Usuario</th>
-                            <th>Acción</th>
-                            <th>Tabla</th>
-                            <th>Registro</th>
-                            <th>Nuevo</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        @foreach (var log in logs)
-                        {
-                            <tr>
-                                <td>@log.Fecha.ToString("yyyy-MM-dd HH:mm")</td>
-                                <td>@log.Usuario</td>
-                                <td>
-                                    <span class="badge bg-info text-dark">@log.Accion</span>
-                                </td>
-                                <td>@log.Tabla</td>
-                                <td>@log.RegistroId</td>
-                                <td>
-                                    @if (!string.IsNullOrWhiteSpace(log.ValoresNuevos))
-                                    {
-                                        <pre class="json-box">
-@FormatJson(log.ValoresNuevos)
-        </pre>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    }
-
-    <!-- ================= CATEGORÍAS ================= -->
-    @if (tab == 1)
-    {
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="card bg-dark text-light border-secondary p-3">
-                    <h5>Nueva categoría</h5>
-
-                    <input class="form-control bg-dark text-light border-secondary mb-2" placeholder="Nombre categoría"
-                           @bind="newCategory" />
-
-                    <button class="btn btn-success w-100" @onclick="AgregarCategoria">
-                        Guardar categoría
-                    </button>
+                <div class="settings-subtitle">
+                    Administración del sistema y registros
                 </div>
             </div>
 
-            <div class="col-md-8">
-                <div class="card bg-dark text-light border-secondary p-3">
-                    <h5>Categorías</h5>
+        </div>
+
+        <div class="tabs">
+
+            <button class="tab-btn @(tab == 0 ? "active" : "")"
+                    @onclick="() => tab = 0">
+
+                <i class="bi bi-clock-history"></i>
+                Logs
+
+            </button>
+
+            <button class="tab-btn @(tab == 1 ? "active" : "")"
+                    @onclick="() => tab = 1">
+
+                <i class="bi bi-tags-fill"></i>
+                Categorías
+
+            </button>
+
+            <button class="tab-btn @(tab == 2 ? "active" : "")"
+                    @onclick="() => tab = 2">
+
+                <i class="bi bi-truck"></i>
+                Proveedores
+
+            </button>
+
+        </div>
+
+        @* ================= LOGS ================= *@
+        @if (tab == 0)
+        {
+            <div class="card-modern">
+
+                <div class="card-header-modern">
+
+                    <div>
+                        <div class="card-title">
+                            Logs del Sistema
+                        </div>
+
+                        <div class="card-subtitle">
+                            Últimos movimientos registrados
+                        </div>
+                    </div>
+
+                    <div class="badge-count">
+                        @logs.Count registros
+                    </div>
+
+                </div>
+
+                <div class="table-wrapper">
+
+                    <table class="modern-table">
+
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Usuario</th>
+                                <th>Acción</th>
+                                <th>Tabla</th>
+                                <th>Registro</th>
+                                <th>Datos</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var log in logs)
+                            {
+                                <tr>
+
+                                    <td>
+                                        @log.Fecha.ToString("yyyy-MM-dd HH:mm")
+                                    </td>
+
+                                    <td>
+                                        @log.Usuario
+                                    </td>
+
+                                    <td>
+
+                                        <span class="action-badge">
+
+                                            @log.Accion
+
+                                        </span>
+
+                                    </td>
+
+                                    <td>
+                                        @log.Tabla
+                                    </td>
+
+                                    <td>
+                                        #@log.RegistroId
+                                    </td>
+
+                                    <td>
+
+                                        @if (!string.IsNullOrWhiteSpace(log.ValoresNuevos))
+                                        {
+                                            <pre class="json-box">@FormatJson(log.ValoresNuevos)</pre>
+                                        }
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+        }
+
+        @* ================= CATEGORIAS ================= *@
+        @if (tab == 1)
+        {
+            <div class="grid-layout">
+
+                <div class="card-modern">
+
+                    <div class="card-title mb-4">
+                        Nueva categoría
+                    </div>
+
+                    <input class="input-modern"
+                           placeholder="Nombre de categoría"
+                           @bind="newCategory" />
+
+                    <button class="btn-modern mt-3"
+                            @onclick="AgregarCategoria">
+
+                        <i class="bi bi-plus-lg"></i>
+                        Guardar categoría
+
+                    </button>
+
+                </div>
+
+                <div class="card-modern">
+
+                    <div class="card-title mb-4">
+                        Categorías registradas
+                    </div>
 
                     @if (categories.Count == 0)
                     {
-                        <p class="text-muted">No hay categorías</p>
+                        <div class="empty-state">
+                            No hay categorías registradas
+                        </div>
                     }
                     else
                     {
                         @foreach (var c in categories)
                         {
-                            <div class="d-flex justify-content-between border-bottom border-secondary py-2">
+                            <div class="list-item">
+
                                 <div>
-                                    <strong>@c.Nombre</strong>
+                                    <div class="item-title">
+                                        @c.Nombre
+                                    </div>
+
+                                    <div class="item-subtitle">
+                                        Categoría de productos
+                                    </div>
                                 </div>
-                                <span class="text-muted">#@c.Id</span>
+
+                                <div class="item-id">
+                                    #@c.Id
+                                </div>
+
                             </div>
                         }
                     }
+
                 </div>
+
             </div>
-        </div>
-    }
+        }
 
-    <!-- ================= PROVEEDORES ================= -->
-    @if (tab == 2)
-    {
-        <div class="row g-3">
+        @* ================= PROVEEDORES ================= *@
+        @if (tab == 2)
+        {
+            <div class="grid-layout">
 
-            <!-- FORM -->
-            <div class="col-md-4">
-                <div class="card bg-dark text-light border-secondary p-3">
-                    <h5>Nuevo proveedor</h5>
+                <div class="card-modern">
 
-                    <input class="form-control bg-dark text-light border-secondary mb-2" placeholder="Nombre"
+                    <div class="card-title mb-4">
+                        Nuevo proveedor
+                    </div>
+
+                    <input class="input-modern mb-3"
+                           placeholder="Nombre"
                            @bind="newProveedor.Nombre" />
 
-                    <input class="form-control bg-dark text-light border-secondary mb-2" placeholder="Teléfono"
+                    <input class="input-modern mb-3"
+                           placeholder="Teléfono"
                            @bind="newProveedor.Telefono" />
 
-                    <input class="form-control bg-dark text-light border-secondary mb-2" placeholder="Email"
+                    <input class="input-modern mb-3"
+                           placeholder="Correo electrónico"
                            @bind="newProveedor.Email" />
 
-                    <button class="btn btn-primary w-100" @onclick="AgregarProveedor">
-                        Guardar proveedor
-                    </button>
-                </div>
-            </div>
+                    <button class="btn-modern"
+                            @onclick="AgregarProveedor">
 
-            <!-- LISTA -->
-            <div class="col-md-8">
-                <div class="card bg-dark text-light border-secondary p-3">
-                    <h5>Proveedores</h5>
+                        <i class="bi bi-check-lg"></i>
+                        Guardar proveedor
+
+                    </button>
+
+                </div>
+
+                <div class="card-modern">
+
+                    <div class="card-title mb-4">
+                        Proveedores registrados
+                    </div>
 
                     @if (proveedors.Count == 0)
                     {
-                        <p class="text-muted">No hay proveedores</p>
+                        <div class="empty-state">
+                            No hay proveedores registrados
+                        </div>
                     }
                     else
                     {
                         @foreach (var p in proveedors)
                         {
-                            <div class="border border-secondary rounded p-2 mb-2 d-flex justify-content-between">
+                            <div class="provider-card">
+
                                 <div>
-                                    <strong>@p.Nombre</strong><br />
-                                    <small class="text-muted">@p.Email</small>
+
+                                    <div class="item-title">
+                                        @p.Nombre
+                                    </div>
+
+                                    <div class="item-subtitle">
+                                        @p.Email
+                                    </div>
+
                                 </div>
 
-                                <div class="text-end">
-                                    <div>@p.Telefono</div>
-                                    <small class="text-muted">#@p.Id</small>
+                                <div class="provider-side">
+
+                                    <div>
+                                        @p.Telefono
+                                    </div>
+
+                                    <div class="item-id">
+                                        #@p.Id
+                                    </div>
+
                                 </div>
+
                             </div>
                         }
                     }
+
                 </div>
+
             </div>
-        </div>
-    }
+        }
+
+    </div>
 
 </UserValidator>
 
+<style>
+
+    :root {
+
+        --accent: #ffaa43;
+        --accent-soft: rgba(255,170,67,.12);
+        --accent-border: rgba(255,170,67,.18);
+
+        --bg: #0b0b0e;
+        --surface: #121217;
+        --surface-2: #18181f;
+
+        --border: #23232c;
+
+        --text: #f5f5f7;
+        --muted: #8b8b97;
+    }
+
+    .settings-page {
+
+        color: var(--text);
+
+        animation: fadeIn .25s ease;
+    }
+
+    @@keyframes fadeIn {
+
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .settings-header {
+
+        margin-bottom: 2rem;
+    }
+
+    .settings-title {
+
+        font-size: 2rem;
+        font-weight: 800;
+
+        letter-spacing: -.04em;
+    }
+
+    .settings-subtitle {
+
+        color: var(--muted);
+
+        margin-top: .35rem;
+    }
+
+    .tabs {
+
+        display: flex;
+        gap: .8rem;
+
+        margin-bottom: 2rem;
+
+        flex-wrap: wrap;
+    }
+
+    .tab-btn {
+
+        border: 1px solid var(--border);
+
+        background: var(--surface);
+
+        color: var(--muted);
+
+        padding: .85rem 1.2rem;
+
+        border-radius: 14px;
+
+        font-weight: 700;
+
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+
+        transition: .2s ease;
+    }
+
+    .tab-btn:hover {
+
+        border-color: var(--accent-border);
+
+        color: var(--accent);
+    }
+
+    .tab-btn.active {
+
+        background: var(--accent-soft);
+
+        border-color: var(--accent-border);
+
+        color: var(--accent);
+    }
+
+    .card-modern {
+
+        background: linear-gradient(180deg,
+        rgba(255,255,255,.015),
+        rgba(255,255,255,.01));
+
+        border: 1px solid var(--border);
+
+        border-radius: 24px;
+
+        padding: 1.5rem;
+
+        backdrop-filter: blur(10px);
+
+        box-shadow:
+            0 10px 30px rgba(0,0,0,.22);
+    }
+
+    .card-header-modern {
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        margin-bottom: 1.5rem;
+    }
+
+    .card-title {
+
+        font-size: 1.1rem;
+        font-weight: 800;
+    }
+
+    .card-subtitle {
+
+        color: var(--muted);
+
+        margin-top: .2rem;
+
+        font-size: .9rem;
+    }
+
+    .badge-count {
+
+        background: var(--accent-soft);
+
+        border: 1px solid var(--accent-border);
+
+        color: var(--accent);
+
+        padding: .5rem .9rem;
+
+        border-radius: 999px;
+
+        font-size: .8rem;
+        font-weight: 700;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .modern-table {
+
+        width: 100%;
+
+        border-collapse: collapse;
+    }
+
+    .modern-table th {
+
+        text-align: left;
+
+        padding: 1rem;
+
+        color: var(--muted);
+
+        font-size: .82rem;
+        font-weight: 700;
+
+        border-bottom: 1px solid var(--border);
+    }
+
+    .modern-table td {
+
+        padding: 1rem;
+
+        border-bottom: 1px solid rgba(255,255,255,.04);
+
+        vertical-align: top;
+
+        font-size: .92rem;
+    }
+
+    .modern-table tr:hover {
+
+        background: rgba(255,255,255,.015);
+    }
+
+    .action-badge {
+
+        background: var(--accent-soft);
+
+        color: var(--accent);
+
+        border: 1px solid var(--accent-border);
+
+        padding: .45rem .75rem;
+
+        border-radius: 999px;
+
+        font-size: .72rem;
+        font-weight: 800;
+    }
+
+    .json-box {
+
+        background: #0d0d11;
+
+        border: 1px solid var(--border);
+
+        border-radius: 14px;
+
+        padding: 1rem;
+
+        max-width: 420px;
+
+        overflow: auto;
+
+        color: #b8ffc2;
+
+        font-size: .75rem;
+    }
+
+    .grid-layout {
+
+        display: grid;
+
+        grid-template-columns: 350px 1fr;
+
+        gap: 1.5rem;
+    }
+
+    .input-modern {
+
+        width: 100%;
+
+        background: var(--surface);
+
+        border: 1px solid var(--border);
+
+        color: var(--text);
+
+        padding: .95rem 1rem;
+
+        border-radius: 14px;
+
+        outline: none;
+
+        transition: .2s ease;
+    }
+
+    .input-modern:focus {
+
+        border-color: var(--accent);
+
+        box-shadow:
+            0 0 0 4px rgba(255,170,67,.08);
+    }
+
+    .btn-modern {
+
+        width: 100%;
+
+        border: none;
+
+        background:
+            linear-gradient(135deg,
+            #ffaa43 0%,
+            #ff8c1f 100%);
+
+        color: #111;
+
+        padding: 1rem;
+
+        border-radius: 14px;
+
+        font-weight: 800;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .6rem;
+
+        transition: .2s ease;
+    }
+
+    .btn-modern:hover {
+
+        transform: translateY(-1px);
+
+        box-shadow:
+            0 12px 28px rgba(255,170,67,.2);
+    }
+
+    .list-item,
+    .provider-card {
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 1rem 0;
+
+        border-bottom: 1px solid rgba(255,255,255,.05);
+    }
+
+    .item-title {
+
+        font-weight: 700;
+    }
+
+    .item-subtitle {
+
+        color: var(--muted);
+
+        margin-top: .2rem;
+
+        font-size: .85rem;
+    }
+
+    .item-id {
+
+        color: var(--accent);
+
+        font-size: .82rem;
+        font-weight: 700;
+    }
+
+    .provider-side {
+        text-align: right;
+    }
+
+    .empty-state {
+
+        color: var(--muted);
+
+        padding: 2rem 0;
+
+        text-align: center;
+    }
+
+    @@media(max-width: 900px) {
+
+        .grid-layout {
+
+            grid-template-columns: 1fr;
+        }
+
+        .modern-table {
+            min-width: 900px;
+        }
+    }
+
+</style>
+
 @code {
+
     private PulperiaDbContext db;
 
     private List<LogCambio> logs = new();
@@ -184,6 +678,7 @@
     private int tab = 0;
 
     private string newCategory = "";
+
     private Proveedor newProveedor = new();
 
     protected override async Task OnInitializedAsync()
@@ -196,16 +691,19 @@
         try
         {
             using var doc = JsonDocument.Parse(json);
-            return JsonSerializer.Serialize(doc, new JsonSerializerOptions
-            {
-                WriteIndented = true
-            });
+
+            return JsonSerializer.Serialize(doc,
+                new JsonSerializerOptions
+                    {
+                        WriteIndented = true
+                    });
         }
         catch
         {
             return json;
         }
     }
+
     private async Task LoadData()
     {
         db = await dbContextFactory.CreateDbContextAsync();
@@ -237,6 +735,7 @@
         await db.SaveChangesAsync();
 
         newCategory = "";
+
         await LoadData();
     }
 
@@ -254,7 +753,8 @@
 
         await db.SaveChangesAsync();
 
-        newProveedor = new Proveedor();
+        newProveedor = new();
+
         await LoadData();
     }
 }
