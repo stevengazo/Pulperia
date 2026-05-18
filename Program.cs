@@ -11,6 +11,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
 
+
 // SQLite
 builder.Services.AddDbContextFactory<PulperiaDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -24,6 +25,7 @@ await supabasePublic.InitializeAsync();
 builder.Services.AddSingleton(supabasePublic);
 builder.Services.AddScoped<AppSessionService>();
 builder.Services.AddScoped<EmpleadoService>();
+builder.Services.AddScoped<LogService>();
 
 var app = builder.Build();
 

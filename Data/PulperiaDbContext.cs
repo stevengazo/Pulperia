@@ -20,6 +20,7 @@ public class PulperiaDbContext : DbContext
     public DbSet<Producto> Producto => Set<Producto>();
     public DbSet<RolSystem> Roles => Set<RolSystem>();
     public DbSet<RolUser> RolUsers => Set<RolUser>();
+    public DbSet<LogCambio> LogsCambios => Set<LogCambio>();
 
     public DbSet<Proveedor> Proveedores => Set<Proveedor>(); public DbSet<Venta> Venta => Set<Venta>();
 }

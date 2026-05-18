@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Pulperia.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class CrearSchemaVentas : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -25,6 +25,25 @@ namespace Pulperia.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LogsCambios",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Tabla = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Accion = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RegistroId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ValoresAnteriores = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ValoresNuevos = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Usuario = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Fecha = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LogsCambios", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Proveedores",
                 columns: table => new
                 {
@@ -40,11 +59,25 @@ namespace Pulperia.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Roles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Roles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Venta",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Autor = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Fecha = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Total = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     MetodoPago = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -101,6 +134,26 @@ namespace Pulperia.Migrations
                         column: x => x.ProveedorId,
                         principalTable: "Proveedores",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RolUsers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RolId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RolUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RolUsers_Roles_RolId",
+                        column: x => x.RolId,
+                        principalTable: "Roles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -189,6 +242,11 @@ namespace Pulperia.Migrations
                 name: "IX_Producto_CategoriaId",
                 table: "Producto",
                 column: "CategoriaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RolUsers_RolId",
+                table: "RolUsers",
+                column: "RolId");
         }
 
         /// <inheritdoc />
@@ -201,6 +259,12 @@ namespace Pulperia.Migrations
                 name: "DetalleVenta");
 
             migrationBuilder.DropTable(
+                name: "LogsCambios");
+
+            migrationBuilder.DropTable(
+                name: "RolUsers");
+
+            migrationBuilder.DropTable(
                 name: "CompraInventario");
 
             migrationBuilder.DropTable(
@@ -208,6 +272,9 @@ namespace Pulperia.Migrations
 
             migrationBuilder.DropTable(
                 name: "Venta");
+
+            migrationBuilder.DropTable(
+                name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "Proveedores");

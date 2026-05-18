@@ -2,8 +2,9 @@
 
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.Forms
-
+@inject LogService LogService
 @inject IDbContextFactory<PulperiaDbContext> dbContextFactory
+@inject AppSessionService Session
 @inject NavigationManager Nav
 
 <PageTitle>Editar Producto</PageTitle>
@@ -61,7 +62,7 @@ else
                         <li>
                             La modificación manual del
                             <strong>stock</strong>
-                            solo debe realizarse 
+                            solo debe realizarse
                             <strong>en ajusten necesarios.</strong>.
                         </li>
 
@@ -96,9 +97,7 @@ else
 
                         <label>Nombre</label>
 
-                        <InputText
-                            class="input"
-                            @bind-Value="producto.Nombre" />
+                        <InputText class="input" @bind-Value="producto.Nombre" />
 
                     </div>
 
@@ -106,9 +105,7 @@ else
 
                         <label>Precio Costo</label>
 
-                        <InputNumber
-                            class="input"
-                            @bind-Value="producto.PrecioCosto" />
+                        <InputNumber class="input" @bind-Value="producto.PrecioCosto" />
 
                     </div>
 
@@ -116,9 +113,7 @@ else
 
                         <label>Precio Venta</label>
 
-                        <InputNumber
-                            class="input"
-                            @bind-Value="producto.PrecioVenta" />
+                        <InputNumber class="input" @bind-Value="producto.PrecioVenta" />
 
                     </div>
 
@@ -126,9 +121,7 @@ else
 
                         <label>Stock Mínimo</label>
 
-                        <InputNumber
-                            class="input"
-                            @bind-Value="producto.StockMinimo" />
+                        <InputNumber class="input" @bind-Value="producto.StockMinimo" />
 
                     </div>
 
@@ -136,9 +129,7 @@ else
 
                         <label>Presentación</label>
 
-                        <InputText
-                            class="input"
-                            @bind-Value="producto.Presentacion" />
+                        <InputText class="input" @bind-Value="producto.Presentacion" />
 
                     </div>
 
@@ -146,9 +137,7 @@ else
 
                         <label>Stock Actual</label>
 
-                        <InputNumber
-                            class="input stock-warning"
-                            @bind-Value="producto.StockActual" />
+                        <InputNumber class="input stock-warning" @bind-Value="producto.StockActual" />
 
                         <small class="field-warning">
                             Evita modificar el stock manualmente.
@@ -160,10 +149,7 @@ else
 
                 <div class="actions">
 
-                    <button
-                        type="submit"
-                        class="save-btn"
-                        disabled="@isSaving">
+                    <button type="submit" class="save-btn" disabled="@isSaving">
 
                         @if (isSaving)
                         {
@@ -215,12 +201,33 @@ else
         {
             isSaving = true;
 
+            // 🔴 estado anterior (si ya existe en DB)
+            var anterior = await db.Producto
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.Id == producto.Id);
+
             db.Producto.Update(producto);
 
-            // AQUÍ puedes agregar auditoría después
-            // db.Auditoria.Add(...)
-
             await db.SaveChangesAsync();
+
+            // 🟢 log después de guardar
+            await LogService.RegistrarAsync(
+                tabla: "Productos",
+                accion: "UPDATE",
+                registroId: producto.Id.ToString(),
+                   usuario: Session != null ? Session?.CurrentUser?.Email : "Sistema",
+                anterior: anterior,
+                nuevo: new
+                {
+                    producto.Id,
+                    producto.Nombre,
+                    producto.PrecioCosto,
+                    producto.PrecioVenta,
+                    producto.Presentacion,
+                    producto.StockActual,
+                    producto.StockMinimo,
+                }
+            );
 
             Nav.NavigateTo($"/producto/{producto.Id}");
         }
@@ -236,7 +243,6 @@ else
 }
 
 <style>
-
     .page-wrapper {
         min-height: 90vh;
         padding: 2rem;
@@ -251,7 +257,7 @@ else
         border: 1px solid #1b1f27;
         border-radius: 18px;
         padding: 2rem;
-        box-shadow: 0 24px 60px rgba(0,0,0,.35);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, .35);
     }
 
     .header {
@@ -276,22 +282,22 @@ else
     .back-btn {
         text-decoration: none;
         color: #ffaa43;
-        border: 1px solid rgba(255,170,67,.25);
+        border: 1px solid rgba(255, 170, 67, .25);
         padding: 10px 14px;
         border-radius: 10px;
         transition: .15s ease;
     }
 
     .back-btn:hover {
-        background: rgba(255,170,67,.08);
+        background: rgba(255, 170, 67, .08);
     }
 
     .warning-box {
         display: flex;
         gap: 1rem;
         align-items: flex-start;
-        background: rgba(255,170,67,.08);
-        border: 1px solid rgba(255,170,67,.18);
+        background: rgba(255, 170, 67, .08);
+        border: 1px solid rgba(255, 170, 67, .18);
         border-radius: 16px;
         padding: 1rem 1.2rem;
         margin-bottom: 2rem;
@@ -351,11 +357,11 @@ else
 
     .input:focus {
         border-color: #ffaa43;
-        box-shadow: 0 0 0 3px rgba(255,170,67,.08);
+        box-shadow: 0 0 0 3px rgba(255, 170, 67, .08);
     }
 
     .stock-warning {
-        border-color: rgba(255,170,67,.25);
+        border-color: rgba(255, 170, 67, .25);
     }
 
     .field-warning {
@@ -409,5 +415,4 @@ else
         color: #ff6b6b;
         font-size: .8rem;
     }
-
 </style>

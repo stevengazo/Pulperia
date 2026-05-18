@@ -124,6 +124,44 @@ namespace Pulperia.Migrations
                     b.ToTable("DetalleVenta");
                 });
 
+            modelBuilder.Entity("Pulperia.Models.LogCambio", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Accion")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RegistroId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Tabla")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Usuario")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ValoresAnteriores")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ValoresNuevos")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LogsCambios");
+                });
+
             modelBuilder.Entity("Pulperia.Models.Producto", b =>
                 {
                     b.Property<int>("Id")
@@ -187,6 +225,28 @@ namespace Pulperia.Migrations
                     b.ToTable("Proveedores");
                 });
 
+            modelBuilder.Entity("Pulperia.Models.RolUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("RolId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RolId");
+
+                    b.ToTable("RolUsers");
+                });
+
             modelBuilder.Entity("Pulperia.Models.Venta", b =>
                 {
                     b.Property<int>("Id")
@@ -194,6 +254,10 @@ namespace Pulperia.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Autor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Cambio")
                         .HasColumnType("decimal(18,2)");
@@ -225,6 +289,22 @@ namespace Pulperia.Migrations
                     b.ToTable("Venta");
                 });
 
+            modelBuilder.Entity("RolSystem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Name")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Roles");
+                });
+
             modelBuilder.Entity("Pulperia.Models.CompraInventario", b =>
                 {
                     b.HasOne("Pulperia.Models.Proveedor", "Proveedor")
@@ -243,7 +323,7 @@ namespace Pulperia.Migrations
                         .IsRequired();
 
                     b.HasOne("Pulperia.Models.Producto", "Producto")
-                        .WithMany()
+                        .WithMany("DetalleCompras")
                         .HasForeignKey("ProductoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -281,6 +361,17 @@ namespace Pulperia.Migrations
                     b.Navigation("Categoria");
                 });
 
+            modelBuilder.Entity("Pulperia.Models.RolUser", b =>
+                {
+                    b.HasOne("RolSystem", "Rol")
+                        .WithMany("RolUsers")
+                        .HasForeignKey("RolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Rol");
+                });
+
             modelBuilder.Entity("Pulperia.Models.Categoria", b =>
                 {
                     b.Navigation("Productos");
@@ -293,6 +384,8 @@ namespace Pulperia.Migrations
 
             modelBuilder.Entity("Pulperia.Models.Producto", b =>
                 {
+                    b.Navigation("DetalleCompras");
+
                     b.Navigation("DetalleVentas");
                 });
 
@@ -304,6 +397,11 @@ namespace Pulperia.Migrations
             modelBuilder.Entity("Pulperia.Models.Venta", b =>
                 {
                     b.Navigation("DetalleVentas");
+                });
+
+            modelBuilder.Entity("RolSystem", b =>
+                {
+                    b.Navigation("RolUsers");
                 });
 #pragma warning restore 612, 618
         }
