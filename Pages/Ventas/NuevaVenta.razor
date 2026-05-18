@@ -262,6 +262,7 @@
             MontoRecibido = metodoPago == "Efectivo" ? pagoCon : Total,
             Cambio = Cambio,
             Notas = "",
+            Pagado =  metodoPago == "Fiado" ? false : true ,
             ClienteId = empleadoId == "" ? null : empleadoId.ToString()
         };
 

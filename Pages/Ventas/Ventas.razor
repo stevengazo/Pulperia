@@ -4,7 +4,6 @@
 @inject NavigationManager Nav
 
 <style>
-
     .sales-root {
         min-height: 100vh;
         padding: 2rem 2.5rem;
@@ -45,32 +44,34 @@
         font-size: .9rem;
         font-weight: 700;
         transition: .2s ease;
-        box-shadow: 0 10px 25px rgba(255,170,67,.25);
+        box-shadow: 0 10px 25px rgba(255, 170, 67, .25);
     }
 
     .btn-sale:hover {
         transform: translateY(-2px);
         background: #ffc266;
-        box-shadow: 0 14px 30px rgba(255,170,67,.35);
+        box-shadow: 0 14px 30px rgba(255, 170, 67, .35);
     }
 
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(4,1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: 1rem;
         margin-bottom: 1.5rem;
     }
 
     .stat-card {
         background: #181c27;
-        border: 1px solid rgba(255,255,255,0.06);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 22px;
         padding: 1.4rem;
-        box-shadow: 0 20px 40px rgba(0,0,0,.35);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, .35);
         transition: .2s ease;
     }
 
-    .stat-card:hover { transform: translateY(-3px); }
+    .stat-card:hover {
+        transform: translateY(-3px);
+    }
 
     .stat-top {
         display: flex;
@@ -89,10 +90,25 @@
         font-size: 1rem;
     }
 
-    .icon-orange  { background: rgba(255,170,67,.12);  color: #ffaa43; }
-    .icon-green   { background: rgba(34,197,94,.12);   color: #4ade80; }
-    .icon-red     { background: rgba(239,68,68,.12);   color: #f87171; }
-    .icon-yellow  { background: rgba(250,204,21,.12);  color: #facc15; }
+    .icon-orange {
+        background: rgba(255, 170, 67, .12);
+        color: #ffaa43;
+    }
+
+    .icon-green {
+        background: rgba(34, 197, 94, .12);
+        color: #4ade80;
+    }
+
+    .icon-red {
+        background: rgba(239, 68, 68, .12);
+        color: #f87171;
+    }
+
+    .icon-yellow {
+        background: rgba(250, 204, 21, .12);
+        color: #facc15;
+    }
 
     .stat-label {
         color: #707887;
@@ -109,20 +125,20 @@
 
     .sales-card {
         background: #181c27;
-        border: 1px solid rgba(255,255,255,0.06);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 22px;
         overflow: hidden;
-        box-shadow: 0 20px 40px rgba(0,0,0,.35);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, .35);
     }
 
     .sales-toolbar {
         padding: 1.4rem;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     .sales-search {
         background: #0f1117;
-        border: 1px solid rgba(255,255,255,0.07);
+        border: 1px solid rgba(255, 255, 255, 0.07);
         border-radius: 14px;
         overflow: hidden;
         transition: .2s ease;
@@ -130,7 +146,7 @@
 
     .sales-search:focus-within {
         border-color: #ffaa43;
-        box-shadow: 0 0 0 4px rgba(255,170,67,.1);
+        box-shadow: 0 0 0 4px rgba(255, 170, 67, .1);
     }
 
     .sales-search .input-group-text {
@@ -146,7 +162,9 @@
         box-shadow: none;
     }
 
-    .sales-search .form-control::placeholder { color: #5f6775; }
+    .sales-search .form-control::placeholder {
+        color: #5f6775;
+    }
 
     .filter-group {
         display: flex;
@@ -156,7 +174,7 @@
     }
 
     .filter-btn {
-        border: 1px solid rgba(255,255,255,0.07);
+        border: 1px solid rgba(255, 255, 255, 0.07);
         background: #1e2333;
         color: #9099a8;
         padding: 10px 16px;
@@ -172,14 +190,18 @@
     }
 
     .filter-active {
-        background: rgba(255,170,67,.12);
+        background: rgba(255, 170, 67, .12);
         color: #ffaa43;
         border-color: #ffaa43;
     }
 
-    .table { margin: 0; }
+    .table {
+        margin: 0;
+    }
 
-    .table thead { background: #0f1117; }
+    .table thead {
+        background: #0f1117;
+    }
 
     .table thead th {
         border: none;
@@ -191,11 +213,13 @@
     }
 
     .table tbody tr {
-        border-top: 1px solid rgba(255,255,255,0.04);
+        border-top: 1px solid rgba(255, 255, 255, 0.04);
         transition: .15s ease;
     }
 
-    .table tbody tr:hover { background: rgba(255,255,255,.02); }
+    .table tbody tr:hover {
+        background: rgba(255, 255, 255, .02);
+    }
 
     .table tbody td {
         border: none;
@@ -204,12 +228,25 @@
         vertical-align: middle;
     }
 
-    .folio { color: #f5f7fa; font-weight: 700; }
+    .folio {
+        color: #f5f7fa;
+        font-weight: 700;
+    }
 
-    .date-main { color: #f5f7fa; font-size: .9rem; }
-    .date-sub  { color: #6b7280; font-size: .75rem; }
+    .date-main {
+        color: #f5f7fa;
+        font-size: .9rem;
+    }
 
-    .employee-name { color: #f5f7fa; font-weight: 500; }
+    .date-sub {
+        color: #6b7280;
+        font-size: .75rem;
+    }
+
+    .employee-name {
+        color: #f5f7fa;
+        font-weight: 500;
+    }
 
     .payment-tag {
         display: inline-flex;
@@ -221,10 +258,25 @@
         font-weight: 600;
     }
 
-    .pay-cash   { background: rgba(34,197,94,.12);  color: #4ade80; }
-    .pay-sinpe  { background: rgba(59,130,246,.12); color: #60a5fa; }
-    .pay-credit { background: rgba(239,68,68,.12);  color: #f87171; }
-    .pay-card   { background: rgba(250,204,21,.12); color: #facc15; }
+    .pay-cash {
+        background: rgba(34, 197, 94, .12);
+        color: #4ade80;
+    }
+
+    .pay-sinpe {
+        background: rgba(59, 130, 246, .12);
+        color: #60a5fa;
+    }
+
+    .pay-credit {
+        background: rgba(239, 68, 68, .12);
+        color: #f87171;
+    }
+
+    .pay-card {
+        background: rgba(250, 204, 21, .12);
+        color: #facc15;
+    }
 
     .total {
         font-weight: 700;
@@ -242,8 +294,15 @@
         font-weight: 700;
     }
 
-    .status-paid    { background: rgba(34,197,94,.12); color: #4ade80; }
-    .status-pending { background: rgba(239,68,68,.12); color: #f87171; }
+    .status-paid {
+        background: rgba(34, 197, 94, .12);
+        color: #4ade80;
+    }
+
+    .status-pending {
+        background: rgba(239, 68, 68, .12);
+        color: #f87171;
+    }
 
     .action-buttons {
         display: flex;
@@ -255,7 +314,7 @@
         width: 38px;
         height: 38px;
         border-radius: 12px;
-        border: 1px solid rgba(255,255,255,0.07);
+        border: 1px solid rgba(255, 255, 255, 0.07);
         background: #1e2333;
         color: #7e8796;
         display: inline-flex;
@@ -264,20 +323,21 @@
         transition: .18s ease;
     }
 
-    .btn-action:hover { transform: translateY(-2px); }
+    .btn-action:hover {
+        transform: translateY(-2px);
+    }
 
     .btn-view:hover {
         color: #ffaa43;
         border-color: #ffaa43;
-        background: rgba(255,170,67,.12);
+        background: rgba(255, 170, 67, .12);
     }
 
     .btn-print:hover {
         color: #60a5fa;
         border-color: #60a5fa;
-        background: rgba(59,130,246,.12);
+        background: rgba(59, 130, 246, .12);
     }
-
 </style>
 
 <div class="sales-root">
@@ -348,11 +408,8 @@
                         <span class="input-group-text">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
-                        <input type="text"
-                               class="form-control"
-                               placeholder="Buscar por folio o empleado..."
-                               @bind="filtro"
-                               @bind:event="oninput" />
+                        <input type="text" class="form-control" placeholder="Buscar por folio o empleado..."
+                               @bind="filtro" @bind:event="oninput" />
                     </div>
                 </div>
 
@@ -445,9 +502,12 @@
                             <td class="text-end total">@venta.Total.ToString("C0")</td>
 
                             <td class="text-center">
-                                @if (venta.MetodoPago == "Fiado")
+                                @if (venta.Pagado == false )
                                 {
-                                    <span class="status-badge status-pending">Pendiente</span>
+                                    <button class="status-badge status-pending border-0"
+                                            @onclick="() => MarcarComoPagado(venta)">
+                                        Marcar Pagado
+                                    </button>
                                 }
                                 else
                                 {
@@ -508,14 +568,23 @@
         filtroEstado switch
         {
             "Fiado" => v.MetodoPago == "Fiado",
-            "Hoy"   => v.Fecha.Date == DateTime.Today,
-            _       => true
+            "Hoy" => v.Fecha.Date == DateTime.Today,
+            _ => true
         });
+
 
     protected override async Task OnInitializedAsync()
     {
         db = DbFactory.CreateDbContext();
         ventas = db.Venta.OrderByDescending(v => v.Fecha).ToList();
         empleados = await empleadoService.GetAllAsync();
+    }
+    private async Task MarcarComoPagado(Pulperia.Models.Venta venta)
+    {
+        venta.Pagado = true;
+        db.Venta.Update(venta);
+        await db.SaveChangesAsync();
+
+        StateHasChanged();
     }
 }
