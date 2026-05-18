@@ -436,252 +436,253 @@
 </style>
 
 
-<div class="sales-root">
+<UserValidator>
+    <div class="sales-root">
 
-    <div class="sales-head">
-        <div class="sales-title">
-            <h2>Historial de Ventas</h2>
-            <p>@ventas.Count ventas registradas</p>
-        </div>
-
-        <div class="d-flex gap-2">
-            <button class="btn-export" @onclick="ExportarExcel">
-                <i class="fa-solid fa-file-excel"></i>
-                Exportar Excel
-            </button>
-            <button class="btn-sale" @onclick='() => Nav.NavigateTo("nueva-venta")'>
-                <i class="fa-solid fa-plus"></i>
-                Nueva Venta
-            </button>
-        </div>
-    </div>
-
-    <div class="stats-grid">
-
-        <div class="stat-card">
-            <div class="stat-top">
-                <div class="stat-icon icon-orange">
-                    <i class="fa-solid fa-chart-line"></i>
-                </div>
+        <div class="sales-head">
+            <div class="sales-title">
+                <h2>Historial de Ventas</h2>
+                <p>@ventas.Count ventas registradas</p>
             </div>
-            <div class="stat-label">Ventas de Hoy</div>
-            <div class="stat-value">@VentasHoy.ToString("C0")</div>
-        </div>
 
-        <div class="stat-card">
-            <div class="stat-top">
-                <div class="stat-icon icon-green">
-                    <i class="fa-solid fa-wallet"></i>
-                </div>
+            <div class="d-flex gap-2">
+                <button class="btn-export" @onclick="ExportarExcel">
+                    <i class="fa-solid fa-file-excel"></i>
+                    Exportar Excel
+                </button>
+                <button class="btn-sale" @onclick='() => Nav.NavigateTo("nueva-venta")'>
+                    <i class="fa-solid fa-plus"></i>
+                    Nueva Venta
+                </button>
             </div>
-            <div class="stat-label">Cobrado</div>
-            <div class="stat-value">@Cobrado.ToString("C0")</div>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-top">
-                <div class="stat-icon icon-red">
-                    <i class="fa-solid fa-file-invoice-dollar"></i>
-                </div>
-            </div>
-            <div class="stat-label">Fiados</div>
-            <div class="stat-value">@Fiados.ToString("C0")</div>
-        </div>
+        <div class="stats-grid">
 
-        <div class="stat-card">
-            <div class="stat-top">
-                <div class="stat-icon icon-yellow">
-                    <i class="fa-solid fa-receipt"></i>
-                </div>
-            </div>
-            <div class="stat-label">Transacciones</div>
-            <div class="stat-value">@Transacciones</div>
-        </div>
-
-    </div>
-
-    <div class="sales-card">
-
-        <div class="sales-toolbar">
-            <div class="row g-3 align-items-center">
-
-                <div class="col-md-6">
-                    <div class="input-group sales-search">
-                        <span class="input-group-text">
-                            <i class="fa-solid fa-magnifying-glass"></i>
-                        </span>
-                        <input type="text" class="form-control" placeholder="Buscar por folio o empleado..."
-                               value="@filtro" @oninput="OnFiltroChanged" />
+            <div class="stat-card">
+                <div class="stat-top">
+                    <div class="stat-icon icon-orange">
+                        <i class="fa-solid fa-chart-line"></i>
                     </div>
                 </div>
+                <div class="stat-label">Ventas de Hoy</div>
+                <div class="stat-value">@VentasHoy.ToString("C0")</div>
+            </div>
 
-                <div class="col-md-6">
-                    <div class="filter-group">
-                        <button class="filter-btn @(filtroEstado == "Todas" ? "filter-active" : "")"
-                                @onclick='() => CambiarFiltro("Todas")'>Todas</button>
-
-                        <button class="filter-btn @(filtroEstado == "Fiado" ? "filter-active" : "")"
-                                @onclick='() => CambiarFiltro("Fiado")'>Fiados</button>
-
-                        <button class="filter-btn @(filtroEstado == "Hoy" ? "filter-active" : "")"
-                                @onclick='() => CambiarFiltro("Hoy")'>Hoy</button>
+            <div class="stat-card">
+                <div class="stat-top">
+                    <div class="stat-icon icon-green">
+                        <i class="fa-solid fa-wallet"></i>
                     </div>
                 </div>
-
+                <div class="stat-label">Cobrado</div>
+                <div class="stat-value">@Cobrado.ToString("C0")</div>
             </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <div class="stat-icon icon-red">
+                        <i class="fa-solid fa-file-invoice-dollar"></i>
+                    </div>
+                </div>
+                <div class="stat-label">Fiados</div>
+                <div class="stat-value">@Fiados.ToString("C0")</div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-top">
+                    <div class="stat-icon icon-yellow">
+                        <i class="fa-solid fa-receipt"></i>
+                    </div>
+                </div>
+                <div class="stat-label">Transacciones</div>
+                <div class="stat-value">@Transacciones</div>
+            </div>
+
         </div>
 
-        <div class="table-responsive">
-            <table class="table align-middle">
+        <div class="sales-card">
 
-                <thead>
-                    <tr>
-                        <th class="ps-4">Folio</th>
-                        <th>Fecha/Hora</th>
-                        <th>Empleado</th>
-                        <th>Método</th>
-                        <th class="text-end">Total</th>
-                        <th class="text-center">Estado</th>
-                        <th class="text-center pe-4">Acciones</th>
-                    </tr>
-                </thead>
+            <div class="sales-toolbar">
+                <div class="row g-3 align-items-center">
 
-                <tbody>
-                    @foreach (var venta in VentasPaginadas)
-                    {
-                        var empleado = empleados.FirstOrDefault(e => e.Id.ToString() == venta.ClienteId);
+                    <div class="col-md-6">
+                        <div class="input-group sales-search">
+                            <span class="input-group-text">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </span>
+                            <input type="text" class="form-control" placeholder="Buscar por folio o empleado..."
+                                   value="@filtro" @oninput="OnFiltroChanged" />
+                        </div>
+                    </div>
 
+                    <div class="col-md-6">
+                        <div class="filter-group">
+                            <button class="filter-btn @(filtroEstado == "Todas" ? "filter-active" : "")"
+                                    @onclick='() => CambiarFiltro("Todas")'>Todas</button>
+
+                            <button class="filter-btn @(filtroEstado == "Fiado" ? "filter-active" : "")"
+                                    @onclick='() => CambiarFiltro("Fiado")'>Fiados</button>
+
+                            <button class="filter-btn @(filtroEstado == "Hoy" ? "filter-active" : "")"
+                                    @onclick='() => CambiarFiltro("Hoy")'>Hoy</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table align-middle">
+
+                    <thead>
                         <tr>
-                            <td class="ps-4">
-                                <span class="folio">#@venta.Id.ToString("D5")</span>
-                            </td>
-
-                            <td>
-                                <div class="date-main">@venta.Fecha.ToShortDateString()</div>
-                                <div class="date-sub">@venta.Fecha.ToShortTimeString()</div>
-                            </td>
-
-                            <td>
-                                @if (empleado != null)
-                                {
-                                    <span class="employee-name">@empleado.Nombre @empleado.Apellido</span>
-                                }
-                                else
-                                {
-                                    <span class="text-secondary">—</span>
-                                }
-                            </td>
-
-                            <td>
-                                @switch (venta.MetodoPago)
-                                {
-                                    case "Efectivo":
-                                        <span class="payment-tag pay-cash">
-                                            <i class="fa-solid fa-money-bill-wave"></i> Efectivo
-                                        </span>
-                                        break;
-                                    case "SINPE":
-                                        <span class="payment-tag pay-sinpe">
-                                            <i class="fa-solid fa-mobile-screen"></i> SINPE
-                                        </span>
-                                        break;
-                                    case "Fiado":
-                                        <span class="payment-tag pay-credit">
-                                            <i class="fa-solid fa-file-invoice"></i> Fiado
-                                        </span>
-                                        break;
-                                    case "Tarjeta":
-                                        <span class="payment-tag pay-card">
-                                            <i class="fa-solid fa-credit-card"></i> Tarjeta
-                                        </span>
-                                        break;
-                                    default:
-                                        <span class="payment-tag">@venta.MetodoPago</span>
-                                        break;
-                                }
-                            </td>
-
-                            <td class="text-end total">@venta.Total.ToString("C0")</td>
-
-                            <td class="text-center">
-                                @if (venta.Pagado == false)
-                                {
-                                    <button class="status-badge status-pending border-0"
-                                            @onclick="() => MarcarComoPagado(venta)">
-                                        Marcar Pagado
-                                    </button>
-                                }
-                                else
-                                {
-                                    <span class="status-badge status-paid">Pagado</span>
-                                }
-                            </td>
-
-                            <td class="text-center pe-4">
-                                <div class="action-buttons">
-                                    <a class="btn-action btn-view" href="/venta/@venta.Id">
-                                        <i class="fa-solid fa-eye"></i>
-                                    </a>
-                                    <button class="btn-action btn-print">
-                                        <i class="fa-solid fa-print"></i>
-                                    </button>
-                                </div>
-                            </td>
+                            <th class="ps-4">Folio</th>
+                            <th>Fecha/Hora</th>
+                            <th>Empleado</th>
+                            <th>Método</th>
+                            <th class="text-end">Total</th>
+                            <th class="text-center">Estado</th>
+                            <th class="text-center pe-4">Acciones</th>
                         </tr>
-                    }
-                </tbody>
+                    </thead>
 
-            </table>
-        </div>
+                    <tbody>
+                        @foreach (var venta in VentasPaginadas)
+                        {
+                            var empleado = empleados.FirstOrDefault(e => e.Id.ToString() == venta.ClienteId);
 
-        {{!-- Paginación --}}
-        <div class="pagination-bar">
+                            <tr>
+                                <td class="ps-4">
+                                    <span class="folio">#@venta.Id.ToString("D5")</span>
+                                </td>
 
-            <span class="pagination-info">
-                Mostrando @PrimerRegistro–@UltimoRegistro de @TotalFiltradas ventas
-            </span>
+                                <td>
+                                    <div class="date-main">@venta.Fecha.ToShortDateString()</div>
+                                    <div class="date-sub">@venta.Fecha.ToShortTimeString()</div>
+                                </td>
 
-            <div class="pagination-controls">
+                                <td>
+                                    @if (empleado != null)
+                                    {
+                                        <span class="employee-name">@empleado.Nombre @empleado.Apellido</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-secondary">—</span>
+                                    }
+                                </td>
 
-                <button class="page-btn" @onclick="PrimeraPagina" disabled="@(paginaActual == 1)">
-                    <i class="fa-solid fa-angles-left"></i>
-                </button>
-                <button class="page-btn" @onclick="PaginaAnterior" disabled="@(paginaActual == 1)">
-                    <i class="fa-solid fa-angle-left"></i>
-                </button>
+                                <td>
+                                    @switch (venta.MetodoPago)
+                                    {
+                                        case "Efectivo":
+                                            <span class="payment-tag pay-cash">
+                                                <i class="fa-solid fa-money-bill-wave"></i> Efectivo
+                                            </span>
+                                            break;
+                                        case "SINPE":
+                                            <span class="payment-tag pay-sinpe">
+                                                <i class="fa-solid fa-mobile-screen"></i> SINPE
+                                            </span>
+                                            break;
+                                        case "Fiado":
+                                            <span class="payment-tag pay-credit">
+                                                <i class="fa-solid fa-file-invoice"></i> Fiado
+                                            </span>
+                                            break;
+                                        case "Tarjeta":
+                                            <span class="payment-tag pay-card">
+                                                <i class="fa-solid fa-credit-card"></i> Tarjeta
+                                            </span>
+                                            break;
+                                        default:
+                                            <span class="payment-tag">@venta.MetodoPago</span>
+                                            break;
+                                    }
+                                </td>
 
-                @for (int i = PaginaInicio; i <= PaginaFin; i++)
-                {
-                    var p = i;
-                    <button class="page-btn @(p == paginaActual ? "page-active" : "")" @onclick="() => IrAPagina(p)">
-                        @p
+                                <td class="text-end total">@venta.Total.ToString("C0")</td>
+
+                                <td class="text-center">
+                                    @if (venta.Pagado == false)
+                                    {
+                                        <button class="status-badge status-pending border-0"
+                                                @onclick="() => MarcarComoPagado(venta)">
+                                            Marcar Pagado
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <span class="status-badge status-paid">Pagado</span>
+                                    }
+                                </td>
+
+                                <td class="text-center pe-4">
+                                    <div class="action-buttons">
+                                        <a class="btn-action btn-view" href="/venta/@venta.Id">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        <button class="btn-action btn-print">
+                                            <i class="fa-solid fa-print"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+
+                </table>
+            </div>
+
+            {{!-- Paginación --}}
+            <div class="pagination-bar">
+
+                <span class="pagination-info">
+                    Mostrando @PrimerRegistro–@UltimoRegistro de @TotalFiltradas ventas
+                </span>
+
+                <div class="pagination-controls">
+
+                    <button class="page-btn" @onclick="PrimeraPagina" disabled="@(paginaActual == 1)">
+                        <i class="fa-solid fa-angles-left"></i>
                     </button>
-                }
+                    <button class="page-btn" @onclick="PaginaAnterior" disabled="@(paginaActual == 1)">
+                        <i class="fa-solid fa-angle-left"></i>
+                    </button>
 
-                <button class="page-btn" @onclick="PaginaSiguiente" disabled="@(paginaActual == TotalPaginas)">
-                    <i class="fa-solid fa-angle-right"></i>
-                </button>
-                <button class="page-btn" @onclick="UltimaPagina" disabled="@(paginaActual == TotalPaginas)">
-                    <i class="fa-solid fa-angles-right"></i>
-                </button>
+                    @for (int i = PaginaInicio; i <= PaginaFin; i++)
+                    {
+                        var p = i;
+                        <button class="page-btn @(p == paginaActual ? "page-active" : "")" @onclick="() => IrAPagina(p)">
+                            @p
+                        </button>
+                    }
 
+                    <button class="page-btn" @onclick="PaginaSiguiente" disabled="@(paginaActual == TotalPaginas)">
+                        <i class="fa-solid fa-angle-right"></i>
+                    </button>
+                    <button class="page-btn" @onclick="UltimaPagina" disabled="@(paginaActual == TotalPaginas)">
+                        <i class="fa-solid fa-angles-right"></i>
+                    </button>
+
+                </div>
+
+                <div class="page-size-selector">
+                    <span>Filas:</span>
+                    <select @onchange="CambiarTamañoPagina">
+                        <option value="10" selected="@(tamañoPagina == 10)">10</option>
+                        <option value="25" selected="@(tamañoPagina == 25)">25</option>
+                        <option value="50" selected="@(tamañoPagina == 50)">50</option>
+                        <option value="100" selected="@(tamañoPagina == 100)">100</option>
+                    </select>
+                </div>
             </div>
-
-            <div class="page-size-selector">
-                <span>Filas:</span>
-                <select @onchange="CambiarTamañoPagina">
-                    <option value="10" selected="@(tamañoPagina == 10)">10</option>
-                    <option value="25" selected="@(tamañoPagina == 25)">25</option>
-                    <option value="50" selected="@(tamañoPagina == 50)">50</option>
-                    <option value="100" selected="@(tamañoPagina == 100)">100</option>
-                </select>
-            </div>
-
         </div>
-
     </div>
+</UserValidator>
 
-</div>
+
 
 @code {
 

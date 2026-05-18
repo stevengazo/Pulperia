@@ -22,8 +22,13 @@ public class AppSessionService
     }
 
     public User? CurrentUser { get; private set; }
-    public event Action? OnChange;
+
     public bool IsAuthenticated => CurrentUser != null;
+
+    // 🔑 IMPORTANTE: estado de carga inicial
+    public bool IsInitialized { get; private set; }
+
+    public event Action? OnChange;
 
     public async Task<bool> LoginAsync(string email, string password)
     {
@@ -34,12 +39,11 @@ public class AppSessionService
 
         CurrentUser = response.User;
 
-        // Persistir sesión con fecha de expiración
         var saved = new SavedSession
         {
-            AccessToken  = response.AccessToken,
+            AccessToken = response.AccessToken,
             RefreshToken = response.RefreshToken,
-            ExpiresAt    = DateTime.UtcNow.Add(SessionDuration)
+            ExpiresAt = DateTime.UtcNow.Add(SessionDuration)
         };
 
         await JS.InvokeVoidAsync("appStorage.save", SessionKey,
@@ -58,52 +62,63 @@ public class AppSessionService
         Notify();
     }
 
-    // Llamar en App.razor o MainLayout al iniciar
+    /// <summary>
+    /// Debe llamarse una sola vez al iniciar la app (App.razor o MainLayout)
+    /// </summary>
     public async Task TryRestoreSessionAsync()
     {
         try
         {
             var raw = await JS.InvokeAsync<string?>("appStorage.load", SessionKey);
 
-            if (string.IsNullOrEmpty(raw))
-                return;
-
-            var saved = JsonSerializer.Deserialize<SavedSession>(raw);
-
-            if (saved == null || DateTime.UtcNow > saved.ExpiresAt)
+            if (!string.IsNullOrEmpty(raw))
             {
-                await JS.InvokeVoidAsync("appStorage.remove", SessionKey);
-                return;
-            }
+                var saved = JsonSerializer.Deserialize<SavedSession>(raw);
 
-            // Restaurar sesión en Supabase con el refresh token
-            var response = await _supabase.Auth.SetSession(saved.AccessToken, saved.RefreshToken);
+                if (saved != null && DateTime.UtcNow <= saved.ExpiresAt)
+                {
+                    var response = await _supabase.Auth.SetSession(
+                        saved.AccessToken,
+                        saved.RefreshToken
+                    );
 
-            if (response?.User != null)
-            {
-                CurrentUser = response.User;
+                    if (response?.User != null)
+                    {
+                        CurrentUser = response.User;
 
-                // Renovar fecha de expiración
-                saved.ExpiresAt = DateTime.UtcNow.Add(SessionDuration);
-                await JS.InvokeVoidAsync("appStorage.save", SessionKey,
-                    JsonSerializer.Serialize(saved));
+                        // renovar expiración
+                        saved.ExpiresAt = DateTime.UtcNow.Add(SessionDuration);
 
-                Notify();
-            }
-            else
-            {
-                await JS.InvokeVoidAsync("appStorage.remove", SessionKey);
+                        await JS.InvokeVoidAsync("appStorage.save", SessionKey,
+                            JsonSerializer.Serialize(saved));
+                    }
+                    else
+                    {
+                        await JS.InvokeVoidAsync("appStorage.remove", SessionKey);
+                    }
+                }
+                else
+                {
+                    await JS.InvokeVoidAsync("appStorage.remove", SessionKey);
+                }
             }
         }
         catch
         {
-            // Si falla la restauración, simplemente no hay sesión
+            // sesión inválida o storage no disponible
+        }
+        finally
+        {
+            // 🔑 clave del fix: SIEMPRE marcar inicializado
+            IsInitialized = true;
+            Notify();
         }
     }
 
     public void LoadFromSupabase()
     {
         CurrentUser = _supabase.Auth.CurrentUser;
+        IsInitialized = true;
         Notify();
     }
 
@@ -111,8 +126,8 @@ public class AppSessionService
 
     private class SavedSession
     {
-        public string AccessToken  { get; set; } = "";
+        public string AccessToken { get; set; } = "";
         public string RefreshToken { get; set; } = "";
-        public DateTime ExpiresAt  { get; set; }
+        public DateTime ExpiresAt { get; set; }
     }
 }

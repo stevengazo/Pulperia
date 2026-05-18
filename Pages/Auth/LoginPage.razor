@@ -9,58 +9,126 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background: #0b0d11;
+        background: radial-gradient(circle at top, #1b1408 0%, #0b0d11 45%);
         font-family: system-ui, sans-serif;
+        padding: 1rem;
     }
 
     .card {
-        width: 320px;
+        width: 360px;
         padding: 2rem;
-        border-radius: 16px;
-        background: #11151b;
-        border: 1px solid #1b1f27;
-        box-shadow: 0 20px 50px rgba(0,0,0,.4);
+        border-radius: 24px;
+        background: rgba(17, 21, 27, 0.96);
+        border: 1px solid rgba(255, 170, 67, 0.18);
+        box-shadow:
+            0 25px 60px rgba(0,0,0,.45),
+            0 0 40px rgba(255,170,67,.08);
         color: #f5f7fa;
+        backdrop-filter: blur(14px);
+        animation: fadeIn .35s ease;
     }
 
-    input {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 10px;
-        border-radius: 10px;
-        border: 1px solid #1b1f27;
-        background: #0f1318;
-        color: #f5f7fa;
-        outline: none;
-    }
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
 
-    button {
-        width: 100%;
-        padding: 10px;
-        border-radius: 10px;
-        border: none;
-        background: #7c6bff;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-    button:hover {
-        opacity: .9;
-    }
-
-    .error {
-        color: #ff6b6b;
-        font-size: .85rem;
-        margin-top: 10px;
-        text-align: center;
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .title {
         text-align: center;
+        margin-bottom: .35rem;
+        font-size: 1.7rem;
+        font-weight: 800;
+        color: #ffaa43;
+        letter-spacing: -.5px;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #8b93a7;
+        font-size: .92rem;
+        margin-bottom: 1.8rem;
+    }
+
+    .input-group {
         margin-bottom: 1rem;
-        font-size: 1.2rem;
-        font-weight: 700;
+    }
+
+    .label {
+        display: block;
+        margin-bottom: .45rem;
+        font-size: .85rem;
+        color: #b8c0d0;
+        font-weight: 600;
+    }
+
+    input {
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        border: 1px solid #252c36;
+        background: #0f1318;
+        color: #f5f7fa;
+        outline: none;
+        transition: .2s ease;
+        font-size: .95rem;
+    }
+
+    input:focus {
+        border-color: #ffaa43;
+        box-shadow: 0 0 0 4px rgba(255,170,67,.12);
+    }
+
+    input::placeholder {
+        color: #6d7585;
+    }
+
+    button {
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        border: none;
+        background: linear-gradient(135deg, #ffaa43 0%, #ff8a1f 100%);
+        color: #111;
+        font-weight: 800;
+        font-size: .95rem;
+        cursor: pointer;
+        transition: .2s ease;
+        margin-top: .5rem;
+        box-shadow: 0 10px 25px rgba(255,170,67,.2);
+    }
+
+    button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 30px rgba(255,170,67,.28);
+    }
+
+    button:active {
+        transform: scale(.99);
+    }
+
+    .error {
+        color: #ff7b7b;
+        font-size: .88rem;
+        margin-top: 1rem;
+        text-align: center;
+        background: rgba(255, 0, 0, .08);
+        border: 1px solid rgba(255,0,0,.15);
+        padding: .8rem;
+        border-radius: 12px;
+    }
+
+    .footer {
+        margin-top: 1.5rem;
+        text-align: center;
+        color: #667085;
+        font-size: .8rem;
     }
 </style>
 
@@ -68,23 +136,43 @@
 
     <div class="card">
 
-        <div class="title">Iniciar Sesión</div>
+        <div class="title">Pulpería</div>
 
-        <input @bind="email" placeholder="Email" />
-        <input @bind="password" type="password" placeholder="Contraseña" />
+        <div class="subtitle">
+            Accede al sistema administrativo
+        </div>
 
-        <button @onclick="Login">Entrar</button>
+        <div class="input-group">
+            <label class="label">Correo electrónico</label>
+            <input @bind="email" placeholder="correo@empresa.com" />
+        </div>
+
+        <div class="input-group">
+            <label class="label">Contraseña</label>
+            <input @bind="password"
+                   type="password"
+                   placeholder="••••••••" />
+        </div>
+
+        <button @onclick="Login">
+            Ingresar al sistema
+        </button>
 
         @if (!string.IsNullOrEmpty(error))
         {
             <div class="error">@error</div>
         }
 
+        <div class="footer">
+            Sistema de gestión
+        </div>
+
     </div>
 
 </div>
 
 @code {
+
     string email = "";
     string password = "";
     string? error;
@@ -93,7 +181,8 @@
     {
         error = null;
 
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        if (string.IsNullOrWhiteSpace(email) ||
+            string.IsNullOrWhiteSpace(password))
         {
             error = "Email y contraseña son obligatorios";
             return;

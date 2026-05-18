@@ -1,239 +1,516 @@
 ﻿<div class="sidebar-wrapper">
-    @* Navbar superior (Brand) *@
-    <nav class="sidebar-header px-3">
-        <div class="brand-logo">
-            <span class="brand-icon"><i class="bi bi-bag-check-fill"></i></span>
-            <span class="brand-name">Gestión</span>
-        </div>
-        <button class="toggler-btn d-md-none" @onclick="ToggleNavMenu">
-            <i class="bi bi-list"></i>
-        </button>
-    </nav>
 
-    @* Contenedor de navegación *@
+    <div class="sidebar-glow"></div>
+
+    @* HEADER *@
+
+
+    @* NAVIGATION *@
     <div class="@NavMenuCssClass">
-        <nav class="nav-content d-flex flex-column p-3 gap-1">
 
-            <p class="nav-section-label">MENÚ PRINCIPAL</p>
+        <nav class="nav-content">
 
-            <NavLink class="nav-link d-flex align-items-center gap-2" href="" Match="NavLinkMatch.All">
-                <span class="nav-icon"><i class="bi bi-house-fill"></i></span>
-                <span>Inicio</span>
-            </NavLink>
+            <div class="nav-section">
 
-            <NavLink class="nav-link d-flex align-items-center gap-2" href="productos">
-                <span class="nav-icon"><i class="bi bi-box-seam-fill"></i></span>
-                <span>Productos</span>
-            </NavLink>
+                <div class="nav-section-label">
+                    PRINCIPAL
+                </div>
 
-            <NavLink class="nav-link d-flex align-items-center gap-2" href="empleados">
-                <span class="nav-icon"><i class="bi bi-people-fill"></i></span>
-                <span>Empleados</span>
-            </NavLink>
+                <NavLink class="nav-link"
+                         href=""
+                         Match="NavLinkMatch.All">
 
-            <NavLink class="nav-link d-flex align-items-center gap-2" href="ventas">
-                <span class="nav-icon"><i class="bi bi-receipt-cutoff"></i></span>
-                <span>Ventas</span>
-            </NavLink>
+                    <span class="nav-icon">
+                        <i class="bi bi-grid-fill"></i>
+                    </span>
 
-            <NavLink class="nav-link d-flex align-items-center gap-2" href="inventario">
-                <span class="nav-icon"><i class="bi bi-clipboard-data-fill"></i></span>
-                <span>Inventario</span>
-            </NavLink>
+                    <span class="nav-text">
+                        Dashboard
+                    </span>
 
-            <hr class="nav-divider" />
-
-            <p class="nav-section-label">SISTEMA</p>
-
-            <NavLink class="nav-link d-flex align-items-center gap-2" href="configuracion">
-                <span class="nav-icon"><i class="bi bi-gear-fill"></i></span>
-                <span>Configuración</span>
-            </NavLink>
-
-            @* BOTÓN INFERIOR *@
-            <div class="mt-auto pt-3">
-                <NavLink class="btn-nueva-venta d-flex align-items-center justify-content-center gap-2" href="nueva-venta">
-                    <i class="bi bi-plus-lg"></i>
-                    <span>NUEVA VENTA</span>
                 </NavLink>
+
+                <NavLink class="nav-link"
+                         href="ventas">
+
+                    <span class="nav-icon">
+                        <i class="bi bi-receipt"></i>
+                    </span>
+
+                    <span class="nav-text">
+                        Ventas
+                    </span>
+
+                </NavLink>
+
+                <NavLink class="nav-link"
+                         href="nueva-venta">
+
+                    <span class="nav-icon">
+                        <i class="bi bi-cart-plus-fill"></i>
+                    </span>
+
+                    <span class="nav-text">
+                        Nueva Venta
+                    </span>
+
+                </NavLink>
+
+            </div>
+
+            <div class="nav-divider"></div>
+
+            <div class="nav-section">
+
+                <div class="nav-section-label">
+                    GESTIÓN
+                </div>
+
+                <NavLink class="nav-link"
+                         href="productos">
+
+                    <span class="nav-icon">
+                        <i class="bi bi-box-seam-fill"></i>
+                    </span>
+
+                    <span class="nav-text">
+                        Productos
+                    </span>
+
+                </NavLink>
+
+                <NavLink class="nav-link"
+                         href="inventario">
+
+                    <span class="nav-icon">
+                        <i class="bi bi-stack"></i>
+                    </span>
+
+                    <span class="nav-text">
+                        Inventario
+                    </span>
+
+                </NavLink>
+
+                <NavLink class="nav-link"
+                         href="empleados">
+
+                    <span class="nav-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </span>
+
+                    <span class="nav-text">
+                        Empleados
+                    </span>
+
+                </NavLink>
+
+            </div>
+
+            <div class="nav-divider"></div>
+
+            <div class="nav-section">
+
+                <div class="nav-section-label">
+                    SISTEMA
+                </div>
+
+                <NavLink class="nav-link"
+                         href="configuracion">
+
+                    <span class="nav-icon">
+                        <i class="bi bi-gear-fill"></i>
+                    </span>
+
+                    <span class="nav-text">
+                        Configuración
+                    </span>
+
+                </NavLink>
+
+                <NavLink class="nav-link"
+                         href="logs">
+
+                    <span class="nav-icon">
+                        <i class="bi bi-clock-history"></i>
+                    </span>
+
+                    <span class="nav-text">
+                        Logs
+                    </span>
+
+                </NavLink>
+
+            </div>
+
+            <div class="nav-bottom">
+
+                <NavLink class="btn-sale"
+                         href="nueva-venta">
+
+                    <i class="bi bi-plus-lg"></i>
+
+                    <span>
+                        NUEVA VENTA
+                    </span>
+
+                </NavLink>
+
             </div>
 
         </nav>
+
     </div>
+
 </div>
 
 <style>
+
     :root {
+
         --accent: #ffaa43;
-        --accent-glow: rgba(255, 170, 67, 0.15);
-        --accent-dim: rgba(255, 170, 67, 0.6);
-        --sidebar-bg: #0f1117;
-        --sidebar-surface: #181c27;
-        --text-muted: rgba(255,255,255,0.4);
-        --text-main: rgba(255,255,255,0.85);
-        --border: rgba(255,255,255,0.07);
+
+        --accent-soft: rgba(255,170,67,.12);
+        --accent-border: rgba(255,170,67,.18);
+
+        --sidebar-bg: #101014;
+        --sidebar-surface: #17171d;
+
+        --border: #23232c;
+
+        --text: #f3f4f6;
+        --muted: #8b8b98;
     }
 
-    /* Wrapper principal */
     .sidebar-wrapper {
-        position: sticky;
-        top: 0;
-        height: 100vh;
+
+        height: 100%;
+
         display: flex;
         flex-direction: column;
-        background-color: var(--sidebar-bg);
-        border-right: 1px solid var(--border);
+
+        position: relative;
+
         overflow: hidden;
     }
 
-    /* Header / Brand */
+    .sidebar-glow {
+
+        position: absolute;
+
+        top: -120px;
+        left: -120px;
+
+        width: 260px;
+        height: 260px;
+
+        background: radial-gradient(circle,
+        rgba(255,170,67,.14),
+        transparent 70%);
+
+        pointer-events: none;
+    }
+
     .sidebar-header {
+
+        padding: 1.4rem 1.2rem;
+
+        border-bottom: 1px solid var(--border);
+
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 1.25rem 1rem;
-        border-bottom: 1px solid var(--border);
+
+        position: relative;
+        z-index: 2;
     }
 
     .brand-logo {
+
         display: flex;
         align-items: center;
-        gap: 0.6rem;
+
+        gap: .9rem;
     }
 
     .brand-icon {
+
+        width: 46px;
+        height: 46px;
+
+        border-radius: 14px;
+
+        background:
+            linear-gradient(135deg,
+            #ffaa43 0%,
+            #ff8d1f 100%);
+
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 34px;
-        height: 34px;
-        background: var(--accent);
-        border-radius: 8px;
-        color: #0f1117;
-        font-size: 1rem;
+
+        color: #111;
+
+        font-size: 1.1rem;
+
+        box-shadow:
+            0 10px 24px rgba(255,170,67,.22);
+    }
+
+    .brand-content {
+        display: flex;
+        flex-direction: column;
     }
 
     .brand-name {
+
+        color: var(--text);
+
         font-size: 1rem;
-        font-weight: 700;
-        color: var(--text-main);
-        letter-spacing: 0.05em;
-        text-transform: uppercase;
+        font-weight: 800;
+
+        letter-spacing: -.4px;
+    }
+
+    .brand-name span {
+        color: var(--accent);
+    }
+
+    .brand-subtitle {
+
+        color: var(--muted);
+
+        font-size: .74rem;
+
+        margin-top: 2px;
     }
 
     .toggler-btn {
-        background: none;
+
+        width: 40px;
+        height: 40px;
+
+        border-radius: 12px;
+
         border: 1px solid var(--border);
-        color: var(--text-muted);
-        border-radius: 6px;
-        padding: 0.3rem 0.6rem;
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: color 0.2s;
+
+        background: transparent;
+
+        color: var(--muted);
+
+        transition: .2s ease;
     }
 
     .toggler-btn:hover {
+
+        border-color: var(--accent-border);
+
         color: var(--accent);
+
+        background: var(--accent-soft);
     }
 
-    /* Etiquetas de sección */
-    .nav-section-label {
-        font-size: 0.65rem;
-        font-weight: 700;
-        letter-spacing: 0.12em;
-        color: var(--text-muted);
-        margin: 0.5rem 0.25rem 0.25rem;
-        text-transform: uppercase;
-    }
-
-    /* Nav content */
     .nav-content {
-        flex-grow: 1;
+
+        height: 100%;
+
+        display: flex;
+        flex-direction: column;
+
+        padding: 1rem .8rem;
+    }
+
+    .nav-section {
+
+        display: flex;
+        flex-direction: column;
+
+        gap: 6px;
+    }
+
+    .nav-section-label {
+
+        color: var(--muted);
+
+        font-size: .68rem;
+        font-weight: 800;
+
+        letter-spacing: .14em;
+
+        padding: .3rem .8rem .7rem;
+
+        opacity: .8;
+    }
+
+    .nav-link {
+
+        display: flex;
+        align-items: center;
+
+        gap: .9rem;
+
+        padding: .9rem 1rem;
+
+        border-radius: 14px;
+
+        text-decoration: none !important;
+
+        color: var(--muted) !important;
+
+        transition: .2s ease;
+
+        position: relative;
+
         overflow: hidden;
     }
 
-    /* Links */
-    .nav-link {
-        color: var(--text-muted) !important;
-        transition: all 0.2s ease;
-        padding: 0.65rem 0.85rem;
-        border-radius: 8px;
-        font-size: 0.875rem;
-        font-weight: 500;
-        text-decoration: none;
-        position: relative;
+    .nav-link::before {
+
+        content: "";
+
+        position: absolute;
+
+        left: 0;
+        top: 10px;
+        bottom: 10px;
+
+        width: 4px;
+
+        border-radius: 20px;
+
+        background: var(--accent);
+
+        opacity: 0;
+
+        transition: .2s ease;
     }
 
     .nav-link:hover {
-        color: var(--text-main) !important;
-        background-color: rgba(255,255,255,0.05);
+
+        background: rgba(255,255,255,.03);
+
+        color: var(--text) !important;
+
+        transform: translateX(2px);
     }
 
     .nav-link.active {
+
+        background: var(--accent-soft);
+
         color: var(--accent) !important;
-        background-color: var(--accent-glow);
+
+        border: 1px solid var(--accent-border);
+
+        box-shadow:
+            inset 0 0 0 1px rgba(255,170,67,.03);
     }
 
-    /* Icono de nav */
-    .nav-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 22px;
-        font-size: 0.95rem;
-    }
-
-    .nav-link.active .nav-icon {
-        color: var(--accent);
-    }
-
-    /* Línea divisora */
-    .nav-divider {
-        border: none;
-        border-top: 1px solid var(--border);
-        margin: 0.5rem 0;
+    .nav-link.active::before {
         opacity: 1;
     }
 
-    /* Botón nueva venta */
-    .btn-nueva-venta {
+    .nav-icon {
+
+        width: 20px;
+
         display: flex;
+        align-items: center;
+        justify-content: center;
+
+        font-size: 1rem;
+
+        flex-shrink: 0;
+    }
+
+    .nav-text {
+
+        font-size: .9rem;
+        font-weight: 600;
+    }
+
+    .nav-divider {
+
+        height: 1px;
+
+        background: var(--border);
+
+        margin: 1rem 0;
+    }
+
+    .nav-bottom {
+
+        margin-top: auto;
+
+        padding-top: 1rem;
+    }
+
+    .btn-sale {
+
         width: 100%;
-        padding: 0.8rem;
-        background: var(--accent);
-        color: #0f1117 !important;
-        border-radius: 10px;
-        font-size: 0.85rem;
-        font-weight: 800;
-        letter-spacing: 0.06em;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: .7rem;
+
+        padding: 1rem;
+
+        border-radius: 16px;
+
+        background:
+            linear-gradient(135deg,
+            #ffaa43 0%,
+            #ff8d1f 100%);
+
+        color: #111 !important;
+
         text-decoration: none;
-        transition: all 0.2s ease;
-        box-shadow: 0 4px 15px rgba(255, 170, 67, 0.25);
+
+        font-size: .84rem;
+        font-weight: 900;
+
+        letter-spacing: .08em;
+
+        transition: .2s ease;
+
+        box-shadow:
+            0 12px 28px rgba(255,170,67,.18);
     }
 
-    .btn-nueva-venta:hover {
-        background: #ffc266;
-        transform: translateY(-1px);
-        box-shadow: 0 6px 20px rgba(255, 170, 67, 0.4);
-        color: #0f1117 !important;
+    .btn-sale:hover {
+
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 18px 34px rgba(255,170,67,.26);
     }
 
-    .btn-nueva-venta:active {
-        transform: translateY(0);
-    }
+    @@media(max-width: 768px) {
 
-    /* Responsivo */
-    @@media (max-width: 767.98px) {
         .sidebar-wrapper {
             height: auto;
-            position: relative;
+        }
+
+        .nav-content {
+            padding-bottom: 1rem;
         }
     }
+
 </style>
 
 @code {
-    private bool collapseNavMenu = true;
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse d-md-block flex-grow-1" : "d-block flex-grow-1";
 
-    private void ToggleNavMenu() => collapseNavMenu = !collapseNavMenu;
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass =>
+        collapseNavMenu
+            ? "collapse d-md-block flex-grow-1"
+            : "d-block flex-grow-1";
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
 }

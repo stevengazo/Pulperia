@@ -3,7 +3,6 @@
 @inject EmpleadoService emp
 
 <style>
-
     .employees-page {
         min-height: 100vh;
         padding: 2rem;
@@ -43,7 +42,7 @@
         border: 1px solid #1b1f27;
         border-radius: 28px;
         overflow: hidden;
-        box-shadow: 0 24px 60px rgba(0,0,0,.35);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, .35);
     }
 
     .table-modern thead {
@@ -65,7 +64,7 @@
     }
 
     .table-modern tbody tr:hover {
-        background: rgba(255,170,67,.03);
+        background: rgba(255, 170, 67, .03);
     }
 
     .table-modern tbody td {
@@ -82,8 +81,8 @@
         overflow: hidden;
         flex-shrink: 0;
 
-        background: rgba(255,170,67,.12);
-        border: 1px solid rgba(255,170,67,.18);
+        background: rgba(255, 170, 67, .12);
+        border: 1px solid rgba(255, 170, 67, .18);
 
         display: flex;
         align-items: center;
@@ -118,9 +117,9 @@
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        background: rgba(255,170,67,.12);
+        background: rgba(255, 170, 67, .12);
         color: #ffaa43;
-        border: 1px solid rgba(255,170,67,.18);
+        border: 1px solid rgba(255, 170, 67, .18);
         padding: 8px 14px;
         border-radius: 999px;
         font-size: .8rem;
@@ -148,8 +147,8 @@
     }
 
     .btn-action:hover {
-        background: rgba(255,170,67,.08);
-        border-color: rgba(255,170,67,.18);
+        background: rgba(255, 170, 67, .08);
+        border-color: rgba(255, 170, 67, .18);
         color: #ffaa43;
     }
 
@@ -165,8 +164,8 @@
     }
 
     .search-box:focus {
-        border-color: rgba(255,170,67,.35);
-        box-shadow: 0 0 0 3px rgba(255,170,67,.08);
+        border-color: rgba(255, 170, 67, .35);
+        box-shadow: 0 0 0 3px rgba(255, 170, 67, .08);
     }
 
     .empty-state {
@@ -201,129 +200,128 @@
         }
 
     }
-
 </style>
 
-<div class="employees-page">
+  
+<UserValidator>
+    <div class="employees-page">
 
-    <div class="employees-container">
+        <div class="employees-container">
 
-        <div class="employees-header">
+            <div class="employees-header">
 
-            <div class="employees-title">
-                <h2>Empleados</h2>
-                <p>Administración y listado de empleados registrados</p>
-            </div>
+                <div class="employees-title">
+                    <h2>Empleados</h2>
+                    <p>Administración y listado de empleados registrados</p>
+                </div>
 
-            <div class="d-flex gap-3 align-items-center flex-wrap">
+                <div class="d-flex gap-3 align-items-center flex-wrap">
 
-                <input class="search-box"
-                       placeholder="Buscar por nombre o apellido..."
-                       @bind="searchText"
-                       @bind:event="oninput" />
+                    <input class="search-box" placeholder="Buscar por nombre o apellido..." @bind="searchText"
+                           @bind:event="oninput" />
 
-                <div class="badge-modern">
-                    <i class="fa-solid fa-users"></i>
-                    @filtered.Count empleado@(filtered.Count != 1 ? "s" : "")
+                    <div class="badge-modern">
+                        <i class="fa-solid fa-users"></i>
+                        @filtered.Count empleado@(filtered.Count != 1 ? "s" : "")
+                    </div>
+
                 </div>
 
             </div>
 
-        </div>
+            <div class="employees-card">
 
-        <div class="employees-card">
+                <div class="table-responsive">
 
-            <div class="table-responsive">
+                    <table class="table table-modern align-middle">
 
-                <table class="table table-modern align-middle">
-
-                    <thead>
-                        <tr>
-                            <th class="ps-4">Empleado</th>
-                            <th>Apellido</th>
-                            <th class="text-center pe-4">Acciones</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @if (!filtered.Any())
-                        {
+                        <thead>
                             <tr>
-                                <td colspan="3">
-
-                                    <div class="empty-state">
-                                        <i class="fa-solid fa-users-slash"></i>
-                                        <div>No hay empleados que coincidan</div>
-                                    </div>
-
-                                </td>
+                                <th class="ps-4">Empleado</th>
+                                <th>Apellido</th>
+                                <th class="text-center pe-4">Acciones</th>
                             </tr>
-                        }
+                        </thead>
 
-                        @foreach (var i in filtered)
-                        {
-                            <tr>
+                        <tbody>
 
-                                <td class="ps-4">
+                            @if (!filtered.Any())
+                            {
+                                <tr>
+                                    <td colspan="3">
 
-                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="empty-state">
+                                            <i class="fa-solid fa-users-slash"></i>
+                                            <div>No hay empleados que coincidan</div>
+                                        </div>
 
-                                        <div class="employee-avatar">
+                                    </td>
+                                </tr>
+                            }
 
-                                            @if (!string.IsNullOrWhiteSpace(i.Photo))
-                                            {
-                                                <img src="@i.Photo"
-                                                     alt="@i.Nombre" />
-                                            }
-                                            else
-                                            {
-                                                <i class="fa-solid fa-user"></i>
-                                            }
+                            @foreach (var i in filtered)
+                            {
+                                <tr>
+
+                                    <td class="ps-4">
+
+                                        <div class="d-flex align-items-center gap-3">
+
+                                            <div class="employee-avatar">
+
+                                                @if (!string.IsNullOrWhiteSpace(i.Photo))
+                                                {
+                                                    <img src="@i.Photo" alt="@i.Nombre" />
+                                                }
+                                                else
+                                                {
+                                                    <i class="fa-solid fa-user"></i>
+                                                }
+
+                                            </div>
+
+                                            <div>
+
+                                                <div class="employee-name">
+                                                    @i.Nombre
+                                                </div>
+
+                                                <div class="employee-id">
+                                                    EMP-@i.Id
+                                                </div>
+
+                                            </div>
 
                                         </div>
 
-                                        <div>
+                                    </td>
 
-                                            <div class="employee-name">
-                                                @i.Nombre
-                                            </div>
+                                    <td>
+                                        @i.Apellido
+                                    </td>
 
-                                            <div class="employee-id">
-                                                EMP-@i.Id
-                                            </div>
+                                    <td class="text-center pe-4">
+
+                                        <div class="actions">
+
+                                            <a class="btn-action" href="/empleado/@i.Id">
+
+                                                <i class="fa-solid fa-eye"></i>
+
+                                            </a>
 
                                         </div>
 
-                                    </div>
+                                    </td>
 
-                                </td>
+                                </tr>
+                            }
 
-                                <td>
-                                    @i.Apellido
-                                </td>
+                        </tbody>
 
-                                <td class="text-center pe-4">
+                    </table>
 
-                                    <div class="actions">
-
-                                        <a class="btn-action"
-                                           href="/empleado/@i.Id">
-
-                                            <i class="fa-solid fa-eye"></i>
-
-                                        </a>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-                        }
-
-                    </tbody>
-
-                </table>
+                </div>
 
             </div>
 
@@ -331,7 +329,8 @@
 
     </div>
 
-</div>
+  
+</UserValidator>
 
 @code {
 

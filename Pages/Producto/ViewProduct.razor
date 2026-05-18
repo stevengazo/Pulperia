@@ -2,63 +2,69 @@
 @inject PulperiaDbContext db
 @inject NavigationManager Nav
 
-<div class="view-container">
-    <div class="view-header mb-4">
-        <button @onclick='() => Nav.NavigateTo("/productos")' class="btn-back">
-            <i class="bi bi-arrow-left"></i> Volver a la lista
-        </button>
-    </div>
 
-    @if (producto == null)
-    {
-        <div class="loading-state">
-            <div class="spinner"></div>
-            <span>Cargando detalles del producto...</span>
+  
+<UserValidator>
+    <div class="view-container">
+        <div class="view-header mb-4">
+            <button @onclick='() => Nav.NavigateTo("/productos")' class="btn-back">
+                <i class="bi bi-arrow-left"></i> Volver a la lista
+            </button>
         </div>
-    }
-    else
-    {
-        <div class="product-detail-card">
-            <div class="detail-header">
-                <div class="title-group">
-                    <span class="category-tag">Producto</span>
-                    <h2 class="product-name">@producto.Nombre</h2>
-                </div>
-                <button @onclick='() => Nav.NavigateTo($"/producto/editar/{id}")' class="btn-edit">
-                    <i class="bi bi-pencil-square"></i> Editar
-                </button>
+
+        @if (producto == null)
+        {
+            <div class="loading-state">
+                <div class="spinner"></div>
+                <span>Cargando detalles del producto...</span>
             </div>
-
-            <div class="detail-body">
-                <section class="info-section">
-                    <label>Presentación</label>
-                    <p>@(string.IsNullOrEmpty(producto.Presentacion) ? "Sin descripción" : producto.Presentacion)</p>
-                </section>
-
-                <div class="info-grid">
-                    <div class="info-item">
-                        <label>Precio Costo</label>
-                        <div class="value cost">@producto.PrecioCosto.ToString("C")</div>
+        }
+        else
+        {
+            <div class="product-detail-card">
+                <div class="detail-header">
+                    <div class="title-group">
+                        <span class="category-tag">Producto</span>
+                        <h2 class="product-name">@producto.Nombre</h2>
                     </div>
-                    <div class="info-item">
-                        <label>Precio Venta</label>
-                        <div class="value price">@producto.PrecioVenta.ToString("C")</div>
-                    </div>
-                    <div class="info-item">
-                        <label>Stock Actual</label>
-                        <div class="value @(producto.StockActual <= producto.StockMinimo ? "text-danger" : "")">
-                            @producto.StockActual unidades
+                    <button @onclick='() => Nav.NavigateTo($"/producto/editar/{id}")' class="btn-edit">
+                        <i class="bi bi-pencil-square"></i> Editar
+                    </button>
+                </div>
+
+                <div class="detail-body">
+                    <section class="info-section">
+                        <label>Presentación</label>
+                        <p>@(string.IsNullOrEmpty(producto.Presentacion) ? "Sin descripción" : producto.Presentacion)</p>
+                    </section>
+
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Precio Costo</label>
+                            <div class="value cost">@producto.PrecioCosto.ToString("C")</div>
+                        </div>
+                        <div class="info-item">
+                            <label>Precio Venta</label>
+                            <div class="value price">@producto.PrecioVenta.ToString("C")</div>
+                        </div>
+                        <div class="info-item">
+                            <label>Stock Actual</label>
+                            <div class="value @(producto.StockActual <= producto.StockMinimo ? "text-danger" : "")">
+                                @producto.StockActual unidades
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <label>Stock Mínimo</label>
+                            <div class="value">@producto.StockMinimo unidades</div>
                         </div>
                     </div>
-                    <div class="info-item">
-                        <label>Stock Mínimo</label>
-                        <div class="value">@producto.StockMinimo unidades</div>
-                    </div>
                 </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
+
+  
+</UserValidator>
 
 <style>
     .view-container {
@@ -98,11 +104,16 @@
         color: #fff;
     }
 
-    .detail-body { padding: 24px; }
+    .detail-body {
+        padding: 24px;
+    }
 
-    .info-section { margin-bottom: 32px; }
+    .info-section {
+        margin-bottom: 32px;
+    }
 
-    .info-section label, .info-item label {
+    .info-section label,
+    .info-item label {
         font-size: 12px;
         color: var(--muted);
         display: block;
@@ -111,7 +122,10 @@
         letter-spacing: 0.5px;
     }
 
-    .info-section p { font-size: 16px; color: var(--text); }
+    .info-section p {
+        font-size: 16px;
+        color: var(--text);
+    }
 
     .info-grid {
         display: grid;
@@ -119,9 +133,18 @@
         gap: 32px;
     }
 
-    .value { font-size: 18px; font-weight: 600; color: var(--text); }
-    .price { color: #4ade80; } /* Verde suave para ventas */
-    
+    .value {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .price {
+        color: #4ade80;
+    }
+
+    /* Verde suave para ventas */
+
     .btn-back {
         background: transparent;
         border: none;
@@ -132,7 +155,9 @@
         padding: 0;
     }
 
-    .btn-back:hover { color: var(--accent); }
+    .btn-back:hover {
+        color: var(--accent);
+    }
 
     .btn-edit {
         background: var(--accent-dim);
@@ -144,7 +169,10 @@
         transition: all 0.2s;
     }
 
-    .btn-edit:hover { background: var(--accent); transform: translateY(-1px); }
+    .btn-edit:hover {
+        background: var(--accent);
+        transform: translateY(-1px);
+    }
 
     .loading-state {
         display: flex;
@@ -164,10 +192,27 @@
         animation: spin 1s linear infinite;
     }
 
-    .text-danger { color: #f87171 !important; }
+    .text-danger {
+        color: #f87171 !important;
+    }
 
-    @@keyframes spin { to { transform: rotate(360deg); } }
-    @@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
 
 @code {
@@ -177,7 +222,7 @@
     protected override async Task OnInitializedAsync()
     {
         // Pequeño retraso artificial para apreciar el estado de carga si es local (opcional)
-        // await Task.Delay(300); 
+        // await Task.Delay(300);
         producto = await db.Producto.FindAsync(id);
     }
 }

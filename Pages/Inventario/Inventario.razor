@@ -3,7 +3,6 @@
 @inject IDbContextFactory<PulperiaDbContext> DbFactory
 @inject NavigationManager Nav
 
-<AddCompraInventario @ref="modalCompra" OnSaved="ActualizarDatos" />
 
 <style>
     .inv-root {
@@ -45,14 +44,14 @@
         font-size: .9rem;
         font-weight: 700;
         transition: .2s ease;
-        box-shadow: 0 10px 25px rgba(255,170,67,.25);
+        box-shadow: 0 10px 25px rgba(255, 170, 67, .25);
         cursor: pointer;
     }
 
     .btn-compra:hover {
         transform: translateY(-2px);
         background: #ffc266;
-        box-shadow: 0 14px 30px rgba(255,170,67,.35);
+        box-shadow: 0 14px 30px rgba(255, 170, 67, .35);
     }
 
     /* Stat cards */
@@ -65,7 +64,7 @@
 
     .stat-card {
         background: #181c27;
-        border: 1px solid rgba(255,255,255,0.06);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 18px;
         padding: 1.4rem;
         display: flex;
@@ -74,7 +73,9 @@
         transition: .2s ease;
     }
 
-    .stat-card:hover { transform: translateY(-3px); }
+    .stat-card:hover {
+        transform: translateY(-3px);
+    }
 
     .stat-icon {
         width: 50px;
@@ -87,9 +88,20 @@
         flex-shrink: 0;
     }
 
-    .icon-orange { background: rgba(255,170,67,.12); color: #ffaa43; }
-    .icon-yellow { background: rgba(250,204,21,.12); color: #facc15; }
-    .icon-red    { background: rgba(239,68,68,.12);  color: #f87171; }
+    .icon-orange {
+        background: rgba(255, 170, 67, .12);
+        color: #ffaa43;
+    }
+
+    .icon-yellow {
+        background: rgba(250, 204, 21, .12);
+        color: #facc15;
+    }
+
+    .icon-red {
+        background: rgba(239, 68, 68, .12);
+        color: #f87171;
+    }
 
     .stat-label {
         color: #707887;
@@ -105,21 +117,26 @@
         line-height: 1;
     }
 
-    .stat-value.yellow { color: #facc15; }
-    .stat-value.red    { color: #f87171; }
+    .stat-value.yellow {
+        color: #facc15;
+    }
+
+    .stat-value.red {
+        color: #f87171;
+    }
 
     /* Main card */
     .inv-card {
         background: #181c27;
-        border: 1px solid rgba(255,255,255,0.06);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 22px;
         overflow: hidden;
-        box-shadow: 0 20px 40px rgba(0,0,0,.35);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, .35);
     }
 
     .inv-toolbar {
         padding: 1.4rem;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         display: grid;
         grid-template-columns: 1fr 220px;
         gap: 14px;
@@ -128,7 +145,7 @@
     .inv-input {
         width: 100%;
         background: #0f1117;
-        border: 1px solid rgba(255,255,255,0.07);
+        border: 1px solid rgba(255, 255, 255, 0.07);
         border-radius: 14px;
         color: #eef2f7;
         padding: 12px 16px;
@@ -139,10 +156,12 @@
 
     .inv-input:focus {
         border-color: #ffaa43;
-        box-shadow: 0 0 0 4px rgba(255,170,67,.1);
+        box-shadow: 0 0 0 4px rgba(255, 170, 67, .1);
     }
 
-    .inv-input::placeholder { color: #5f6775; }
+    .inv-input::placeholder {
+        color: #5f6775;
+    }
 
     .search-wrap {
         position: relative;
@@ -167,7 +186,9 @@
         border-collapse: collapse;
     }
 
-    thead { background: #0f1117; }
+    thead {
+        background: #0f1117;
+    }
 
     thead th {
         padding: 16px;
@@ -176,19 +197,29 @@
         font-weight: 700;
         text-transform: uppercase;
         letter-spacing: .08em;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
-    thead th.r { text-align: right; }
-    thead th.c { text-align: center; }
+    thead th.r {
+        text-align: right;
+    }
+
+    thead th.c {
+        text-align: center;
+    }
 
     tbody tr {
-        border-bottom: 1px solid rgba(255,255,255,0.04);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
         transition: .15s;
     }
 
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: rgba(255,255,255,.02); }
+    tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    tbody tr:hover {
+        background: rgba(255, 255, 255, .02);
+    }
 
     tbody td {
         padding: 16px;
@@ -203,7 +234,9 @@
         font-size: .85rem;
     }
 
-    .td-fecha { color: #707887; }
+    .td-fecha {
+        color: #707887;
+    }
 
     .td-nombre {
         color: #f5f7fa;
@@ -215,11 +248,26 @@
         font-size: .78rem;
     }
 
-    .td-ctr { text-align: center; font-weight: 600; color: #eef2f7; }
-    .td-r   { text-align: right; font-variant-numeric: tabular-nums; }
+    .td-ctr {
+        text-align: center;
+        font-weight: 600;
+        color: #eef2f7;
+    }
 
-    .costo  { color: #facc15; font-weight: 600; }
-    .venta  { color: #4ade80; font-weight: 700; }
+    .td-r {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .costo {
+        color: #facc15;
+        font-weight: 600;
+    }
+
+    .venta {
+        color: #4ade80;
+        font-weight: 700;
+    }
 
     .ganancia {
         text-align: center;
@@ -228,133 +276,143 @@
         font-variant-numeric: tabular-nums;
     }
 
-    .ganancia.neg { color: #f87171; }
+    .ganancia.neg {
+        color: #f87171;
+    }
 </style>
 
-<div class="inv-root">
 
-    <div class="inv-head">
-        <div>
-            <h2>Control de Inventario</h2>
-            <p>Gestione sus productos y niveles de existencias</p>
-        </div>
-        <button class="btn-compra" @onclick="AbrirModalNuevo">
-            <i class="bi bi-plus-lg"></i>
-            Registrar Compra
-        </button>
-    </div>
+<UserValidator>
+    <AddCompraInventario @ref="modalCompra" OnSaved="ActualizarDatos" />
 
-    <div class="stats-grid">
 
-        <div class="stat-card">
-            <div class="stat-icon icon-orange">
-                <i class="bi bi-box-seam"></i>
-            </div>
+
+    <div class="inv-root">
+
+        <div class="inv-head">
             <div>
-                <div class="stat-label">Total Registros</div>
-                <div class="stat-value">@detalleCompras.Count</div>
+                <h2>Control de Inventario</h2>
+                <p>Gestione sus productos y niveles de existencias</p>
             </div>
+            <button class="btn-compra" @onclick="AbrirModalNuevo">
+                <i class="bi bi-plus-lg"></i>
+                Registrar Compra
+            </button>
         </div>
 
-        <div class="stat-card">
-            <div class="stat-icon icon-yellow">
-                <i class="bi bi-exclamation-triangle"></i>
-            </div>
-            <div>
-                <div class="stat-label">Stock Bajo</div>
-                <div class="stat-value yellow">
-                    @detalleCompras.Count(x => x.Producto.StockActual <= x.Producto.StockMinimo && x.Producto.StockActual > 0)
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon icon-orange">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+                <div>
+                    <div class="stat-label">Total Registros</div>
+                    <div class="stat-value">@detalleCompras.Count</div>
                 </div>
             </div>
-        </div>
 
-        <div class="stat-card">
-            <div class="stat-icon icon-red">
-                <i class="bi bi-x-octagon"></i>
-            </div>
-            <div>
-                <div class="stat-label">Agotados</div>
-                <div class="stat-value red">
-                    @detalleCompras.Count(x => x.Producto.StockActual <= 0)
+            <div class="stat-card">
+                <div class="stat-icon icon-yellow">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <div class="stat-label">Stock Bajo</div>
+                    <div class="stat-value yellow">
+                        @detalleCompras.Count(x => x.Producto.StockActual <= x.Producto.StockMinimo &&
+                            x.Producto.StockActual > 0)
+                    </div>
                 </div>
             </div>
-        </div>
 
-    </div>
-
-    <div class="inv-card">
-
-        <div class="inv-toolbar">
-            <div class="search-wrap">
-                <i class="bi bi-search search-icon"></i>
-                <input class="inv-input"
-                       placeholder="Buscar por nombre, SKU o proveedor..."
-                       @bind="filtro"
-                       @bind:event="oninput" />
+            <div class="stat-card">
+                <div class="stat-icon icon-red">
+                    <i class="bi bi-x-octagon"></i>
+                </div>
+                <div>
+                    <div class="stat-label">Agotados</div>
+                    <div class="stat-value red">
+                        @detalleCompras.Count(x => x.Producto.StockActual <= 0)
+                    </div>
+                </div>
             </div>
 
-            <select class="inv-input">
-                <option value="">Todas las categorías</option>
-                <option value="Abarrotes">Abarrotes</option>
-                <option value="Lacteos">Lácteos</option>
-                <option value="Bebidas">Bebidas</option>
-            </select>
         </div>
 
-        <div class="table-responsive">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Proveedor</th>
-                        <th>Fecha</th>
-                        <th>Producto</th>
-                        <th class="c">Cantidad</th>
-                        <th class="r">Costo Unit.</th>
-                        <th class="r">Precio Venta</th>
-                        <th class="c">Ganancia</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var i in detalleCompras.Where(x =>
-                        string.IsNullOrWhiteSpace(filtro)
-                        || x.Producto.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)
-                        || x.CompraInventario.Proveedor.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)
-                        || x.Producto.Id.ToString().Contains(filtro)))
-                    {
-                        var ganancia = i.Producto.PrecioVenta - i.PrecioUnitario;
+        <div class="inv-card">
 
+            <div class="inv-toolbar">
+                <div class="search-wrap">
+                    <i class="bi bi-search search-icon"></i>
+                    <input class="inv-input" placeholder="Buscar por nombre, SKU o proveedor..." @bind="filtro"
+                           @bind:event="oninput" />
+                </div>
+
+                <select class="inv-input">
+                    <option value="">Todas las categorías</option>
+                    <option value="Abarrotes">Abarrotes</option>
+                    <option value="Lacteos">Lácteos</option>
+                    <option value="Bebidas">Bebidas</option>
+                </select>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
                         <tr>
-                            <td class="td-proveedor">
-                                @i.CompraInventario?.Proveedor?.Nombre
-                            </td>
-
-                            <td class="td-fecha">
-                                @i.CompraInventario.Fecha.ToString("dd/MM/yyyy")
-                            </td>
-
-                            <td>
-                                <div class="td-nombre">@i.Producto.Nombre</div>
-                                <div class="td-sku">SKU: @i.Producto.Id</div>
-                            </td>
-
-                            <td class="td-ctr">@i.Cantidad</td>
-
-                            <td class="td-r costo">₡@i.PrecioUnitario.ToString("N2")</td>
-
-                            <td class="td-r venta">₡@i.Producto.PrecioVenta.ToString("N2")</td>
-
-                            <td class="ganancia @(ganancia < 0 ? "neg" : "")">
-                                ₡@ganancia.ToString("N2")
-                            </td>
+                            <th>Proveedor</th>
+                            <th>Fecha</th>
+                            <th>Producto</th>
+                            <th class="c">Cantidad</th>
+                            <th class="r">Costo Unit.</th>
+                            <th class="r">Precio Venta</th>
+                            <th class="c">Ganancia</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in detalleCompras.Where(x =>
+                            string.IsNullOrWhiteSpace(filtro)
+                            || x.Producto.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)
+                            || x.CompraInventario.Proveedor.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)
+                            || x.Producto.Id.ToString().Contains(filtro)))
+                        {
+                            var ganancia = i.Producto.PrecioVenta - i.PrecioUnitario;
+
+                            <tr>
+                                <td class="td-proveedor">
+                                    @i.CompraInventario?.Proveedor?.Nombre
+                                </td>
+
+                                <td class="td-fecha">
+                                    @i.CompraInventario.Fecha.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td>
+                                    <div class="td-nombre">@i.Producto.Nombre</div>
+                                    <div class="td-sku">SKU: @i.Producto.Id</div>
+                                </td>
+
+                                <td class="td-ctr">@i.Cantidad</td>
+
+                                <td class="td-r costo">₡@i.PrecioUnitario.ToString("N2")</td>
+
+                                <td class="td-r venta">₡@i.Producto.PrecioVenta.ToString("N2")</td>
+
+                                <td class="ganancia @(ganancia < 0 ? "neg" : "")">
+                                    ₡@ganancia.ToString("N2")
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
         </div>
 
     </div>
+</UserValidator>
 
-</div>
+
 
 @code {
 

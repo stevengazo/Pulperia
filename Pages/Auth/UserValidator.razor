@@ -1,7 +1,14 @@
 @inject IDbContextFactory<PulperiaDbContext> DbContextFactory
 @inject AppSessionService Session
 
-@if (Session?.CurrentUser == null)
+@if (!Session.IsInitialized)
+{
+    <div class="auth-loading">
+        <div class="spinner"></div>
+        <p>Verificando sesión...</p>
+    </div>
+}
+else if (Session.CurrentUser == null)
 {
     <div class="auth-required">
         <h3>Sesión requerida</h3>
@@ -56,6 +63,38 @@ else
 }
 
 <style>
+    .auth-loading {
+        width: 100%;
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+
+        background: #0e0e11;
+        border: 1px solid #1b1b22;
+        border-radius: 12px;
+
+        color: #8d8d99;
+        text-align: center;
+    }
+
+    .spinner {
+        width: 34px;
+        height: 34px;
+        border: 3px solid #2a2a35;
+        border-top: 3px solid #ffaa43;
+        border-radius: 50%;
+        animation: spin 0.9s linear infinite;
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
     .auth-required {
         width: 100%;
         min-height: 220px;

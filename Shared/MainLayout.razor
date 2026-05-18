@@ -6,8 +6,16 @@
 <PageTitle>Pulpería - Sistema POS</PageTitle>
 
 @code {
+
     private bool IsLoginPage =>
         Navigation.Uri.Contains("/login", StringComparison.OrdinalIgnoreCase);
+
+    private async Task OnClose()
+    {
+        await Session.LogoutAsync();
+
+        Navigation.NavigateTo("/login", true);
+    }
 }
 
 @if (IsLoginPage)
@@ -21,22 +29,71 @@ else
         @if (Session.IsAuthenticated)
         {
             <aside class="sidebar">
+
                 <div class="brand">
-                    <span class="brand-icon">P</span>
-                    <span class="brand-name">
-                        Pulpe<span class="brand-accent">POS</span>
-                    </span>
+
+                    <div class="brand-logo">
+                        P
+                    </div>
+
+                    <div class="brand-content">
+                        <div class="brand-title">
+                            Pulpe<span>POS</span>
+                        </div>
+
+                        <div class="brand-subtitle">
+                            Sistema Administrativo
+                        </div>
+                    </div>
+
                 </div>
 
-                <NavMenu />
+                <div class="sidebar-menu">
+                    <NavMenu />
+                </div>
+
+                <div class="sidebar-footer">
+
+                    <div class="footer-user">
+                        <i class="bi bi-person-circle"></i>
+
+                        <div>
+                            <div class="footer-email">
+                                @Session?.CurrentUser?.Email
+                            </div>
+
+                            <div class="footer-role">
+                                Usuario activo
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="logout-btn"
+                            @onclick="OnClose">
+
+                        <i class="bi bi-box-arrow-right"></i>
+                        Cerrar sesión
+
+                    </button>
+
+                </div>
+
             </aside>
         }
 
         <div class="main-area @(Session.IsAuthenticated ? "" : "full-width")">
 
-            <header class="topbar p-2">
+            <header class="topbar">
 
-                <div class="topbar-right d-flex flex-row gap-2">
+                <div class="topbar-left">
+
+                    <div class="page-title">
+                        Sistema POS
+                    </div>
+
+                </div>
+
+                <div class="topbar-right">
 
                     @if (!Session.IsAuthenticated)
                     {
@@ -46,23 +103,19 @@ else
                     }
                     else
                     {
-                        <span class="user-label">
-                            <i class="bi bi-person-circle text-white"></i>
-                            @Session?.CurrentUser?.Email
-                        </span>
-
-                        <a href="logout" class="btn-logout">
-                            Salir
-                        </a>
+                        <div class="status-badge">
+                            <span class="status-dot"></span>
+                            En línea
+                        </div>
                     }
 
                 </div>
 
             </header>
 
-            <article class="content">
+            <main class="content">
                 @Body
-            </article>
+            </main>
 
         </div>
 
@@ -70,6 +123,7 @@ else
 }
 
 <style>
+
     *,
     *::before,
     *::after {
@@ -79,77 +133,210 @@ else
     }
 
     :root {
-        --bg: #000000;
-        --surface: #0e0e11;
-        --border: #17171c;
-        --text: #d8d8e0;
-        --muted: #3a3a46;
+
+        --bg: #090909;
+        --surface: #101014;
+        --surface-2: #141419;
+
+        --border: #1d1d25;
+
+        --text: #f4f4f5;
+        --muted: #8b8b99;
 
         --accent: #ffaa43;
-        --accent-dim: #2a1a06;
+        --accent-soft: rgba(255,170,67,.12);
 
-        --sidebar-w: 220px;
-        --topbar-h: 50px;
+        --danger: #ff5c5c;
+
+        --sidebar-width: 255px;
+        --topbar-height: 62px;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: Inter, system-ui, sans-serif;
     }
 
     .layout {
         display: flex;
-        background: var(--bg);
-        color: var(--text);
-        font-family: 'DM Sans', system-ui, sans-serif;
         min-height: 100vh;
+        background:
+            radial-gradient(circle at top right,
+            rgba(255,170,67,.06),
+            transparent 22%),
+            var(--bg);
     }
 
     .sidebar {
-        width: var(--sidebar-w);
-        background: var(--surface);
-        border-right: 0.5px solid var(--border);
+
+        width: var(--sidebar-width);
+        background: rgba(16,16,20,.96);
+
+        border-right: 1px solid var(--border);
+
         position: fixed;
         top: 0;
         left: 0;
+
         height: 100vh;
+
         display: flex;
         flex-direction: column;
+
+        backdrop-filter: blur(18px);
+
         z-index: 100;
     }
 
     .brand {
+
         display: flex;
         align-items: center;
-        gap: 10px;
-        padding: 17px 20px 15px;
-        border-bottom: 0.5px solid var(--border);
+        gap: 14px;
+
+        padding: 1.35rem;
+
+        border-bottom: 1px solid var(--border);
     }
 
-    .brand-icon {
-        width: 26px;
-        height: 26px;
-        background: var(--accent);
-        border-radius: 6px;
+    .brand-logo {
+
+        width: 46px;
+        height: 46px;
+
+        border-radius: 14px;
+
+        background:
+            linear-gradient(135deg,
+            #ffaa43 0%,
+            #ff8c1a 100%);
+
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 12px;
-        font-weight: 700;
-        color: #fff;
-        flex-shrink: 0;
+
+        font-weight: 800;
+        font-size: 1rem;
+
+        color: #111;
+
+        box-shadow:
+            0 10px 30px rgba(255,170,67,.18);
     }
 
-    .brand-name {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--text);
-        letter-spacing: -0.01em;
+    .brand-content {
+        display: flex;
+        flex-direction: column;
     }
 
-    .brand-accent {
+    .brand-title {
+
+        font-size: 1rem;
+        font-weight: 800;
+
+        letter-spacing: -.4px;
+    }
+
+    .brand-title span {
         color: var(--accent);
     }
 
-    .main-area {
-        height: 100vh;
-        margin-left: var(--sidebar-w);
+    .brand-subtitle {
+
+        color: var(--muted);
+
+        font-size: .78rem;
+
+        margin-top: 2px;
+    }
+
+    .sidebar-menu {
         flex: 1;
+        overflow-y: auto;
+        padding: 1rem .7rem;
+    }
+
+    .sidebar-footer {
+
+        border-top: 1px solid var(--border);
+
+        padding: 1rem;
+    }
+
+    .footer-user {
+
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        margin-bottom: 1rem;
+    }
+
+    .footer-user i {
+
+        font-size: 2rem;
+        color: var(--accent);
+    }
+
+    .footer-email {
+
+        font-size: .85rem;
+        color: var(--text);
+
+        word-break: break-word;
+    }
+
+    .footer-role {
+
+        color: var(--muted);
+
+        font-size: .72rem;
+
+        margin-top: 2px;
+    }
+
+    .logout-btn {
+
+        width: 100%;
+
+        border: 1px solid rgba(255,92,92,.18);
+
+        background: rgba(255,92,92,.08);
+
+        color: #ff8d8d;
+
+        padding: .9rem 1rem;
+
+        border-radius: 14px;
+
+        cursor: pointer;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        font-weight: 700;
+
+        transition: .2s ease;
+    }
+
+    .logout-btn:hover {
+
+        background: rgba(255,92,92,.15);
+
+        transform: translateY(-1px);
+    }
+
+    .main-area {
+
+        margin-left: var(--sidebar-width);
+
+        flex: 1;
+
+        min-height: 100vh;
+
         display: flex;
         flex-direction: column;
     }
@@ -159,69 +346,115 @@ else
     }
 
     .topbar {
-        height: var(--topbar-h);
-        background: var(--surface);
-        border-bottom: 0.5px solid var(--border);
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        padding: 0 16px;
+
+        height: var(--topbar-height);
+
+        border-bottom: 1px solid var(--border);
+
+        background: rgba(16,16,20,.82);
+
+        backdrop-filter: blur(16px);
+
         position: sticky;
         top: 0;
+
         z-index: 50;
+
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        padding: 0 1.5rem;
+    }
+
+    .page-title {
+
+        font-size: .95rem;
+        font-weight: 700;
+
+        color: var(--text);
     }
 
     .topbar-right {
+
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 1rem;
     }
 
-    .user-label {
-        font-size: 12px;
-        color: var(--muted);
+    .status-badge {
+
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 8px;
+
+        background: var(--accent-soft);
+
+        border: 1px solid rgba(255,170,67,.15);
+
+        padding: .55rem .9rem;
+
+        border-radius: 999px;
+
+        color: var(--accent);
+
+        font-size: .8rem;
+        font-weight: 700;
     }
 
-    .btn-logout {
-        font-size: 12px;
-        color: red;
-        text-decoration: none;
-        border: 0.5px solid #bb0d0d;
-        border-radius: 5px;
-        padding: 5px 11px;
-        transition: color 0.15s, border-color 0.15s;
-    }
+    .status-dot {
 
-    .btn-logout:hover {
-        color: #e2734a;
-        border-color: #e2734a44;
+        width: 8px;
+        height: 8px;
+
+        border-radius: 999px;
+
+        background: var(--accent);
+
+        box-shadow:
+            0 0 12px var(--accent);
     }
 
     .login-link {
-        color: var(--accent);
+
         text-decoration: none;
-        font-size: 13px;
-        border: 1px solid var(--accent);
-        padding: 6px 12px;
-        border-radius: 6px;
+
+        background: linear-gradient(135deg,
+        #ffaa43 0%,
+        #ff8c1a 100%);
+
+        color: #111;
+
+        padding: .75rem 1.2rem;
+
+        border-radius: 12px;
+
+        font-size: .85rem;
+        font-weight: 800;
+
+        transition: .2s ease;
     }
 
     .login-link:hover {
-        background: var(--accent);
-        color: #000;
+
+        transform: translateY(-1px);
+
+        box-shadow:
+            0 10px 24px rgba(255,170,67,.22);
     }
 
     .content {
+
         flex: 1;
-        padding: 2rem 2.5rem;
-        background: var(--bg);
+
+        padding: 2rem;
+
+        overflow-x: hidden;
     }
 
     ::-webkit-scrollbar {
-        width: 5px;
+        width: 6px;
+        height: 6px;
     }
 
     ::-webkit-scrollbar-track {
@@ -229,11 +462,31 @@ else
     }
 
     ::-webkit-scrollbar-thumb {
-        background: #202026;
-        border-radius: 10px;
+
+        background: #23232b;
+
+        border-radius: 999px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-        background: var(--muted);
+        background: #31313d;
     }
+
+    @@media(max-width: 900px) {
+
+        .sidebar {
+            width: 100%;
+            height: auto;
+            position: relative;
+        }
+
+        .main-area {
+            margin-left: 0;
+        }
+
+        .layout {
+            flex-direction: column;
+        }
+    }
+
 </style>

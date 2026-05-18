@@ -10,7 +10,6 @@
 <PageTitle>Empleado</PageTitle>
 
 <style>
-
     .employee-page {
         min-height: 100vh;
         padding: 2rem;
@@ -25,17 +24,17 @@
 
     .invoice {
         background: #181c27;
-        border: 1px solid rgba(255,255,255,0.06);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 22px;
         padding: 2rem;
-        box-shadow: 0 24px 60px rgba(0,0,0,.35);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, .35);
     }
 
     .invoice-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         padding-bottom: 1.5rem;
         margin-bottom: 1.5rem;
         gap: 1rem;
@@ -55,8 +54,8 @@
         overflow: hidden;
         flex-shrink: 0;
 
-        background: rgba(255,170,67,.08);
-        border: 1px solid rgba(255,170,67,.18);
+        background: rgba(255, 170, 67, .08);
+        border: 1px solid rgba(255, 170, 67, .18);
 
         display: flex;
         align-items: center;
@@ -90,8 +89,8 @@
     .emp-badge {
         padding: 8px 16px;
         border-radius: 999px;
-        background: rgba(255,170,67,.1);
-        border: 1px solid rgba(255,170,67,.2);
+        background: rgba(255, 170, 67, .1);
+        border: 1px solid rgba(255, 170, 67, .2);
         color: #ffaa43;
         font-size: .75rem;
         font-weight: 700;
@@ -100,14 +99,14 @@
 
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
         gap: 1rem;
         margin-bottom: 1.8rem;
     }
 
     .stat-card {
         background: #0f1117;
-        border: 1px solid rgba(255,255,255,0.06);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 16px;
         padding: 1rem;
     }
@@ -145,7 +144,7 @@
 
     .filter-input {
         background: #0f1117;
-        border: 1px solid rgba(255,255,255,0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 12px;
         color: white;
         padding: 10px 14px;
@@ -154,8 +153,8 @@
     }
 
     .filter-input:focus {
-        border-color: rgba(255,170,67,.3);
-        box-shadow: 0 0 0 3px rgba(255,170,67,.08);
+        border-color: rgba(255, 170, 67, .3);
+        box-shadow: 0 0 0 3px rgba(255, 170, 67, .08);
     }
 
     .btn-export {
@@ -190,7 +189,7 @@
         width: 100%;
         border-collapse: collapse;
         background: #0f1117;
-        border: 1px solid rgba(255,255,255,0.06);
+        border: 1px solid rgba(255, 255, 255, 0.06);
         border-radius: 12px;
         overflow: hidden;
     }
@@ -207,14 +206,14 @@
         text-transform: uppercase;
         letter-spacing: .08em;
         color: #7e8796;
-        border-bottom: 1px solid rgba(255,255,255,0.06);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     td {
         padding: 14px 16px;
         font-size: .9rem;
         color: #c7cfdb;
-        border-bottom: 1px solid rgba(255,255,255,0.04);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     }
 
     tbody tr:last-child td {
@@ -222,7 +221,7 @@
     }
 
     tbody tr:hover td {
-        background: rgba(255,255,255,.02);
+        background: rgba(255, 255, 255, .02);
     }
 
     .total {
@@ -271,179 +270,179 @@
         }
 
     }
-
 </style>
 
-<div class="employee-page">
 
-    <div class="container-max">
+  
+<UserValidator>
+    <div class="employee-page">
 
-        @if (isLoading)
-        {
-            <div class="loading">
-                Cargando...
-            </div>
-        }
-        else if (empleado is null)
-        {
-            <div class="empty">
-                Empleado no encontrado
-            </div>
-        }
-        else
-        {
-            <div class="invoice">
+        <div class="container-max">
 
-                <!-- HEADER -->
-                <div class="invoice-header">
+            @if (isLoading)
+            {
+                <div class="loading">
+                    Cargando...
+                </div>
+            }
+            else if (empleado is null)
+            {
+                <div class="empty">
+                    Empleado no encontrado
+                </div>
+            }
+            else
+            {
+                <div class="invoice">
 
-                    <div class="employee-info">
+                    <!-- HEADER -->
+                    <div class="invoice-header">
 
-                        <div class="employee-photo">
+                        <div class="employee-info">
 
-                            @if (!string.IsNullOrWhiteSpace(empleado.Photo))
-                            {
-                                <img src="@empleado.Photo" alt="@empleado.Nombre" />
-                            }
-                            else
-                            {
-                                <i class="fa-solid fa-user"></i>
-                            }
+                            <div class="employee-photo">
+
+                                @if (!string.IsNullOrWhiteSpace(empleado.Photo))
+                                {
+                                    <img src="@empleado.Photo" alt="@empleado.Nombre" />
+                                }
+                                else
+                                {
+                                    <i class="fa-solid fa-user"></i>
+                                }
+
+                            </div>
+
+                            <div class="invoice-title">
+                                <h2>
+                                    @empleado.Nombre @empleado.Apellido
+                                </h2>
+
+                                <div class="muted">
+                                    Historial de ventas del empleado
+                                </div>
+                            </div>
 
                         </div>
 
-                        <div class="invoice-title">
-                            <h2>
-                                @empleado.Nombre @empleado.Apellido
-                            </h2>
+                        <div class="emp-badge">
+                            ID: @empleado.Id
+                        </div>
 
-                            <div class="muted">
-                                Historial de ventas del empleado
+                    </div>
+
+                    <!-- STATS -->
+                    <div class="stats-grid">
+
+                        <div class="stat-card">
+                            <div class="stat-label">
+                                Ventas
+                            </div>
+
+                            <div class="stat-value">
+                                @FilteredVentas.Count
+                            </div>
+                        </div>
+
+                        <div class="stat-card">
+                            <div class="stat-label">
+                                Total Vendido
+                            </div>
+
+                            <div class="stat-value">
+                                ₡@FilteredVentas.Sum(v => v.Total).ToString("N2")
                             </div>
                         </div>
 
                     </div>
 
-                    <div class="emp-badge">
-                        ID: @empleado.Id
-                    </div>
+                    <!-- FILTERS -->
+                    <div class="filters">
 
-                </div>
+                        <div class="filter-group">
+                            <label>Fecha inicio</label>
 
-                <!-- STATS -->
-                <div class="stats-grid">
-
-                    <div class="stat-card">
-                        <div class="stat-label">
-                            Ventas
+                            <InputDate class="filter-input" @bind-Value="fechaInicio" />
                         </div>
 
-                        <div class="stat-value">
-                            @FilteredVentas.Count
-                        </div>
-                    </div>
+                        <div class="filter-group">
+                            <label>Fecha fin</label>
 
-                    <div class="stat-card">
-                        <div class="stat-label">
-                            Total Vendido
+                            <InputDate class="filter-input" @bind-Value="fechaFin" />
                         </div>
 
-                        <div class="stat-value">
-                            ₡@FilteredVentas.Sum(v => v.Total).ToString("N2")
+                        <button class="btn-export" @onclick="ExportCsv">
+
+                            Exportar CSV
+                        </button>
+
+                    </div>
+
+                    @if (!FilteredVentas.Any())
+                    {
+                        <div class="empty">
+                            No hay ventas registradas
                         </div>
-                    </div>
+                    }
+                    else
+                    {
+                        <div class="table-wrap">
 
-                </div>
+                            <table>
 
-                <!-- FILTERS -->
-                <div class="filters">
-
-                    <div class="filter-group">
-                        <label>Fecha inicio</label>
-
-                        <InputDate class="filter-input"
-                                   @bind-Value="fechaInicio" />
-                    </div>
-
-                    <div class="filter-group">
-                        <label>Fecha fin</label>
-
-                        <InputDate class="filter-input"
-                                   @bind-Value="fechaFin" />
-                    </div>
-
-                    <button class="btn-export"
-                            @onclick="ExportCsv">
-
-                        Exportar CSV
-                    </button>
-
-                </div>
-
-                @if (!FilteredVentas.Any())
-                {
-                    <div class="empty">
-                        No hay ventas registradas
-                    </div>
-                }
-                else
-                {
-                    <div class="table-wrap">
-
-                        <table>
-
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Fecha</th>
-                                    <th>Total</th>
-                                    <th>Acción</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-
-                                @foreach (var v in FilteredVentas)
-                                {
+                                <thead>
                                     <tr>
-
-                                        <td class="id-cell">
-                                            #@v.Id
-                                        </td>
-
-                                        <td style="color:#707887;">
-                                            @v.Fecha.ToString("dd MMM yyyy, hh:mm tt")
-                                        </td>
-
-                                        <td class="total">
-                                            ₡@v.Total.ToString("N2")
-                                        </td>
-
-                                        <td>
-                                            <a class="link"
-                                               href="/venta/@v.Id">
-
-                                                Ver recibo →
-
-                                            </a>
-                                        </td>
-
+                                        <th>ID</th>
+                                        <th>Fecha</th>
+                                        <th>Total</th>
+                                        <th>Acción</th>
                                     </tr>
-                                }
+                                </thead>
 
-                            </tbody>
+                                <tbody>
 
-                        </table>
+                                    @foreach (var v in FilteredVentas)
+                                    {
+                                        <tr>
 
-                    </div>
-                }
+                                            <td class="id-cell">
+                                                #@v.Id
+                                            </td>
 
-            </div>
-        }
+                                            <td style="color:#707887;">
+                                                @v.Fecha.ToString("dd MMM yyyy, hh:mm tt")
+                                            </td>
+
+                                            <td class="total">
+                                                ₡@v.Total.ToString("N2")
+                                            </td>
+
+                                            <td>
+                                                <a class="link" href="/venta/@v.Id">
+
+                                                    Ver recibo →
+
+                                                </a>
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    }
+
+                </div>
+            }
+
+        </div>
 
     </div>
 
-</div>
+</UserValidator>
 
 @code {
 
