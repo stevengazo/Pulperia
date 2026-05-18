@@ -2,8 +2,101 @@
 @inject IDbContextFactory<PulperiaDbContext> DbFactory
 @inject EmpleadoService empleadoService
 @inject NavigationManager Nav
+@inject IJSRuntime JS
 
 <style>
+    /* Botón exportar */
+    .btn-export {
+        border: none;
+        background: #1e2333;
+        color: #4ade80;
+        padding: 12px 18px;
+        border-radius: 14px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-size: .9rem;
+        font-weight: 700;
+        border: 1px solid rgba(74, 222, 128, .25);
+        transition: .2s ease;
+    }
+
+    .btn-export:hover {
+        background: rgba(74, 222, 128, .12);
+        border-color: #4ade80;
+        transform: translateY(-2px);
+    }
+
+    /* Paginación */
+    .pagination-bar {
+        padding: 1.2rem 1.4rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .pagination-info {
+        color: #707887;
+        font-size: .83rem;
+    }
+
+    .pagination-controls {
+        display: flex;
+        gap: 6px;
+    }
+
+    .page-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background: #1e2333;
+        color: #9099a8;
+        font-size: .82rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: .15s ease;
+    }
+
+    .page-btn:hover:not(:disabled) {
+        border-color: #ffaa43;
+        color: #ffaa43;
+    }
+
+    .page-btn:disabled {
+        opacity: .35;
+        cursor: not-allowed;
+    }
+
+    .page-active {
+        background: rgba(255, 170, 67, .15) !important;
+        color: #ffaa43 !important;
+        border-color: #ffaa43 !important;
+    }
+
+    .page-size-selector {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #707887;
+        font-size: .83rem;
+    }
+
+    .page-size-selector select {
+        background: #1e2333;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 10px;
+        color: #f5f7fa;
+        padding: 6px 10px;
+        font-size: .83rem;
+    }
+
+
     .sales-root {
         min-height: 100vh;
         padding: 2rem 2.5rem;
@@ -340,6 +433,7 @@
     }
 </style>
 
+
 <div class="sales-root">
 
     <div class="sales-head">
@@ -348,10 +442,16 @@
             <p>@ventas.Count ventas registradas</p>
         </div>
 
-        <button class="btn-sale" @onclick='() => Nav.NavigateTo("nueva-venta")'>
-            <i class="fa-solid fa-plus"></i>
-            Nueva Venta
-        </button>
+        <div class="d-flex gap-2">
+            <button class="btn-export" @onclick="ExportarExcel">
+                <i class="fa-solid fa-file-excel"></i>
+                Exportar Excel
+            </button>
+            <button class="btn-sale" @onclick='() => Nav.NavigateTo("nueva-venta")'>
+                <i class="fa-solid fa-plus"></i>
+                Nueva Venta
+            </button>
+        </div>
     </div>
 
     <div class="stats-grid">
@@ -409,20 +509,20 @@
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
                         <input type="text" class="form-control" placeholder="Buscar por folio o empleado..."
-                               @bind="filtro" @bind:event="oninput" />
+                               value="@filtro" @oninput="OnFiltroChanged" />
                     </div>
                 </div>
 
                 <div class="col-md-6">
                     <div class="filter-group">
                         <button class="filter-btn @(filtroEstado == "Todas" ? "filter-active" : "")"
-                                @onclick='() => filtroEstado = "Todas"'>Todas</button>
+                                @onclick='() => CambiarFiltro("Todas")'>Todas</button>
 
                         <button class="filter-btn @(filtroEstado == "Fiado" ? "filter-active" : "")"
-                                @onclick='() => filtroEstado = "Fiado"'>Fiados</button>
+                                @onclick='() => CambiarFiltro("Fiado")'>Fiados</button>
 
                         <button class="filter-btn @(filtroEstado == "Hoy" ? "filter-active" : "")"
-                                @onclick='() => filtroEstado = "Hoy"'>Hoy</button>
+                                @onclick='() => CambiarFiltro("Hoy")'>Hoy</button>
                     </div>
                 </div>
 
@@ -445,7 +545,7 @@
                 </thead>
 
                 <tbody>
-                    @foreach (var venta in VentasFiltradas)
+                    @foreach (var venta in VentasPaginadas)
                     {
                         var empleado = empleados.FirstOrDefault(e => e.Id.ToString() == venta.ClienteId);
 
@@ -502,7 +602,7 @@
                             <td class="text-end total">@venta.Total.ToString("C0")</td>
 
                             <td class="text-center">
-                                @if (venta.Pagado == false )
+                                @if (venta.Pagado == false)
                                 {
                                     <button class="status-badge status-pending border-0"
                                             @onclick="() => MarcarComoPagado(venta)">
@@ -532,6 +632,51 @@
             </table>
         </div>
 
+        {{!-- Paginación --}}
+        <div class="pagination-bar">
+
+            <span class="pagination-info">
+                Mostrando @PrimerRegistro–@UltimoRegistro de @TotalFiltradas ventas
+            </span>
+
+            <div class="pagination-controls">
+
+                <button class="page-btn" @onclick="PrimeraPagina" disabled="@(paginaActual == 1)">
+                    <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button class="page-btn" @onclick="PaginaAnterior" disabled="@(paginaActual == 1)">
+                    <i class="fa-solid fa-angle-left"></i>
+                </button>
+
+                @for (int i = PaginaInicio; i <= PaginaFin; i++)
+                {
+                    var p = i;
+                    <button class="page-btn @(p == paginaActual ? "page-active" : "")" @onclick="() => IrAPagina(p)">
+                        @p
+                    </button>
+                }
+
+                <button class="page-btn" @onclick="PaginaSiguiente" disabled="@(paginaActual == TotalPaginas)">
+                    <i class="fa-solid fa-angle-right"></i>
+                </button>
+                <button class="page-btn" @onclick="UltimaPagina" disabled="@(paginaActual == TotalPaginas)">
+                    <i class="fa-solid fa-angles-right"></i>
+                </button>
+
+            </div>
+
+            <div class="page-size-selector">
+                <span>Filas:</span>
+                <select @onchange="CambiarTamañoPagina">
+                    <option value="10" selected="@(tamañoPagina == 10)">10</option>
+                    <option value="25" selected="@(tamañoPagina == 25)">25</option>
+                    <option value="50" selected="@(tamañoPagina == 50)">50</option>
+                    <option value="100" selected="@(tamañoPagina == 100)">100</option>
+                </select>
+            </div>
+
+        </div>
+
     </div>
 
 </div>
@@ -544,27 +689,38 @@
     private string filtro = "";
     private string filtroEstado = "Todas";
 
-    private decimal VentasHoy => ventas
-        .Where(v => v.Fecha.Date == DateTime.Today)
-        .Sum(v => v.Total);
+    // ── Paginación ────────────────────────────────────────────
+    private int paginaActual = 1;
+    private int tamañoPagina = 50;
 
-    private decimal Cobrado => ventas
-        .Where(v => v.Fecha.Date == DateTime.Today && v.MetodoPago != "Fiado")
-        .Sum(v => v.Total);
+    private int TotalFiltradas => VentasFiltradas.Count();
+    private int TotalPaginas => Math.Max(1, (int)Math.Ceiling(TotalFiltradas / (double)tamañoPagina));
+    private int PrimerRegistro => TotalFiltradas == 0 ? 0 : (paginaActual - 1) * tamañoPagina + 1;
+    private int UltimoRegistro => Math.Min(paginaActual * tamañoPagina, TotalFiltradas);
 
-    private decimal Fiados => ventas
-        .Where(v => v.Fecha.Date == DateTime.Today && v.MetodoPago == "Fiado")
-        .Sum(v => v.Total);
+    // Ventana de páginas visibles (máx 5 botones)
+    private int PaginaInicio => Math.Max(1, Math.Min(paginaActual - 2, TotalPaginas - 4));
+    private int PaginaFin => Math.Min(TotalPaginas, PaginaInicio + 4);
 
-    private int Transacciones => ventas
-        .Count(v => v.Fecha.Date == DateTime.Today);
+    private IEnumerable<Pulperia.Models.Venta> VentasPaginadas =>
+        VentasFiltradas
+            .Skip((paginaActual - 1) * tamañoPagina)
+            .Take(tamañoPagina);
 
+    // ── Stats ─────────────────────────────────────────────────
+    private decimal VentasHoy => ventas.Where(v => v.Fecha.Date == DateTime.Today).Sum(v => v.Total);
+    private decimal Cobrado => ventas.Where(v => v.Fecha.Date == DateTime.Today && v.MetodoPago != "Fiado").Sum(v =>
+v.Total);
+    private decimal Fiados => ventas.Where(v => v.Fecha.Date == DateTime.Today && v.MetodoPago == "Fiado").Sum(v =>
+v.Total);
+    private int Transacciones => ventas.Count(v => v.Fecha.Date == DateTime.Today);
+
+    // ── Filtros ───────────────────────────────────────────────
     private IEnumerable<Pulperia.Models.Venta> VentasFiltradas => ventas.Where(v =>
         (string.IsNullOrEmpty(filtro) ||
             v.Id.ToString().Contains(filtro) ||
             empleados.Any(e => e.Id.ToString() == v.ClienteId &&
-                ($"{e.Nombre} {e.Apellido}")
-                .Contains(filtro, StringComparison.OrdinalIgnoreCase))) &&
+                $"{e.Nombre} {e.Apellido}".Contains(filtro, StringComparison.OrdinalIgnoreCase))) &&
         filtroEstado switch
         {
             "Fiado" => v.MetodoPago == "Fiado",
@@ -572,19 +728,98 @@
             _ => true
         });
 
-
+    // ── Init ──────────────────────────────────────────────────
     protected override async Task OnInitializedAsync()
     {
         db = DbFactory.CreateDbContext();
         ventas = db.Venta.OrderByDescending(v => v.Fecha).ToList();
         empleados = await empleadoService.GetAllAsync();
     }
+
+    // ── Acciones de paginación ────────────────────────────────
+    private void IrAPagina(int p) => paginaActual = Math.Clamp(p, 1, TotalPaginas);
+    private void PrimeraPagina() => paginaActual = 1;
+    private void UltimaPagina() => paginaActual = TotalPaginas;
+    private void PaginaAnterior() => paginaActual = Math.Max(1, paginaActual - 1);
+    private void PaginaSiguiente() => paginaActual = Math.Min(TotalPaginas, paginaActual + 1);
+    private void ResetPagina() => paginaActual = 1;
+    private void OnFiltroChanged(ChangeEventArgs e)
+    {
+        filtro = e.Value?.ToString() ?? "";
+        ResetPagina();
+    }
+    private void CambiarFiltro(string estado)
+    {
+        filtroEstado = estado;
+        ResetPagina();
+    }
+
+    private void CambiarTamañoPagina(ChangeEventArgs e)
+    {
+        tamañoPagina = int.Parse(e.Value!.ToString()!);
+        ResetPagina();
+    }
+
+    // ── Marcar pagado ─────────────────────────────────────────
     private async Task MarcarComoPagado(Pulperia.Models.Venta venta)
     {
         venta.Pagado = true;
         db.Venta.Update(venta);
         await db.SaveChangesAsync();
-
         StateHasChanged();
+    }
+
+    // ── Exportar Excel ────────────────────────────────────────
+    private async Task ExportarExcel()
+    {
+        using var wb = new ClosedXML.Excel.XLWorkbook();
+        var ws = wb.Worksheets.Add("Ventas");
+
+        // Encabezados
+        var headers = new[] { "Folio", "Fecha", "Hora", "Empleado", "Método de Pago", "Total", "Estado" };
+        for (int i = 0; i < headers.Length; i++)
+        {
+            var cell = ws.Cell(1, i + 1);
+            cell.Value = headers[i];
+            cell.Style.Font.Bold = true;
+            cell.Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.FromHtml("#ffaa43");
+            cell.Style.Font.FontColor = ClosedXML.Excel.XLColor.Black;
+            cell.Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
+        }
+
+        // Filas — se exportan TODAS las filtradas (no solo la página actual)
+        int row = 2;
+        foreach (var venta in VentasFiltradas)
+        {
+            var empleado = empleados.FirstOrDefault(e => e.Id.ToString() == venta.ClienteId);
+            ws.Cell(row, 1).Value = $"#{venta.Id:D5}";
+            ws.Cell(row, 2).Value = venta.Fecha.ToShortDateString();
+            ws.Cell(row, 3).Value = venta.Fecha.ToShortTimeString();
+            ws.Cell(row, 4).Value = empleado != null ? $"{empleado.Nombre} {empleado.Apellido}" : "—";
+            ws.Cell(row, 5).Value = venta.MetodoPago;
+            ws.Cell(row, 6).Value = venta.Total;
+            ws.Cell(row, 6).Style.NumberFormat.Format = "#,##0.00";
+            ws.Cell(row, 7).Value = venta.Pagado ? "Pagado" : "Pendiente";
+            row++;
+        }
+
+        // Totales
+        ws.Cell(row, 5).Value = "TOTAL";
+        ws.Cell(row, 5).Style.Font.Bold = true;
+        ws.Cell(row, 6).FormulaA1 = $"=SUM(F2:F{row - 1})";
+        ws.Cell(row, 6).Style.Font.Bold = true;
+        ws.Cell(row, 6).Style.NumberFormat.Format = "#,##0.00";
+
+        ws.Columns().AdjustToContents();
+
+        // Serializar y descargar via JS
+        using var stream = new MemoryStream();
+        wb.SaveAs(stream);
+        var bytes = stream.ToArray();
+        var base64 = Convert.ToBase64String(bytes);
+        var fileName = $"ventas_{DateTime.Today:yyyy-MM-dd}.xlsx";
+
+        await JS.InvokeVoidAsync("downloadBase64File", base64, fileName,
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
     }
 }
