@@ -30,21 +30,33 @@ builder.Services.AddScoped<LogService>();
 var app = builder.Build();
 
 
-// Try to create the DB
 using (var scope = app.Services.CreateScope())
 {
     try
     {
         var db = scope.ServiceProvider.GetRequiredService<PulperiaDbContext>();
-        db.Database.Migrate();
+
+        // Verifica si puede conectarse
+        if (!db.Database.CanConnect())
+        {
+            Console.WriteLine("No se pudo conectar. Intentando crear la DB...");
+
+            // Crea la DB y aplica migraciones
+            db.Database.Migrate();
+
+            Console.WriteLine("Base de datos creada.");
+        }
+        else
+        {
+            Console.WriteLine("La base de datos ya existe y está disponible.");
+        }
     }
-    catch (System.Exception e)
+    catch (Exception ex)
     {
-        Console.WriteLine(e.Message);
+        Console.WriteLine($"Error: {ex.Message}");
         throw;
     }
 }
-
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

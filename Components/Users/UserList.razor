@@ -1,0 +1,52 @@
+@inject IDbContextFactory<PulperiaDbContext> DbContextFactory
+@inject EmpleadoService emp
+
+<div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Empleado</th>
+                @foreach (var rol in Roles)
+                {
+                    <th class="text-center">@rol.Name</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Empleados)
+            {
+                <tr>
+                    <td><strong>@user.Nombre</strong></td>
+                    @foreach (var rol in Roles)
+                    {
+                        var tieneRol = Users.Any(u => u.UserId == user.Id.ToString() && u.RolId == rol.Id);
+                        <td class="text-center">
+                            @if (tieneRol)
+                            {
+                                <span class="badge bg-success">✓</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<RolSystem> Roles = new();
+    private List<Empleado> Empleados = new();
+    private List<RolUser> Users = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await using var _dbContext = await DbContextFactory.CreateDbContextAsync();
+        Roles = await _dbContext.Roles.ToListAsync();
+        Users = await _dbContext.RolUsers.ToListAsync();
+        Empleados = await emp.GetAllAsync();
+    }
+}

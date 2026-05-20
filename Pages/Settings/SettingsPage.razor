@@ -22,20 +22,19 @@
 
         <div class="tabs">
 
-            <button class="tab-btn @(tab == 0 ? "active" : "")"
-                    @onclick="() => tab = 0">
-
+            <button class="tab-btn @(tab == 0 ? "active" : "")" @onclick="() => tab = 0">
                 <i class="bi bi-tags-fill"></i>
                 Categorías
-
             </button>
 
-            <button class="tab-btn @(tab == 1 ? "active" : "")"
-                    @onclick="() => tab = 1">
-
+            <button class="tab-btn @(tab == 1 ? "active" : "")" @onclick="() => tab = 1">
                 <i class="bi bi-truck"></i>
                 Proveedores
+            </button>
 
+                        <button class="tab-btn @(tab == 2 ? "active" : "")" @onclick="() => tab = 2">
+                <i class="bi bi-truck"></i>
+                Permisos
             </button>
 
         </div>
@@ -51,12 +50,9 @@
                         Nueva categoría
                     </div>
 
-                    <input class="input-modern"
-                           placeholder="Nombre de categoría"
-                           @bind="newCategory" />
+                    <input class="input-modern" placeholder="Nombre de categoría" @bind="newCategory" />
 
-                    <button class="btn-modern mt-3"
-                            @onclick="AgregarCategoria">
+                    <button class="btn-modern mt-3" @onclick="AgregarCategoria">
 
                         <i class="bi bi-plus-lg"></i>
                         Guardar categoría
@@ -119,20 +115,13 @@
                         Nuevo proveedor
                     </div>
 
-                    <input class="input-modern mb-3"
-                           placeholder="Nombre"
-                           @bind="newProveedor.Nombre" />
+                    <input class="input-modern mb-3" placeholder="Nombre" @bind="newProveedor.Nombre" />
 
-                    <input class="input-modern mb-3"
-                           placeholder="Teléfono"
-                           @bind="newProveedor.Telefono" />
+                    <input class="input-modern mb-3" placeholder="Teléfono" @bind="newProveedor.Telefono" />
 
-                    <input class="input-modern mb-3"
-                           placeholder="Correo electrónico"
-                           @bind="newProveedor.Email" />
+                    <input class="input-modern mb-3" placeholder="Correo electrónico" @bind="newProveedor.Email" />
 
-                    <button class="btn-modern"
-                            @onclick="AgregarProveedor">
+                    <button class="btn-modern" @onclick="AgregarProveedor">
 
                         <i class="bi bi-check-lg"></i>
                         Guardar proveedor
@@ -192,12 +181,20 @@
             </div>
         }
 
+        @if (tab == 2)
+        {
+            <div class="grid-layout">
+
+               <UserList />
+            
+            </div>
+        }
+
     </div>
 
 </UserValidator>
 
 <style>
-
     :root {
 
         --accent: #ffaa43;
@@ -299,11 +296,9 @@
 
     .card-modern {
 
-        background: linear-gradient(
-            180deg,
-            rgba(255,255,255,.015),
-            rgba(255,255,255,.01)
-        );
+        background: linear-gradient(180deg,
+                rgba(255, 255, 255, .015),
+                rgba(255, 255, 255, .01));
 
         border: 1px solid var(--border);
 
@@ -313,7 +308,7 @@
         backdrop-filter: blur(10px);
 
         box-shadow:
-            0 10px 30px rgba(0,0,0,.22);
+            0 10px 30px rgba(0, 0, 0, .22);
     }
 
     .card-title {
@@ -355,11 +350,9 @@
 
         border: none;
 
-        background: linear-gradient(
-            135deg,
-            #ffaa43 0%,
-            #ff8c1f 100%
-        );
+        background: linear-gradient(135deg,
+                #ffaa43 0%,
+                #ff8c1f 100%);
 
         color: #111;
 
@@ -394,7 +387,7 @@
 
         padding: 1rem 0;
 
-        border-bottom: 1px solid rgba(255,255,255,.05);
+        border-bottom: 1px solid rgba(255, 255, 255, .05);
     }
 
     .item-title {
@@ -440,7 +433,6 @@
             grid-template-columns: 1fr;
         }
     }
-
 </style>
 
 @code {

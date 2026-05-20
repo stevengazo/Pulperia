@@ -12,8 +12,8 @@ using Pulperia.Data;
 namespace Pulperia.Migrations
 {
     [DbContext(typeof(PulperiaDbContext))]
-    [Migration("20260518172740_CrearSchemaVentas")]
-    partial class CrearSchemaVentas
+    [Migration("20260520195351_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -300,8 +300,9 @@ namespace Pulperia.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("Name")
-                        .HasColumnType("int");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
