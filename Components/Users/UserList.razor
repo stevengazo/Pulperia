@@ -1,110 +1,450 @@
+@using Microsoft.IdentityModel.Tokens
 @inject IDbContextFactory<PulperiaDbContext> DbContextFactory
+@inject LogService LogService
+@inject AppSessionService Session
+
 @inject EmpleadoService emp
 
-<div class="container-fluid py-3">
 
-    <!-- Buscador -->
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <div class="input-group shadow-sm">
-                <span class="input-group-text bg-dark text-white border-0">
-                    <i class="bi bi-search"></i>
-                </span>
-                <input type="text"
-                       class="form-control border-0 bg-light"
-                       placeholder="Buscar empleado..."
-                       @bind="SearchTerm"
-                       @bind:event="oninput" />
-                @if (!string.IsNullOrEmpty(SearchTerm))
-                {
-                    <button class="btn btn-outline-secondary" @onclick="() => SearchTerm = string.Empty">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-                }
+
+<style>
+    .perm-wrapper {
+        font-family: 'Segoe UI', sans-serif;
+        color: #e0e0e0;
+    }
+
+    .perm-search-input {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        color: #fff;
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        font-size: 0.95rem;
+        padding: 10px 14px;
+    }
+
+    .perm-search-input:focus {
+        background: #1a1a1a;
+        border-color: #ffaa43;
+        color: #fff;
+        box-shadow: none;
+    }
+
+    .perm-search-input::placeholder {
+        color: #555;
+    }
+
+    .perm-search-icon {
+        background: #ffaa43;
+        border: none;
+        color: #000;
+        border-radius: 10px 0 0 10px;
+        padding: 0 18px;
+        display: flex;
+        align-items: center;
+        font-size: 1rem;
+    }
+
+    .perm-clear-btn {
+        background: #1a1a1a;
+        border: 1px solid #333;
+        color: #aaa;
+        border-radius: 0 10px 10px 0;
+        padding: 0 14px;
+    }
+
+    .perm-clear-btn:hover {
+        color: #fff;
+        background: #2a2a2a;
+    }
+
+    /* Scroll horizontal para que las columnas no se corten */
+    .perm-grid-scroll {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #2a2a2a;
+        border-radius: 14px;
+    }
+
+    .perm-grid {
+        display: flex;
+        flex-direction: column;
+        min-width: 600px;
+        /* fuerza ancho mínimo antes de hacer scroll */
+    }
+
+    .perm-grid-header {
+        display: flex;
+        background: #0d0d0d;
+        border-bottom: 2px solid #ffaa43;
+        border-radius: 14px 14px 0 0;
+    }
+
+    .perm-grid-row {
+        display: flex;
+        border-bottom: 1px solid #1a1a1a;
+        transition: background 0.2s;
+    }
+
+    .perm-grid-row:last-child {
+        border-bottom: none;
+        border-radius: 0 0 14px 14px;
+    }
+
+    .perm-grid-row:hover {
+        background: #151515;
+    }
+
+    .col-name {
+        width: 240px;
+        min-width: 240px;
+        flex-shrink: 0;
+    }
+
+    .col-rol {
+        flex: 1;
+        min-width: 140px;
+        /* cada columna de rol tiene mínimo 140px */
+    }
+
+    .col-header {
+        padding: 18px 20px;
+        color: #ffaa43;
+        font-size: 0.7rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        border-right: 1px solid #1e1e1e;
+        white-space: nowrap;
+    }
+
+    .col-header:last-child {
+        border-right: none;
+    }
+
+    .col-header i {
+        font-size: 0.9rem;
+        opacity: 0.7;
+    }
+
+    .grid-cell {
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        border-right: 1px solid #181818;
+        min-height: 68px;
+    }
+
+    .grid-cell:last-child {
+        border-right: none;
+    }
+
+    .grid-cell-center {
+        justify-content: center;
+    }
+
+    .emp-avatar {
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ffaa43, #c97000);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 900;
+        color: #000;
+        flex-shrink: 0;
+        margin-right: 13px;
+        box-shadow: 0 2px 10px rgba(255, 170, 67, 0.25);
+    }
+
+    .emp-info {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .emp-name-text {
+        font-weight: 700;
+        color: #fff;
+        font-size: 0.92rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2;
+    }
+
+    .emp-sub {
+        font-size: 0.72rem;
+        color: #555;
+        margin-top: 2px;
+    }
+
+    .btn-active {
+        background: rgba(255, 170, 67, 0.12);
+        border: 1.5px solid #ffaa43;
+        color: #ffaa43;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        padding: 8px 18px;
+        transition: all 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .btn-active:hover {
+        background: rgba(255, 170, 67, 0.25);
+        box-shadow: 0 0 12px rgba(255, 170, 67, 0.15);
+    }
+
+    .btn-inactive {
+        background: transparent;
+        border: 1.5px solid #252525;
+        color: #3a3a3a;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 8px 18px;
+        transition: all 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .btn-inactive:hover {
+        border-color: #ffaa43;
+        color: #ffaa43;
+        background: rgba(255, 170, 67, 0.05);
+    }
+
+    .count-badge {
+        background: rgba(255, 170, 67, 0.12);
+        color: #ffaa43;
+        border: 1px solid rgba(255, 170, 67, 0.3);
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        padding: 5px 16px;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 64px 0;
+        color: #333;
+    }
+
+    .perm-toast {
+        background: #161616;
+        border: 1px solid #2a2a2a;
+        border-left: 4px solid #ffaa43;
+        border-radius: 12px;
+        color: #fff;
+        padding: 16px 20px;
+        min-width: 300px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+        animation: slideIn 0.25s ease;
+    }
+
+    .perm-toast.danger {
+        border-left-color: #ff4d4d;
+    }
+
+    .perm-toast.warning {
+        border-left-color: #ffc107;
+    }
+
+    .toast-icon {
+        font-size: 1.2rem;
+        color: #ffaa43;
+    }
+
+    .toast-icon.danger {
+        color: #ff4d4d;
+    }
+
+    .toast-icon.warning {
+        color: #ffc107;
+    }
+
+    .toast-text {
+        font-size: 0.87rem;
+        line-height: 1.4;
+    }
+
+    .toast-close {
+        background: none;
+        border: none;
+        color: #444;
+        margin-left: auto;
+        cursor: pointer;
+        font-size: 0.9rem;
+        padding: 0;
+        transition: color 0.15s;
+        flex-shrink: 0;
+    }
+
+    .toast-close:hover {
+        color: #fff;
+    }
+
+    .header-divider {
+        width: 3px;
+        height: 28px;
+        background: #ffaa43;
+        border-radius: 2px;
+        margin-right: 12px;
+        flex-shrink: 0;
+    }
+
+    @@keyframes slideIn {
+        from {
+            transform: translateX(24px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+</style>
+
+<div class="perm-wrapper">
+
+    <!-- Header -->
+    <div class="d-flex align-items-center justify-content-between mb-5">
+        <div class="d-flex align-items-center">
+            <div class="header-divider"></div>
+            <div>
+                <h5 class="mb-0 text-white fw-bold fs-5">Permisos de Empleados</h5>
+                <small class="text-secondary" style="font-size:0.8rem">Gestiona los roles asignados a cada
+                    empleado</small>
+                </div>
             </div>
+            <span class="count-badge">
+                <i class="bi bi-people-fill me-1"></i>@EmpleadosFiltrados.Count() empleados
+            </span>
         </div>
-    </div>
 
-    <!-- Tabla -->
-    <div class="table-responsive rounded shadow-sm">
-        <table class="table table-bordered table-hover align-middle mb-0">
-            <thead>
-                <tr class="table-dark">
-                    <th class="ps-4" style="min-width:180px">
-                        <i class="bi bi-person-lines-fill me-2"></i>Empleado
-                    </th>
+        <!-- Buscador -->
+        <div class="d-flex mb-4" style="max-width:440px">
+            <span class="perm-search-icon"><i class="bi bi-search"></i></span>
+            <input type="text" class="perm-search-input form-control" placeholder="Buscar empleado por nombre..."
+                   @bind="SearchTerm" @bind:event="oninput" />
+            <button class="perm-clear-btn btn" @onclick="() => SearchTerm = string.Empty">
+                <i class="bi bi-x-lg" style="font-size:0.8rem"></i>
+            </button>
+        </div>
+
+        @if (Roles.Count == 0 && Empleados.Count == 0)
+        {
+            <div class="text-center py-5">
+                <div class="spinner-border" style="color:#ffaa43; width:2rem; height:2rem;"></div>
+                <p class="text-secondary mt-3" style="font-size:0.85rem">Cargando datos...</p>
+            </div>
+        }
+        else
+        {
+            <div class="perm-grid">
+
+                <!-- Header row -->
+                <div class="perm-grid-header">
+                    <div class="col-header col-name">
+                        <i class="bi bi-person-lines-fill"></i> Empleado
+                    </div>
                     @foreach (var rol in Roles)
                     {
-                        <th class="text-center" style="min-width:110px">
-                            <i class="bi bi-shield-lock me-1"></i>@rol.Name
-                        </th>
+                        <div class="col-header col-rol">
+                            <i class="bi bi-shield-lock"></i> @rol.Name
+                        </div>
                     }
-                </tr>
-            </thead>
-            <tbody>
+                </div>
+
+                <!-- Data rows -->
                 @if (!EmpleadosFiltrados.Any())
                 {
-                    <tr>
-                        <td colspan="@(Roles.Count + 1)" class="text-center text-muted py-4">
-                            <i class="bi bi-inbox fs-4 d-block mb-1"></i>
-                            No se encontraron empleados
-                        </td>
-                    </tr>
+                    <div class="empty-state">
+                        <i class="bi bi-person-x d-block" style="font-size:2.5rem; margin-bottom:12px; color:#2a2a2a"></i>
+                        <p class="mb-0" style="font-size:0.9rem">No se encontraron empleados</p>
+                    </div>
                 }
                 @foreach (var user in EmpleadosFiltrados)
                 {
-                    <tr>
-                        <td class="ps-4 fw-semibold">
-                            <i class="bi bi-person-circle me-2 text-secondary"></i>@user.Nombre
-                        </td>
+                    <div class="perm-grid-row">
+                        <div class="grid-cell col-name">
+
+                            @if (!user.Photo.IsNullOrEmpty())
+                            {
+                                <img src="@user.Photo" alt="Avatar" class="emp-avatar" />
+                            }
+                            else
+                            {
+                                <div class="emp-avatar">
+                                    @(user.Nombre[0].ToString().ToUpper())
+
+                                </div>
+                            }
+                            <div class="emp-info">
+                                <span class="emp-name-text">@user.Nombre @user.Apellido</span>
+                                <span class="emp-sub">Empleado</span>
+                            </div>
+                        </div>
                         @foreach (var rol in Roles)
                         {
                             var tieneRol = Users.Any(u => u.UserId == user.Id.ToString() && u.RolId == rol.Id);
-                            <td class="text-center">
+                            <div class="grid-cell grid-cell-center col-rol">
                                 @if (IsLoading(user.Id, rol.Id))
                                 {
-                                    <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                                    <div class="spinner-border spinner-border-sm"
+                                         style="color:#ffaa43;width:20px;height:20px;border-width:2px;"></div>
                                 }
                                 else if (tieneRol)
                                 {
-                                    <button class="btn btn-success btn-sm rounded-pill px-3"
-                                            title="Quitar permiso"
-                                            @onclick="() => ToggleRol(user, rol, false)">
-                                        <i class="bi bi-check-circle-fill me-1"></i>Activo
+                                    <button class="btn-active" @onclick="() => ToggleRol(user, rol, false)">
+                                        <i class="bi bi-check-circle-fill"></i> Activo
                                     </button>
                                 }
                                 else
                                 {
-                                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3"
-                                            title="Agregar permiso"
-                                            @onclick="() => ToggleRol(user, rol, true)">
-                                        <i class="bi bi-dash-circle me-1"></i>Sin rol
+                                    <button class="btn-inactive" @onclick="() => ToggleRol(user, rol, true)">
+                                        <i class="bi bi-plus-circle"></i> Agregar
                                     </button>
                                 }
-                            </td>
+                            </div>
                         }
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Toast feedback -->
-    <div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999">
-        @if (!string.IsNullOrEmpty(ToastMessage))
-        {
-            <div class="toast show align-items-center text-white @ToastCss border-0 shadow" role="alert">
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i class="bi @ToastIcon me-2"></i>@ToastMessage
                     </div>
-                    <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                            @onclick="() => ToastMessage = string.Empty"></button>
-                </div>
+                }
             </div>
         }
     </div>
-</div>
+
+    <!-- Toast -->
+    <div class="position-fixed bottom-0 end-0 p-4" style="z-index:9999">
+        @if (!string.IsNullOrEmpty(ToastMessage))
+        {
+            <div class="perm-toast @ToastVariant">
+                <i class="bi @ToastIcon toast-icon @ToastVariant"></i>
+                <span class="toast-text">@ToastMessage</span>
+                <button class="toast-close" @onclick="() => ToastMessage = string.Empty">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        }
+    </div>
 
 @code {
     private List<RolSystem> Roles = new();
@@ -113,7 +453,7 @@
 
     private string SearchTerm = string.Empty;
     private string ToastMessage = string.Empty;
-    private string ToastCss = "bg-success";
+    private string ToastVariant = "";
     private string ToastIcon = "bi-check-circle";
 
     private HashSet<(Guid empId, int rolId)> LoadingCells = new();
@@ -121,13 +461,15 @@
     private IEnumerable<Empleado> EmpleadosFiltrados =>
         string.IsNullOrWhiteSpace(SearchTerm)
             ? Empleados
-            : Empleados.Where(e => e.Nombre.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase));
+            : Empleados.Where(e => e.Nombre.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase) ||
+e.Apellido.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase));
 
     private bool IsLoading(Guid empId, int rolId) => LoadingCells.Contains((empId, rolId));
 
     protected override async Task OnInitializedAsync()
     {
         await CargarDatos();
+        StateHasChanged();
     }
 
     private async Task CargarDatos()
@@ -136,6 +478,7 @@
         Roles = await db.Roles.ToListAsync();
         Users = await db.RolUsers.ToListAsync();
         Empleados = await emp.GetAllAsync();
+        Empleados = Empleados.OrderBy(e => e.Nombre).ToList();
     }
 
     private async Task ToggleRol(Empleado empleado, RolSystem rol, bool agregar)
@@ -154,7 +497,18 @@
                 db.RolUsers.Add(nuevo);
                 await db.SaveChangesAsync();
                 Users.Add(nuevo);
-                MostrarToast($"Permiso '{rol.Name}' agregado a {empleado.Nombre}", "bg-success", "bi-check-circle");
+                MostrarToast($"'{rol.Name}' agregado a {empleado.Nombre}", "", "bi-check-circle");
+                await LogService.RegistrarAsync(
+                    tabla: "RolUser",
+                    accion: "INSERT",
+                    registroId: nuevo.Id.ToString(),
+                    usuario: Session != null ? Session?.CurrentUser?.Email : "Sistema",
+                    anterior: null,
+                    nuevo: new
+                    {
+                        nuevo
+                    }
+                );
             }
             else
             {
@@ -165,13 +519,25 @@
                     db.RolUsers.Remove(existente);
                     await db.SaveChangesAsync();
                     Users.RemoveAll(u => u.UserId == empleado.Id.ToString() && u.RolId == rol.Id);
-                    MostrarToast($"Permiso '{rol.Name}' quitado de {empleado.Nombre}", "bg-warning text-dark", "bi-dash-circle");
+                    MostrarToast($"'{rol.Name}' quitado de {empleado.Nombre}", "warning", "bi-dash-circle");
+
+                    await LogService.RegistrarAsync(
+                  tabla: "RolUser",
+                  accion: "DELETE",
+                  registroId: existente.Id.ToString(),
+                  usuario: Session != null ? Session?.CurrentUser?.Email : "Sistema",
+                  anterior: new
+                  {
+                      existente
+                  },
+                  nuevo: null
+              );
                 }
             }
         }
         catch (Exception ex)
         {
-            MostrarToast($"Error: {ex.Message}", "bg-danger", "bi-exclamation-triangle");
+            MostrarToast($"Error: {ex.Message}", "danger", "bi-exclamation-triangle");
         }
         finally
         {
@@ -180,10 +546,10 @@
         }
     }
 
-    private void MostrarToast(string msg, string css, string icon)
+    private void MostrarToast(string msg, string variant, string icon)
     {
         ToastMessage = msg;
-        ToastCss = css;
+        ToastVariant = variant;
         ToastIcon = icon;
     }
 }
