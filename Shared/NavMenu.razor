@@ -2,58 +2,27 @@
 
     <div class="sidebar-glow"></div>
 
-    @* HEADER *@
-
-
-    @* NAVIGATION *@
     <div class="@NavMenuCssClass">
 
         <nav class="nav-content">
 
             <div class="nav-section">
 
-                <div class="nav-section-label">
-                    PRINCIPAL
-                </div>
+                <div class="nav-section-label">PRINCIPAL</div>
 
-                <NavLink class="nav-link"
-                         href=""
-                         Match="NavLinkMatch.All">
-
-                    <span class="nav-icon">
-                        <i class="bi bi-grid-fill"></i>
-                    </span>
-
-                    <span class="nav-text">
-                        Dashboard
-                    </span>
-
+                <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <span class="nav-icon"><i class="bi bi-grid-fill"></i></span>
+                    <span class="nav-text">Dashboard</span>
                 </NavLink>
 
-                <NavLink class="nav-link"
-                         href="ventas">
-
-                    <span class="nav-icon">
-                        <i class="bi bi-receipt"></i>
-                    </span>
-
-                    <span class="nav-text">
-                        Ventas
-                    </span>
-
+                <NavLink class="nav-link" href="ventas">
+                    <span class="nav-icon"><i class="bi bi-receipt"></i></span>
+                    <span class="nav-text">Ventas</span>
                 </NavLink>
 
-                <NavLink class="nav-link"
-                         href="nueva-venta">
-
-                    <span class="nav-icon">
-                        <i class="bi bi-cart-plus-fill"></i>
-                    </span>
-
-                    <span class="nav-text">
-                        Nueva Venta
-                    </span>
-
+                <NavLink class="nav-link" href="nueva-venta">
+                    <span class="nav-icon"><i class="bi bi-cart-plus-fill"></i></span>
+                    <span class="nav-text">Nueva Venta</span>
                 </NavLink>
 
             </div>
@@ -62,47 +31,21 @@
 
             <div class="nav-section">
 
-                <div class="nav-section-label">
-                    GESTIÓN
-                </div>
+                <div class="nav-section-label">GESTIÓN</div>
 
-                <NavLink class="nav-link"
-                         href="productos">
-
-                    <span class="nav-icon">
-                        <i class="bi bi-box-seam-fill"></i>
-                    </span>
-
-                    <span class="nav-text">
-                        Productos
-                    </span>
-
+                <NavLink class="nav-link" href="productos">
+                    <span class="nav-icon"><i class="bi bi-box-seam-fill"></i></span>
+                    <span class="nav-text">Productos</span>
                 </NavLink>
 
-                <NavLink class="nav-link"
-                         href="inventario">
-
-                    <span class="nav-icon">
-                        <i class="bi bi-stack"></i>
-                    </span>
-
-                    <span class="nav-text">
-                        Inventario
-                    </span>
-
+                <NavLink class="nav-link" href="inventario">
+                    <span class="nav-icon"><i class="bi bi-stack"></i></span>
+                    <span class="nav-text">Inventario</span>
                 </NavLink>
 
-                <NavLink class="nav-link"
-                         href="empleados">
-
-                    <span class="nav-icon">
-                        <i class="bi bi-people-fill"></i>
-                    </span>
-
-                    <span class="nav-text">
-                        Empleados
-                    </span>
-
+                <NavLink class="nav-link" href="empleados">
+                    <span class="nav-icon"><i class="bi bi-people-fill"></i></span>
+                    <span class="nav-text">Empleados</span>
                 </NavLink>
 
             </div>
@@ -111,49 +54,25 @@
 
             <div class="nav-section">
 
-                <div class="nav-section-label">
-                    SISTEMA
-                </div>
+                <div class="nav-section-label">SISTEMA</div>
 
-                <NavLink class="nav-link"
-                         href="configuracion">
-
-                    <span class="nav-icon">
-                        <i class="bi bi-gear-fill"></i>
-                    </span>
-
-                    <span class="nav-text">
-                        Configuración
-                    </span>
-
+                <NavLink class="nav-link" href="configuracion">
+                    <span class="nav-icon"><i class="bi bi-gear-fill"></i></span>
+                    <span class="nav-text">Configuración</span>
                 </NavLink>
 
-                <NavLink class="nav-link"
-                         href="logs">
-
-                    <span class="nav-icon">
-                        <i class="bi bi-clock-history"></i>
-                    </span>
-
-                    <span class="nav-text">
-                        Logs
-                    </span>
-
+                <NavLink class="nav-link" href="logs">
+                    <span class="nav-icon"><i class="bi bi-clock-history"></i></span>
+                    <span class="nav-text">Logs</span>
                 </NavLink>
 
             </div>
 
             <div class="nav-bottom">
 
-                <NavLink class="btn-sale"
-                         href="nueva-venta">
-
+                <NavLink class="btn-sale" href="nueva-venta">
                     <i class="bi bi-plus-lg"></i>
-
-                    <span>
-                        NUEVA VENTA
-                    </span>
-
+                    <span>NUEVA VENTA</span>
                 </NavLink>
 
             </div>
@@ -169,7 +88,6 @@
     :root {
 
         --accent: #ffaa43;
-
         --accent-soft: rgba(255,170,67,.12);
         --accent-border: rgba(255,170,67,.18);
 
@@ -185,19 +103,17 @@
     .sidebar-wrapper {
 
         height: 100%;
-
         display: flex;
         flex-direction: column;
 
         position: relative;
 
-        overflow: hidden;
+        overflow: visible;
     }
 
     .sidebar-glow {
 
         position: absolute;
-
         top: -120px;
         left: -120px;
 
@@ -205,140 +121,53 @@
         height: 260px;
 
         background: radial-gradient(circle,
-        rgba(255,170,67,.14),
-        transparent 70%);
+            rgba(255,170,67,.14),
+            transparent 70%);
 
         pointer-events: none;
-    }
-
-    .sidebar-header {
-
-        padding: 1.4rem 1.2rem;
-
-        border-bottom: 1px solid var(--border);
-
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        position: relative;
-        z-index: 2;
-    }
-
-    .brand-logo {
-
-        display: flex;
-        align-items: center;
-
-        gap: .9rem;
-    }
-
-    .brand-icon {
-
-        width: 46px;
-        height: 46px;
-
-        border-radius: 14px;
-
-        background:
-            linear-gradient(135deg,
-            #ffaa43 0%,
-            #ff8d1f 100%);
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        color: #111;
-
-        font-size: 1.1rem;
-
-        box-shadow:
-            0 10px 24px rgba(255,170,67,.22);
-    }
-
-    .brand-content {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .brand-name {
-
-        color: var(--text);
-
-        font-size: 1rem;
-        font-weight: 800;
-
-        letter-spacing: -.4px;
-    }
-
-    .brand-name span {
-        color: var(--accent);
-    }
-
-    .brand-subtitle {
-
-        color: var(--muted);
-
-        font-size: .74rem;
-
-        margin-top: 2px;
-    }
-
-    .toggler-btn {
-
-        width: 40px;
-        height: 40px;
-
-        border-radius: 12px;
-
-        border: 1px solid var(--border);
-
-        background: transparent;
-
-        color: var(--muted);
-
-        transition: .2s ease;
-    }
-
-    .toggler-btn:hover {
-
-        border-color: var(--accent-border);
-
-        color: var(--accent);
-
-        background: var(--accent-soft);
     }
 
     .nav-content {
 
         height: 100%;
+        min-height: 0;
 
         display: flex;
         flex-direction: column;
 
         padding: 1rem .8rem;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        scrollbar-width: thin;
+        scrollbar-color: var(--accent) transparent;
+    }
+
+    .nav-content::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .nav-content::-webkit-scrollbar-thumb {
+        background: var(--accent-soft);
+        border-radius: 10px;
     }
 
     .nav-section {
 
         display: flex;
         flex-direction: column;
-
         gap: 6px;
     }
 
     .nav-section-label {
 
         color: var(--muted);
-
         font-size: .68rem;
         font-weight: 800;
-
         letter-spacing: .14em;
 
         padding: .3rem .8rem .7rem;
-
         opacity: .8;
     }
 
@@ -358,69 +187,30 @@
         color: var(--muted) !important;
 
         transition: .2s ease;
-
         position: relative;
 
         overflow: hidden;
     }
 
-    .nav-link::before {
-
-        content: "";
-
-        position: absolute;
-
-        left: 0;
-        top: 10px;
-        bottom: 10px;
-
-        width: 4px;
-
-        border-radius: 20px;
-
-        background: var(--accent);
-
-        opacity: 0;
-
-        transition: .2s ease;
-    }
-
     .nav-link:hover {
 
         background: rgba(255,255,255,.03);
-
         color: var(--text) !important;
-
         transform: translateX(2px);
     }
 
     .nav-link.active {
 
         background: var(--accent-soft);
-
         color: var(--accent) !important;
-
         border: 1px solid var(--accent-border);
-
-        box-shadow:
-            inset 0 0 0 1px rgba(255,170,67,.03);
-    }
-
-    .nav-link.active::before {
-        opacity: 1;
     }
 
     .nav-icon {
 
         width: 20px;
-
         display: flex;
-        align-items: center;
         justify-content: center;
-
-        font-size: 1rem;
-
-        flex-shrink: 0;
     }
 
     .nav-text {
@@ -432,23 +222,19 @@
     .nav-divider {
 
         height: 1px;
-
         background: var(--border);
-
         margin: 1rem 0;
     }
 
     .nav-bottom {
 
         margin-top: auto;
-
         padding-top: 1rem;
     }
 
     .btn-sale {
 
         width: 100%;
-
         display: flex;
         align-items: center;
         justify-content: center;
@@ -459,43 +245,19 @@
 
         border-radius: 16px;
 
-        background:
-            linear-gradient(135deg,
-            #ffaa43 0%,
-            #ff8d1f 100%);
+        background: linear-gradient(135deg,#ffaa43,#ff8d1f);
 
         color: #111 !important;
 
         text-decoration: none;
 
-        font-size: .84rem;
         font-weight: 900;
 
-        letter-spacing: .08em;
-
-        transition: .2s ease;
-
-        box-shadow:
-            0 12px 28px rgba(255,170,67,.18);
+        box-shadow: 0 12px 28px rgba(255,170,67,.18);
     }
 
     .btn-sale:hover {
-
         transform: translateY(-2px);
-
-        box-shadow:
-            0 18px 34px rgba(255,170,67,.26);
-    }
-
-    @@media(max-width: 768px) {
-
-        .sidebar-wrapper {
-            height: auto;
-        }
-
-        .nav-content {
-            padding-bottom: 1rem;
-        }
     }
 
 </style>

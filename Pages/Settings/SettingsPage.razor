@@ -3,7 +3,6 @@
 @inject IDbContextFactory<PulperiaDbContext> dbContextFactory
 
 @using Microsoft.EntityFrameworkCore
-@using System.Text.Json
 
 <UserValidator>
 
@@ -11,14 +10,12 @@
 
         <div class="settings-header">
 
-            <div>
-                <div class="settings-title">
-                    Configuración
-                </div>
+            <div class="settings-title">
+                Configuración
+            </div>
 
-                <div class="settings-subtitle">
-                    Administración del sistema y registros
-                </div>
+            <div class="settings-subtitle">
+                Administración del sistema y registros
             </div>
 
         </div>
@@ -28,21 +25,13 @@
             <button class="tab-btn @(tab == 0 ? "active" : "")"
                     @onclick="() => tab = 0">
 
-                <i class="bi bi-clock-history"></i>
-                Logs
-
-            </button>
-
-            <button class="tab-btn @(tab == 1 ? "active" : "")"
-                    @onclick="() => tab = 1">
-
                 <i class="bi bi-tags-fill"></i>
                 Categorías
 
             </button>
 
-            <button class="tab-btn @(tab == 2 ? "active" : "")"
-                    @onclick="() => tab = 2">
+            <button class="tab-btn @(tab == 1 ? "active" : "")"
+                    @onclick="() => tab = 1">
 
                 <i class="bi bi-truck"></i>
                 Proveedores
@@ -51,99 +40,8 @@
 
         </div>
 
-        @* ================= LOGS ================= *@
-        @if (tab == 0)
-        {
-            <div class="card-modern">
-
-                <div class="card-header-modern">
-
-                    <div>
-                        <div class="card-title">
-                            Logs del Sistema
-                        </div>
-
-                        <div class="card-subtitle">
-                            Últimos movimientos registrados
-                        </div>
-                    </div>
-
-                    <div class="badge-count">
-                        @logs.Count registros
-                    </div>
-
-                </div>
-
-                <div class="table-wrapper">
-
-                    <table class="modern-table">
-
-                        <thead>
-                            <tr>
-                                <th>Fecha</th>
-                                <th>Usuario</th>
-                                <th>Acción</th>
-                                <th>Tabla</th>
-                                <th>Registro</th>
-                                <th>Datos</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-
-                            @foreach (var log in logs)
-                            {
-                                <tr>
-
-                                    <td>
-                                        @log.Fecha.ToString("yyyy-MM-dd HH:mm")
-                                    </td>
-
-                                    <td>
-                                        @log.Usuario
-                                    </td>
-
-                                    <td>
-
-                                        <span class="action-badge">
-
-                                            @log.Accion
-
-                                        </span>
-
-                                    </td>
-
-                                    <td>
-                                        @log.Tabla
-                                    </td>
-
-                                    <td>
-                                        #@log.RegistroId
-                                    </td>
-
-                                    <td>
-
-                                        @if (!string.IsNullOrWhiteSpace(log.ValoresNuevos))
-                                        {
-                                            <pre class="json-box">@FormatJson(log.ValoresNuevos)</pre>
-                                        }
-
-                                    </td>
-
-                                </tr>
-                            }
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-            </div>
-        }
-
         @* ================= CATEGORIAS ================= *@
-        @if (tab == 1)
+        @if (tab == 0)
         {
             <div class="grid-layout">
 
@@ -186,6 +84,7 @@
                             <div class="list-item">
 
                                 <div>
+
                                     <div class="item-title">
                                         @c.Nombre
                                     </div>
@@ -193,6 +92,7 @@
                                     <div class="item-subtitle">
                                         Categoría de productos
                                     </div>
+
                                 </div>
 
                                 <div class="item-id">
@@ -209,7 +109,7 @@
         }
 
         @* ================= PROVEEDORES ================= *@
-        @if (tab == 2)
+        @if (tab == 1)
         {
             <div class="grid-layout">
 
@@ -301,12 +201,10 @@
     :root {
 
         --accent: #ffaa43;
-        --accent-soft: rgba(255,170,67,.12);
-        --accent-border: rgba(255,170,67,.18);
+        --accent-soft: rgba(255, 170, 67, .12);
+        --accent-border: rgba(255, 170, 67, .18);
 
-        --bg: #0b0b0e;
         --surface: #121217;
-        --surface-2: #18181f;
 
         --border: #23232c;
 
@@ -317,18 +215,19 @@
     .settings-page {
 
         color: var(--text);
-
         animation: fadeIn .25s ease;
     }
 
     @@keyframes fadeIn {
 
         from {
+
             opacity: 0;
             transform: translateY(8px);
         }
 
         to {
+
             opacity: 1;
             transform: translateY(0);
         }
@@ -343,14 +242,12 @@
 
         font-size: 2rem;
         font-weight: 800;
-
         letter-spacing: -.04em;
     }
 
     .settings-subtitle {
 
         color: var(--muted);
-
         margin-top: .35rem;
     }
 
@@ -358,22 +255,17 @@
 
         display: flex;
         gap: .8rem;
-
         margin-bottom: 2rem;
-
         flex-wrap: wrap;
     }
 
     .tab-btn {
 
         border: 1px solid var(--border);
-
         background: var(--surface);
-
         color: var(--muted);
 
         padding: .85rem 1.2rem;
-
         border-radius: 14px;
 
         font-weight: 700;
@@ -388,29 +280,34 @@
     .tab-btn:hover {
 
         border-color: var(--accent-border);
-
         color: var(--accent);
     }
 
     .tab-btn.active {
 
         background: var(--accent-soft);
-
         border-color: var(--accent-border);
-
         color: var(--accent);
+    }
+
+    .grid-layout {
+
+        display: grid;
+        grid-template-columns: 350px 1fr;
+        gap: 1.5rem;
     }
 
     .card-modern {
 
-        background: linear-gradient(180deg,
-        rgba(255,255,255,.015),
-        rgba(255,255,255,.01));
+        background: linear-gradient(
+            180deg,
+            rgba(255,255,255,.015),
+            rgba(255,255,255,.01)
+        );
 
         border: 1px solid var(--border);
 
         border-radius: 24px;
-
         padding: 1.5rem;
 
         backdrop-filter: blur(10px);
@@ -419,129 +316,10 @@
             0 10px 30px rgba(0,0,0,.22);
     }
 
-    .card-header-modern {
-
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        margin-bottom: 1.5rem;
-    }
-
     .card-title {
 
         font-size: 1.1rem;
         font-weight: 800;
-    }
-
-    .card-subtitle {
-
-        color: var(--muted);
-
-        margin-top: .2rem;
-
-        font-size: .9rem;
-    }
-
-    .badge-count {
-
-        background: var(--accent-soft);
-
-        border: 1px solid var(--accent-border);
-
-        color: var(--accent);
-
-        padding: .5rem .9rem;
-
-        border-radius: 999px;
-
-        font-size: .8rem;
-        font-weight: 700;
-    }
-
-    .table-wrapper {
-        overflow-x: auto;
-    }
-
-    .modern-table {
-
-        width: 100%;
-
-        border-collapse: collapse;
-    }
-
-    .modern-table th {
-
-        text-align: left;
-
-        padding: 1rem;
-
-        color: var(--muted);
-
-        font-size: .82rem;
-        font-weight: 700;
-
-        border-bottom: 1px solid var(--border);
-    }
-
-    .modern-table td {
-
-        padding: 1rem;
-
-        border-bottom: 1px solid rgba(255,255,255,.04);
-
-        vertical-align: top;
-
-        font-size: .92rem;
-    }
-
-    .modern-table tr:hover {
-
-        background: rgba(255,255,255,.015);
-    }
-
-    .action-badge {
-
-        background: var(--accent-soft);
-
-        color: var(--accent);
-
-        border: 1px solid var(--accent-border);
-
-        padding: .45rem .75rem;
-
-        border-radius: 999px;
-
-        font-size: .72rem;
-        font-weight: 800;
-    }
-
-    .json-box {
-
-        background: #0d0d11;
-
-        border: 1px solid var(--border);
-
-        border-radius: 14px;
-
-        padding: 1rem;
-
-        max-width: 420px;
-
-        overflow: auto;
-
-        color: #b8ffc2;
-
-        font-size: .75rem;
-    }
-
-    .grid-layout {
-
-        display: grid;
-
-        grid-template-columns: 350px 1fr;
-
-        gap: 1.5rem;
     }
 
     .input-modern {
@@ -568,7 +346,7 @@
         border-color: var(--accent);
 
         box-shadow:
-            0 0 0 4px rgba(255,170,67,.08);
+            0 0 0 4px rgba(255, 170, 67, .08);
     }
 
     .btn-modern {
@@ -577,10 +355,11 @@
 
         border: none;
 
-        background:
-            linear-gradient(135deg,
+        background: linear-gradient(
+            135deg,
             #ffaa43 0%,
-            #ff8c1f 100%);
+            #ff8c1f 100%
+        );
 
         color: #111;
 
@@ -603,7 +382,7 @@
         transform: translateY(-1px);
 
         box-shadow:
-            0 12px 28px rgba(255,170,67,.2);
+            0 12px 28px rgba(255, 170, 67, .2);
     }
 
     .list-item,
@@ -641,6 +420,7 @@
     }
 
     .provider-side {
+
         text-align: right;
     }
 
@@ -659,19 +439,14 @@
 
             grid-template-columns: 1fr;
         }
-
-        .modern-table {
-            min-width: 900px;
-        }
     }
 
 </style>
 
 @code {
 
-    private PulperiaDbContext db;
+    private PulperiaDbContext db = default!;
 
-    private List<LogCambio> logs = new();
     private List<Categoria> categories = new();
     private List<Proveedor> proveedors = new();
 
@@ -683,36 +458,13 @@
 
     protected override async Task OnInitializedAsync()
     {
+        db = await dbContextFactory.CreateDbContextAsync();
+
         await LoadData();
-    }
-
-    private string FormatJson(string json)
-    {
-        try
-        {
-            using var doc = JsonDocument.Parse(json);
-
-            return JsonSerializer.Serialize(doc,
-                new JsonSerializerOptions
-                    {
-                        WriteIndented = true
-                    });
-        }
-        catch
-        {
-            return json;
-        }
     }
 
     private async Task LoadData()
     {
-        db = await dbContextFactory.CreateDbContextAsync();
-
-        logs = await db.LogsCambios
-            .OrderByDescending(x => x.Fecha)
-            .Take(100)
-            .ToListAsync();
-
         categories = await db.Categoria
             .OrderBy(x => x.Nombre)
             .ToListAsync();
