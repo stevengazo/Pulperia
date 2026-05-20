@@ -1,40 +1,109 @@
 @inject IDbContextFactory<PulperiaDbContext> DbContextFactory
 @inject EmpleadoService emp
 
-<div class="table-responsive">
-    <table class="table table-bordered table-hover align-middle">
-        <thead class="table-dark">
-            <tr>
-                <th>Empleado</th>
-                @foreach (var rol in Roles)
+<div class="container-fluid py-3">
+
+    <!-- Buscador -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="input-group shadow-sm">
+                <span class="input-group-text bg-dark text-white border-0">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text"
+                       class="form-control border-0 bg-light"
+                       placeholder="Buscar empleado..."
+                       @bind="SearchTerm"
+                       @bind:event="oninput" />
+                @if (!string.IsNullOrEmpty(SearchTerm))
                 {
-                    <th class="text-center">@rol.Name</th>
+                    <button class="btn btn-outline-secondary" @onclick="() => SearchTerm = string.Empty">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
                 }
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Empleados)
-            {
-                <tr>
-                    <td><strong>@user.Nombre</strong></td>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla -->
+    <div class="table-responsive rounded shadow-sm">
+        <table class="table table-bordered table-hover align-middle mb-0">
+            <thead>
+                <tr class="table-dark">
+                    <th class="ps-4" style="min-width:180px">
+                        <i class="bi bi-person-lines-fill me-2"></i>Empleado
+                    </th>
                     @foreach (var rol in Roles)
                     {
-                        var tieneRol = Users.Any(u => u.UserId == user.Id.ToString() && u.RolId == rol.Id);
-                        <td class="text-center">
-                            @if (tieneRol)
-                            {
-                                <span class="badge bg-success">✓</span>
-                            }
-                            else
-                            {
-                                <span class="text-muted">—</span>
-                            }
-                        </td>
+                        <th class="text-center" style="min-width:110px">
+                            <i class="bi bi-shield-lock me-1"></i>@rol.Name
+                        </th>
                     }
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @if (!EmpleadosFiltrados.Any())
+                {
+                    <tr>
+                        <td colspan="@(Roles.Count + 1)" class="text-center text-muted py-4">
+                            <i class="bi bi-inbox fs-4 d-block mb-1"></i>
+                            No se encontraron empleados
+                        </td>
+                    </tr>
+                }
+                @foreach (var user in EmpleadosFiltrados)
+                {
+                    <tr>
+                        <td class="ps-4 fw-semibold">
+                            <i class="bi bi-person-circle me-2 text-secondary"></i>@user.Nombre
+                        </td>
+                        @foreach (var rol in Roles)
+                        {
+                            var tieneRol = Users.Any(u => u.UserId == user.Id.ToString() && u.RolId == rol.Id);
+                            <td class="text-center">
+                                @if (IsLoading(user.Id, rol.Id))
+                                {
+                                    <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                                }
+                                else if (tieneRol)
+                                {
+                                    <button class="btn btn-success btn-sm rounded-pill px-3"
+                                            title="Quitar permiso"
+                                            @onclick="() => ToggleRol(user, rol, false)">
+                                        <i class="bi bi-check-circle-fill me-1"></i>Activo
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3"
+                                            title="Agregar permiso"
+                                            @onclick="() => ToggleRol(user, rol, true)">
+                                        <i class="bi bi-dash-circle me-1"></i>Sin rol
+                                    </button>
+                                }
+                            </td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Toast feedback -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+        @if (!string.IsNullOrEmpty(ToastMessage))
+        {
+            <div class="toast show align-items-center text-white @ToastCss border-0 shadow" role="alert">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        <i class="bi @ToastIcon me-2"></i>@ToastMessage
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                            @onclick="() => ToastMessage = string.Empty"></button>
+                </div>
+            </div>
+        }
+    </div>
 </div>
 
 @code {
@@ -42,11 +111,79 @@
     private List<Empleado> Empleados = new();
     private List<RolUser> Users = new();
 
+    private string SearchTerm = string.Empty;
+    private string ToastMessage = string.Empty;
+    private string ToastCss = "bg-success";
+    private string ToastIcon = "bi-check-circle";
+
+    private HashSet<(Guid empId, int rolId)> LoadingCells = new();
+
+    private IEnumerable<Empleado> EmpleadosFiltrados =>
+        string.IsNullOrWhiteSpace(SearchTerm)
+            ? Empleados
+            : Empleados.Where(e => e.Nombre.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase));
+
+    private bool IsLoading(Guid empId, int rolId) => LoadingCells.Contains((empId, rolId));
+
     protected override async Task OnInitializedAsync()
     {
-        await using var _dbContext = await DbContextFactory.CreateDbContextAsync();
-        Roles = await _dbContext.Roles.ToListAsync();
-        Users = await _dbContext.RolUsers.ToListAsync();
+        await CargarDatos();
+    }
+
+    private async Task CargarDatos()
+    {
+        await using var db = await DbContextFactory.CreateDbContextAsync();
+        Roles = await db.Roles.ToListAsync();
+        Users = await db.RolUsers.ToListAsync();
         Empleados = await emp.GetAllAsync();
+    }
+
+    private async Task ToggleRol(Empleado empleado, RolSystem rol, bool agregar)
+    {
+        var key = (empleado.Id, rol.Id);
+        LoadingCells.Add(key);
+        StateHasChanged();
+
+        try
+        {
+            await using var db = await DbContextFactory.CreateDbContextAsync();
+
+            if (agregar)
+            {
+                var nuevo = new RolUser { UserId = empleado.Id.ToString(), RolId = rol.Id };
+                db.RolUsers.Add(nuevo);
+                await db.SaveChangesAsync();
+                Users.Add(nuevo);
+                MostrarToast($"Permiso '{rol.Name}' agregado a {empleado.Nombre}", "bg-success", "bi-check-circle");
+            }
+            else
+            {
+                var existente = await db.RolUsers
+                    .FirstOrDefaultAsync(u => u.UserId == empleado.Id.ToString() && u.RolId == rol.Id);
+                if (existente != null)
+                {
+                    db.RolUsers.Remove(existente);
+                    await db.SaveChangesAsync();
+                    Users.RemoveAll(u => u.UserId == empleado.Id.ToString() && u.RolId == rol.Id);
+                    MostrarToast($"Permiso '{rol.Name}' quitado de {empleado.Nombre}", "bg-warning text-dark", "bi-dash-circle");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MostrarToast($"Error: {ex.Message}", "bg-danger", "bi-exclamation-triangle");
+        }
+        finally
+        {
+            LoadingCells.Remove(key);
+            StateHasChanged();
+        }
+    }
+
+    private void MostrarToast(string msg, string css, string icon)
+    {
+        ToastMessage = msg;
+        ToastCss = css;
+        ToastIcon = icon;
     }
 }
