@@ -31,6 +31,10 @@ else
 
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
+     protected override async Task OnInitializedAsync()
+    {
+        await Session.TryRestoreSessionAsync();
+    }
 
     protected override void OnParametersSet()
     {
