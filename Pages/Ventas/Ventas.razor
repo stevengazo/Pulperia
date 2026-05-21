@@ -4,7 +4,9 @@
 @inject AppSessionService Session
 @inject NavigationManager Nav
 @inject LogService LogService
+@using ClosedXML.Excel
 @inject IJSRuntime JS
+
 
 <style>
     /* Botón exportar */
@@ -436,6 +438,7 @@
 </style>
 
 
+
 <UserValidator>
     <div class="sales-root">
 
@@ -513,6 +516,7 @@
                             </span>
                             <input type="text" class="form-control" placeholder="Buscar por folio o empleado..."
                                    value="@filtro" @oninput="OnFiltroChanged" />
+                            <DateRangePicker OnRangeChanged="OnRangeChanged" />
                         </div>
                     </div>
 
@@ -692,6 +696,15 @@
     private string filtro = "";
     private string filtroEstado = "Todas";
 
+    private DateTime _inicio = DateTime.MinValue;
+    private DateTime _fin = DateTime.MaxValue;
+
+    private void OnRangeChanged((DateTime Inicio, DateTime Fin) rango)
+    {
+        (_inicio, _fin) = rango;
+        ResetPagina();
+    }
+
     // ── Paginación ────────────────────────────────────────────
     private int paginaActual = 1;
     private int tamañoPagina = 50;
@@ -701,7 +714,6 @@
     private int PrimerRegistro => TotalFiltradas == 0 ? 0 : (paginaActual - 1) * tamañoPagina + 1;
     private int UltimoRegistro => Math.Min(paginaActual * tamañoPagina, TotalFiltradas);
 
-    // Ventana de páginas visibles (máx 5 botones)
     private int PaginaInicio => Math.Max(1, Math.Min(paginaActual - 2, TotalPaginas - 4));
     private int PaginaFin => Math.Min(TotalPaginas, PaginaInicio + 4);
 
@@ -727,9 +739,10 @@ v.Total);
         filtroEstado switch
         {
             "Fiado" => v.MetodoPago == "Fiado",
-            "Hoy" => v.Fecha.Date == DateTime.Today,
             _ => true
-        });
+        } &&
+        (_inicio == DateTime.MinValue || v.Fecha.Date >= _inicio) &&
+        (_fin == DateTime.MaxValue || v.Fecha.Date <= _fin));
 
     // ── Init ──────────────────────────────────────────────────
     protected override async Task OnInitializedAsync()
@@ -746,11 +759,13 @@ v.Total);
     private void PaginaAnterior() => paginaActual = Math.Max(1, paginaActual - 1);
     private void PaginaSiguiente() => paginaActual = Math.Min(TotalPaginas, paginaActual + 1);
     private void ResetPagina() => paginaActual = 1;
+
     private void OnFiltroChanged(ChangeEventArgs e)
     {
         filtro = e.Value?.ToString() ?? "";
         ResetPagina();
     }
+
     private void CambiarFiltro(string estado)
     {
         filtroEstado = estado;
@@ -766,14 +781,9 @@ v.Total);
     // ── Marcar pagado ─────────────────────────────────────────
     private async Task MarcarComoPagado(Pulperia.Models.Venta venta)
     {
-        var anterior = new
-        {
-            venta.Id,
-            venta.Pagado
-        };
+        var anterior = new { venta.Id, venta.Pagado };
 
         venta.Pagado = true;
-
         db.Venta.Update(venta);
         await db.SaveChangesAsync();
 
@@ -781,13 +791,9 @@ v.Total);
             tabla: "Ventas",
             accion: "UPDATE",
             registroId: venta.Id.ToString(),
-            usuario: Session != null ? Session?.CurrentUser?.Email : "Sistema", // o tu usuario real
+            usuario: Session?.CurrentUser?.Email ?? "Sistema",
             anterior: anterior,
-            nuevo: new
-            {
-                venta.Id,
-                venta.Pagado
-            }
+            nuevo: new { venta.Id, venta.Pagado }
         );
 
         StateHasChanged();
@@ -796,34 +802,23 @@ v.Total);
     // ── Exportar Excel ────────────────────────────────────────
     private async Task ExportarExcel()
     {
-
         await LogService.RegistrarAsync(
             tabla: "Ventas",
             accion: "EXPORT_EXCEL",
             registroId: "ALL",
-            usuario: Session != null ? Session?.CurrentUser?.Email : "Sistema",
-            anterior: new
-            {
-                FiltrosAplicados = VentasFiltradas.Count()
-            }
+            usuario: Session?.CurrentUser?.Email ?? "Sistema",
+            anterior: new { FiltrosAplicados = VentasFiltradas.Count() }
         );
 
-        using var wb = new ClosedXML.Excel.XLWorkbook();
+        using var wb = new XLWorkbook();
+
+        // ── Hoja 1: Detalle ───────────────────────────────────────
         var ws = wb.Worksheets.Add("Ventas");
 
-        // Encabezados
         var headers = new[] { "Folio", "Fecha", "Hora", "Empleado", "Método de Pago", "Total", "Estado" };
         for (int i = 0; i < headers.Length; i++)
-        {
-            var cell = ws.Cell(1, i + 1);
-            cell.Value = headers[i];
-            cell.Style.Font.Bold = true;
-            cell.Style.Fill.BackgroundColor = ClosedXML.Excel.XLColor.FromHtml("#ffaa43");
-            cell.Style.Font.FontColor = ClosedXML.Excel.XLColor.Black;
-            cell.Style.Alignment.Horizontal = ClosedXML.Excel.XLAlignmentHorizontalValues.Center;
-        }
+            ws.Cell(1, i + 1).Value = headers[i];
 
-        // Filas — se exportan TODAS las filtradas (no solo la página actual)
         int row = 2;
         foreach (var venta in VentasFiltradas)
         {
@@ -839,20 +834,94 @@ v.Total);
             row++;
         }
 
-        // Totales
-        ws.Cell(row, 5).Value = "TOTAL";
-        ws.Cell(row, 5).Style.Font.Bold = true;
-        ws.Cell(row, 6).FormulaA1 = $"=SUM(F2:F{row - 1})";
-        ws.Cell(row, 6).Style.Font.Bold = true;
-        ws.Cell(row, 6).Style.NumberFormat.Format = "#,##0.00";
+        var tablaRango = ws.Range(1, 1, row - 1, 7);
+        var tabla = tablaRango.CreateTable("TblVentas");
+        tabla.Theme = XLTableTheme.TableStyleMedium2;
+        tabla.ShowTotalsRow = true;
+        tabla.Field("Total").TotalsRowFunction = XLTotalsRowFunction.Sum;
+        tabla.Field("Total").Column.Cells().Style.NumberFormat.Format = "#,##0.00";
+
+        for (int i = 1; i <= 7; i++)
+        {
+            var cell = ws.Cell(1, i);
+            cell.Style.Fill.BackgroundColor = XLColor.FromHtml("#ffaa43");
+            cell.Style.Font.FontColor = XLColor.Black;
+            cell.Style.Font.Bold = true;
+            cell.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        }
 
         ws.Columns().AdjustToContents();
 
-        // Serializar y descargar via JS
+        // ── Hoja 2: Resumen ───────────────────────────────────────
+        var wsR = wb.Worksheets.Add("Resumen");
+
+        void EstiloEncabezado(IXLCell c)
+        {
+            c.Style.Font.Bold = true;
+            c.Style.Fill.BackgroundColor = XLColor.FromHtml("#ffaa43");
+            c.Style.Font.FontColor = XLColor.Black;
+            c.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+        }
+
+        void EstiloSubtotal(IXLCell c)
+        {
+            c.Style.Font.Bold = true;
+            c.Style.Fill.BackgroundColor = XLColor.FromHtml("#1a1a1a");
+            c.Style.Font.FontColor = XLColor.White;
+        }
+
+        void EscribirTablaEstado(string titulo, IEnumerable<Pulperia.Models.Venta> ventasFiltradas, ref int rr)
+        {
+            wsR.Cell(rr, 1).Value = titulo;
+            wsR.Cell(rr, 1).Style.Font.Bold = true;
+            wsR.Cell(rr, 1).Style.Font.FontSize = 13;
+            rr++;
+
+            wsR.Cell(rr, 1).Value = "Folio";
+            wsR.Cell(rr, 2).Value = "Empleado";
+            wsR.Cell(rr, 3).Value = "Método de Pago";
+            wsR.Cell(rr, 4).Value = "Total";
+            EstiloEncabezado(wsR.Cell(rr, 1));
+            EstiloEncabezado(wsR.Cell(rr, 2));
+            EstiloEncabezado(wsR.Cell(rr, 3));
+            EstiloEncabezado(wsR.Cell(rr, 4));
+            rr++;
+
+            foreach (var venta in ventasFiltradas)
+            {
+                var empleado = empleados.FirstOrDefault(e => e.Id.ToString() == venta.ClienteId);
+                wsR.Cell(rr, 1).Value = $"#{venta.Id:D5}";
+                wsR.Cell(rr, 1).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                wsR.Cell(rr, 2).Value = empleado != null ? $"{empleado.Nombre} {empleado.Apellido}" : "—";
+                wsR.Cell(rr, 3).Value = venta.MetodoPago;
+                wsR.Cell(rr, 3).Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+                wsR.Cell(rr, 4).Value = venta.Total;
+                wsR.Cell(rr, 4).Style.NumberFormat.Format = "#,##0.00";
+                rr++;
+            }
+
+            EstiloSubtotal(wsR.Cell(rr, 1)); wsR.Cell(rr, 1).Value = "TOTAL";
+            EstiloSubtotal(wsR.Cell(rr, 2)); wsR.Cell(rr, 2).Value = $"{ventasFiltradas.Count()} ventas";
+            EstiloSubtotal(wsR.Cell(rr, 3)); wsR.Cell(rr, 3).Value = "";
+            EstiloSubtotal(wsR.Cell(rr, 4)); wsR.Cell(rr, 4).Value = ventasFiltradas.Sum(v => v.Total);
+            wsR.Cell(rr, 4).Style.NumberFormat.Format = "#,##0.00";
+            rr += 3;
+        }
+
+        int r = 1;
+
+        var pendientes = VentasFiltradas.Where(v => !v.Pagado).OrderBy(v => v.Id);
+        var pagadas = VentasFiltradas.Where(v => v.Pagado).OrderBy(v => v.Id);
+
+        EscribirTablaEstado("Pendientes de Pago", pendientes, ref r);
+        EscribirTablaEstado("Pagado", pagadas, ref r);
+
+        wsR.Columns().AdjustToContents();
+
+        // ── Descarga ──────────────────────────────────────────────
         using var stream = new MemoryStream();
         wb.SaveAs(stream);
-        var bytes = stream.ToArray();
-        var base64 = Convert.ToBase64String(bytes);
+        var base64 = Convert.ToBase64String(stream.ToArray());
         var fileName = $"ventas_{DateTime.Today:yyyy-MM-dd}.xlsx";
 
         await JS.InvokeVoidAsync("downloadBase64File", base64, fileName,

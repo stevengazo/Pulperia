@@ -1,0 +1,136 @@
+@* Uso: <DateRangePicker OnRangeChanged="OnRangeChanged" /> *@
+
+<div class="drp-wrapper">
+
+    <div class="drp-icon">
+        <i class="fa-solid fa-calendar-days"></i>
+    </div>
+
+    <select class="drp-select" @onchange="OnPresetChanged">
+        <option value="">Todos los períodos</option>
+        <option value="hoy">Hoy</option>
+        <option value="ayer">Ayer</option>
+        <option value="15dias">Últimos 15 días</option>
+        <option value="semana">Esta semana</option>
+        <option value="semana_ant">Semana anterior</option>
+        <option value="mes">Este mes</option>
+        <option value="mes_ant">Mes anterior</option>
+        <option value="anio">Este año</option>
+        <option value="custom">Personalizado</option>
+    </select>
+
+    <div class="drp-divider"></div>
+
+    <input type="date" class="drp-date" @bind="Inicio" @bind:after="NotifyChanged" />
+
+    <span class="drp-sep">—</span>
+
+    <input type="date" class="drp-date" @bind="Fin" @bind:after="NotifyChanged" />
+
+</div>
+
+<style>
+    .drp-wrapper {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: #000000;
+        border: 1.5px solid #ffaa43;
+        border-radius: 10px;
+        padding: 7px 16px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+
+    .drp-icon {
+        color: #ffaa43;
+        font-size: 15px;
+        flex-shrink: 0;
+    }
+
+    .drp-select {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 13px;
+        font-weight: 600;
+        color: #ffffff;
+        cursor: pointer;
+        min-width: 160px;
+        padding: 0;
+    }
+
+    .drp-select option {
+        background: #1a1a1a;
+        color: #ffffff;
+    }
+
+    .drp-select:focus { box-shadow: none; }
+
+    .drp-divider {
+        width: 1px;
+        height: 20px;
+        background: #ffaa43;
+        opacity: 0.4;
+        flex-shrink: 0;
+    }
+
+    .drp-date {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 13px;
+        font-weight: 500;
+        color: #ffffff;
+        padding: 0;
+        width: 130px;
+        color-scheme: dark;
+    }
+
+    .drp-date:focus { box-shadow: none; }
+
+    .drp-date::-webkit-calendar-picker-indicator {
+        filter: invert(1) sepia(1) saturate(5) hue-rotate(5deg);
+        cursor: pointer;
+        opacity: 0.8;
+    }
+
+    .drp-sep {
+        color: #ffaa43;
+        font-size: 14px;
+        font-weight: 600;
+    }
+</style>
+
+@code {
+
+    [Parameter] public EventCallback<(DateTime Inicio, DateTime Fin)> OnRangeChanged { get; set; }
+
+    private DateTime Inicio { get; set; } = DateTime.Today;
+    private DateTime Fin { get; set; } = DateTime.Today;
+
+    private async Task OnPresetChanged(ChangeEventArgs e)
+    {
+        var hoy = DateTime.Today;
+
+        (Inicio, Fin) = e.Value?.ToString() switch
+        {
+            "hoy"        => (hoy, hoy),
+            "ayer"       => (hoy.AddDays(-1), hoy.AddDays(-1)),
+            "15dias"     => (hoy.AddDays(-14), hoy),
+            "semana"     => (hoy.AddDays(-(int)hoy.DayOfWeek + 1), hoy),
+            "semana_ant" => (hoy.AddDays(-(int)hoy.DayOfWeek - 6),
+                             hoy.AddDays(-(int)hoy.DayOfWeek)),
+            "mes"        => (new DateTime(hoy.Year, hoy.Month, 1), hoy),
+            "mes_ant"    => (new DateTime(hoy.Year, hoy.Month - 1, 1),
+                             new DateTime(hoy.Year, hoy.Month, 1).AddDays(-1)),
+            "anio"       => (new DateTime(hoy.Year, 1, 1), hoy),
+            _            => (Inicio, Fin)
+        };
+
+        await NotifyChanged();
+    }
+
+    private async Task NotifyChanged() =>
+        await OnRangeChanged.InvokeAsync((Inicio, Fin));
+}
