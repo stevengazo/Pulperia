@@ -1,0 +1,793 @@
+@page "/venta/editar/{id:int}"
+
+@inject IDbContextFactory<PulperiaDbContext> DbContextFactory
+@inject EmpleadoService emp
+@inject LogService LogService
+@inject IDbContextFactory<PulperiaDbContext> dbContextFactory
+@inject AppSessionService Session
+@inject NavigationManager Nav
+
+@using Microsoft.EntityFrameworkCore
+
+<div class="sale-page">
+
+    <div class="sale-header">
+
+        <div class="header-left">
+
+            <button class="back-btn"
+                    @onclick='() => Nav.NavigateTo("/ventas")'>
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+
+            <div>
+                <div class="page-title">Editar Venta</div>
+                <div class="page-subtitle">Modificar productos y cobro</div>
+            </div>
+
+        </div>
+
+        <div class="folio-badge">
+            Folio #@Id.ToString("D6")
+        </div>
+
+    </div>
+
+    @if (cargando)
+    {
+        <div class="loading-state">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+            <span>Cargando venta...</span>
+        </div>
+    }
+    else if (venta == null)
+    {
+        <div class="alert-modern">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            No se encontró la venta #@Id.
+        </div>
+    }
+    else
+    {
+        <div class="sale-grid">
+
+            @* ================= LEFT ================= *@
+            <div class="sale-left">
+
+                <div class="card-modern">
+
+                    <div class="add-product-grid">
+
+                        <select class="input-modern"
+                                @bind="productoSeleccionadoId">
+
+                            <option value="0">Seleccione producto...</option>
+
+                            @foreach (var p in productos)
+                            {
+                                <option value="@p.Id">
+                                    @p.Nombre — @p.Presentacion (Stock: @p.StockActual)
+                                </option>
+                            }
+
+                        </select>
+
+                        <input type="number"
+                               min="1"
+                               class="input-modern text-center"
+                               @bind="cantidad" />
+
+                        <button class="btn-add"
+                                @onclick="AgregarAlCarrito"
+                                disabled="@(productoSeleccionadoId == 0)">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
+
+                    </div>
+
+                    @if (errorMsg != "")
+                    {
+                        <div class="alert-modern">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            @errorMsg
+                        </div>
+                    }
+
+                    <div class="table-wrapper">
+
+                        <table class="modern-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th class="text-end">Precio</th>
+                                    <th class="text-center">Cantidad</th>
+                                    <th class="text-end">Subtotal</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                @if (!carrito.Any())
+                                {
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="empty-cart">
+                                                <i class="bi bi-cart-x"></i>
+                                                <div>No hay productos agregados</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+
+                                @foreach (var item in carrito)
+                                {
+                                    <tr>
+
+                                        <td>
+                                            <div class="product-cell">
+                                                <div class="product-name">@item.Producto.Nombre</div>
+                                                <div class="product-stock">Stock: @item.Producto.StockActual</div>
+                                            </div>
+                                        </td>
+
+                                        <td class="text-end">
+                                            @item.PrecioUnitarioHistorico.ToString("C0")
+                                        </td>
+
+                                        <td>
+                                            <div class="qty-box">
+
+                                                <button class="qty-btn"
+                                                        @onclick="() => CambiarCantidad(item, -1)">−</button>
+
+                                                <div class="qty-value">@item.Cantidad</div>
+
+                                                <button class="qty-btn"
+                                                        @onclick="() => CambiarCantidad(item, 1)"
+                                                        disabled="@(item.Cantidad >= item.Producto.StockActual)">+</button>
+
+                                            </div>
+                                        </td>
+
+                                        <td class="text-end fw-bold">
+                                            @((item.PrecioUnitarioHistorico * item.Cantidad).ToString("C0"))
+                                        </td>
+
+                                        <td class="text-center">
+                                            <button class="remove-btn"
+                                                    @onclick="() => carrito.Remove(item)">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </td>
+
+                                    </tr>
+                                }
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            @* ================= RIGHT ================= *@
+            <div class="sale-right">
+
+                <div class="card-modern sticky-card">
+
+                    <div class="total-card">
+                        <div class="total-label">Total</div>
+                        <div class="total-value">@Total.ToString("C0")</div>
+                    </div>
+
+                    <div>
+                        <label class="label-modern">Empleado</label>
+                        <select class="input-modern" @bind="empleadoId">
+                            <option value="0">Sin asignar</option>
+                            @foreach (var e in empleados)
+                            {
+                                <option value="@e.Id">@e.Nombre @e.Apellido</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="label-modern">Método de pago</label>
+                        <select class="input-modern" @bind="metodoPago">
+                            <option value="Efectivo">💵 Efectivo</option>
+                            <option value="SINPE">📱 SINPE</option>
+                            <option value="Tarjeta">💳 Tarjeta</option>
+                            <option value="Fiado">📋 Fiado</option>
+                        </select>
+                    </div>
+
+                    @if (metodoPago == "Efectivo")
+                    {
+                        <div>
+                            <label class="label-modern">Monto recibido</label>
+                            <input type="number"
+                                   class="input-modern"
+                                   @bind-value="pagoCon"
+                                   @bind-value:event="oninput" />
+                        </div>
+
+                        <div class="change-box">
+                            <span>Cambio</span>
+                            <strong>@Cambio.ToString("C0")</strong>
+                        </div>
+                    }
+
+                    <div class="checkout-box">
+
+                        @if (guardando)
+                        {
+                            <div class="saving-text">Guardando cambios...</div>
+                        }
+
+                        <button class="checkout-btn"
+                                disabled="@(!carrito.Any() || guardando)"
+                                @onclick="Guardar">
+                            <i class="bi bi-floppy-fill"></i>
+                            Guardar Cambios
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+</div>
+
+<style>
+
+    :root {
+        --accent: #ffaa43;
+        --accent-soft: rgba(255,170,67,.12);
+        --accent-border: rgba(255,170,67,.18);
+        --bg: #0c0c10;
+        --surface: #14141a;
+        --surface-2: #181820;
+        --border: #23232c;
+        --text: #f5f5f7;
+        --muted: #8c8c98;
+    }
+
+    .sale-page {
+        color: var(--text);
+        animation: fadeIn .25s ease;
+    }
+
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .loading-state {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        padding: 4rem;
+        color: var(--muted);
+        font-size: 1rem;
+    }
+
+    .sale-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .back-btn {
+        width: 48px; height: 48px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        transition: .2s ease;
+    }
+
+    .back-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        background: var(--accent-soft);
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+        font-weight: 800;
+        letter-spacing: -.04em;
+    }
+
+    .page-subtitle {
+        color: var(--muted);
+        margin-top: .2rem;
+    }
+
+    .folio-badge {
+        background: var(--accent-soft);
+        border: 1px solid var(--accent-border);
+        color: var(--accent);
+        padding: .8rem 1rem;
+        border-radius: 999px;
+        font-size: .82rem;
+        font-weight: 800;
+    }
+
+    .sale-grid {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 1.5rem;
+    }
+
+    .card-modern {
+        background: linear-gradient(180deg, rgba(255,255,255,.015), rgba(255,255,255,.01));
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 1.5rem;
+        box-shadow: 0 12px 30px rgba(0,0,0,.22);
+    }
+
+    .sticky-card {
+        position: sticky;
+        top: 90px;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .add-product-grid {
+        display: grid;
+        grid-template-columns: 1fr 100px 56px;
+        gap: .8rem;
+        margin-bottom: 1rem;
+    }
+
+    .input-modern {
+        width: 100%;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: .95rem 1rem;
+        border-radius: 14px;
+        outline: none;
+        transition: .2s ease;
+    }
+
+    .input-modern:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px rgba(255,170,67,.08);
+    }
+
+    .btn-add {
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #ffaa43 0%, #ff8c1f 100%);
+        color: #111;
+        font-size: 1rem;
+        font-weight: 800;
+        transition: .2s ease;
+    }
+
+    .btn-add:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 26px rgba(255,170,67,.18);
+    }
+
+    .alert-modern {
+        background: rgba(255,120,120,.08);
+        border: 1px solid rgba(255,120,120,.18);
+        color: #ff9d9d;
+        padding: 1rem;
+        border-radius: 14px;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: .7rem;
+    }
+
+    .table-wrapper { overflow-x: auto; }
+
+    .modern-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .modern-table th {
+        text-align: left;
+        color: var(--muted);
+        font-size: .8rem;
+        font-weight: 700;
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .modern-table td {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255,255,255,.04);
+        vertical-align: middle;
+    }
+
+    .modern-table tr:hover { background: rgba(255,255,255,.015); }
+
+    .product-name { font-weight: 700; }
+
+    .product-stock {
+        color: var(--muted);
+        font-size: .78rem;
+        margin-top: .2rem;
+    }
+
+    .qty-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .5rem;
+    }
+
+    .qty-btn {
+        width: 34px; height: 34px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+    }
+
+    .qty-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+    }
+
+    .qty-value {
+        min-width: 30px;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .remove-btn {
+        width: 34px; height: 34px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,80,80,.15);
+        background: rgba(255,80,80,.06);
+        color: #ff8d8d;
+    }
+
+    .empty-cart {
+        padding: 3rem 1rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        color: var(--muted);
+    }
+
+    .empty-cart i { font-size: 2rem; }
+
+    .total-card {
+        background: linear-gradient(135deg, rgba(255,170,67,.12), rgba(255,170,67,.04));
+        border: 1px solid var(--accent-border);
+        border-radius: 20px;
+        padding: 1.4rem;
+        text-align: center;
+    }
+
+    .total-label {
+        color: var(--muted);
+        margin-bottom: .4rem;
+    }
+
+    .total-value {
+        color: var(--accent);
+        font-size: 2.2rem;
+        font-weight: 900;
+    }
+
+    .label-modern {
+        display: block;
+        margin-bottom: .5rem;
+        color: var(--muted);
+        font-size: .85rem;
+        font-weight: 700;
+    }
+
+    .change-box {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 1rem;
+        border-radius: 14px;
+    }
+
+    .change-box strong {
+        color: var(--accent);
+        font-size: 1.1rem;
+    }
+
+    .checkout-box { margin-top: 1rem; }
+
+    .saving-text {
+        color: var(--muted);
+        text-align: center;
+        margin-bottom: .8rem;
+        font-size: .9rem;
+    }
+
+    .checkout-btn {
+        width: 100%;
+        border: none;
+        background: linear-gradient(135deg, #ffaa43 0%, #ff8c1f 100%);
+        color: #111;
+        padding: 1rem;
+        border-radius: 16px;
+        font-weight: 900;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .7rem;
+        transition: .2s ease;
+    }
+
+    .checkout-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 30px rgba(255,170,67,.2);
+    }
+
+    .checkout-btn:disabled {
+        opacity: .5;
+        cursor: not-allowed;
+    }
+
+    @@media(max-width: 1000px) {
+        .sale-grid { grid-template-columns: 1fr; }
+        .sticky-card { position: relative; top: auto; }
+    }
+
+    @@media(max-width: 700px) {
+        .add-product-grid { grid-template-columns: 1fr; }
+        .modern-table { min-width: 760px; }
+    }
+
+</style>
+
+@code {
+
+    [Parameter] public int Id { get; set; }
+
+    private PulperiaDbContext db = default!;
+
+    private Pulperia.Models.Venta? venta;
+
+    private List<Empleado> empleados = new();
+    private List<Producto> productos = new();
+    private List<DetalleVenta> carrito = new();
+
+    // IDs de los detalles originales para poder borrarlos al guardar
+    private List<int> detallesOriginalesIds = new();
+
+    private int productoSeleccionadoId = 0;
+    private int cantidad = 1;
+
+    private string metodoPago = "Efectivo";
+    private decimal pagoCon;
+    private string errorMsg = "";
+    private string empleadoId = "";
+    private bool guardando = false;
+    private bool cargando = true;
+
+    private decimal Total =>
+        carrito.Sum(i => i.PrecioUnitarioHistorico * i.Cantidad);
+
+    private decimal Cambio =>
+        pagoCon > Total ? pagoCon - Total : 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        db = DbContextFactory.CreateDbContext();
+
+        empleados = await emp.GetAllAsync();
+        empleados = empleados.OrderBy(e => e.Nombre).ToList();
+
+        productos = db.Producto
+            .OrderBy(p => p.Nombre)
+            .ToList();
+
+        // Cargar la venta con sus detalles
+        venta = db.Venta
+            .Include(v => v.DetalleVentas)
+                .ThenInclude(d => d.Producto)
+            .FirstOrDefault(v => v.Id == Id);
+
+        if (venta != null)
+        {
+            // Poblar campos del panel derecho
+            metodoPago = venta.MetodoPago;
+            pagoCon    = venta.MontoRecibido;
+            empleadoId = venta.ClienteId ?? "";
+
+            // Poblar carrito con los detalles existentes
+            foreach (var d in venta.DetalleVentas)
+            {
+                // Asegurarse de tener referencia al producto actualizado
+                var prod = productos.FirstOrDefault(p => p.Id == d.ProductoId)
+                           ?? d.Producto;
+
+                // Restaurar stock "disponible" sumando la cantidad que ya estaba vendida
+                // para que el tope de stock sea correcto al editar
+                if (prod != null)
+                    prod.StockActual += d.Cantidad;
+
+                carrito.Add(new DetalleVenta
+                {
+                    Id                      = d.Id,
+                    ProductoId              = d.ProductoId,
+                    Producto                = prod!,
+                    Cantidad                = d.Cantidad,
+                    PrecioUnitarioHistorico = d.PrecioUnitarioHistorico,
+                    CostoUnitarioHistorico  = d.CostoUnitarioHistorico
+                });
+
+                detallesOriginalesIds.Add(d.Id);
+            }
+
+            // Filtrar solo productos con stock > 0 (después de restaurar)
+            productos = productos
+                .Where(p => p.StockActual > 0)
+                .ToList();
+        }
+
+        cargando = false;
+    }
+
+    void AgregarAlCarrito()
+    {
+        errorMsg = "";
+
+        var producto = productos
+            .FirstOrDefault(p => p.Id == productoSeleccionadoId);
+
+        if (producto == null) return;
+
+        var existente = carrito
+            .FirstOrDefault(c => c.ProductoId == producto.Id);
+
+        int cantidadActual = existente?.Cantidad ?? 0;
+
+        if (cantidadActual + cantidad > producto.StockActual)
+        {
+            errorMsg =
+                $"Stock insuficiente. Disponible: {producto.StockActual - cantidadActual} unidad(es).";
+            return;
+        }
+
+        if (existente != null)
+        {
+            existente.Cantidad += cantidad;
+        }
+        else
+        {
+            carrito.Add(new DetalleVenta
+            {
+                ProductoId              = producto.Id,
+                Producto                = producto,
+                Cantidad                = cantidad,
+                PrecioUnitarioHistorico = producto.PrecioVenta,
+                CostoUnitarioHistorico  = producto.PrecioVenta
+            });
+        }
+
+        productoSeleccionadoId = 0;
+        cantidad = 1;
+    }
+
+    void CambiarCantidad(DetalleVenta item, int delta)
+    {
+        int nueva = item.Cantidad + delta;
+
+        if (nueva <= 0)
+        {
+            carrito.Remove(item);
+            return;
+        }
+
+        if (nueva > item.Producto.StockActual)
+        {
+            errorMsg =
+                $"Stock máximo disponible: {item.Producto.StockActual} unidad(es).";
+            return;
+        }
+
+        errorMsg = "";
+        item.Cantidad = nueva;
+    }
+
+    async Task Guardar()
+    {
+        if (!carrito.Any() || venta == null) return;
+
+        guardando = true;
+
+        // 1. Restaurar stock original (revertir la venta anterior)
+        var detallesAntiguos = db.DetalleVenta
+            .Where(d => d.VentaId == Id)
+            .ToList();
+
+        foreach (var d in detallesAntiguos)
+        {
+            var prod = db.Producto.Find(d.ProductoId);
+            if (prod != null)
+                prod.StockActual += d.Cantidad;
+
+            db.DetalleVenta.Remove(d);
+        }
+
+        // 2. Actualizar cabecera de la venta
+        var ventaDb = db.Venta.Find(Id);
+        if (ventaDb != null)
+        {
+            ventaDb.Total         = Total;
+            ventaDb.MetodoPago    = metodoPago;
+            ventaDb.MontoRecibido = metodoPago == "Efectivo" ? pagoCon : Total;
+            ventaDb.Cambio        = Cambio;
+            ventaDb.Pagado        = metodoPago != "Fiado";
+            ventaDb.ClienteId     =
+                string.IsNullOrWhiteSpace(empleadoId) ? null : empleadoId;
+        }
+
+        await db.SaveChangesAsync();
+
+        // 3. Insertar nuevos detalles y descontar stock
+        foreach (var item in carrito)
+        {
+            db.DetalleVenta.Add(new DetalleVenta
+            {
+                VentaId                 = Id,
+                ProductoId              = item.ProductoId,
+                Cantidad                = item.Cantidad,
+                PrecioUnitarioHistorico = item.PrecioUnitarioHistorico,
+                CostoUnitarioHistorico  = item.CostoUnitarioHistorico
+            });
+
+            var prod = db.Producto.Find(item.ProductoId);
+            if (prod != null)
+                prod.StockActual -= item.Cantidad;
+        }
+
+        await db.SaveChangesAsync();
+
+        // 4. Log de auditoría
+
+
+      await LogService.RegistrarAsync(
+    tabla:      "Venta",
+    accion:     "Editar",
+    registroId: Id.ToString(),
+    usuario:    Session?.CurrentUser?.Email ?? "No indicado",
+    anterior:   detallesAntiguos,
+    nuevo:      carrito);
+
+        guardando = false;
+
+        Nav.NavigateTo("/ventas");
+    }
+}
