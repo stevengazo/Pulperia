@@ -137,7 +137,7 @@
         else
         {
             <div class="actions">
-                <button class="btn-print" @onclick="Print">🧾 Imprimir recibo</button>
+                <GenerarTicket  Venta="@venta" Empleado="@empleado" />
             </div>
 
             <div class="receipt">
@@ -155,10 +155,7 @@
 
                     @if (empleado != null)
                     {
-                       
-                            <div><b>Empleado:</b> <a href="/empleado/@empleado.Id"> @empleado.Nombre @empleado.Apellido </a></div>
-                        
-
+                        <div><b>Empleado:</b> <a href="/empleado/@empleado.Id"> @empleado.Nombre @empleado.Apellido </a></div>
                     }
                 </div>
 

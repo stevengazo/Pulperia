@@ -1,0 +1,94 @@
+@inject IJSRuntime JS
+
+<button class="btn-pdf" @onclick="() => ExportarPdf(Venta,Empleado)">
+    <i class="fa-solid fa-file-pdf"></i>
+    <span>Exportar PDF</span>
+</button>
+
+<style>
+    .btn-pdf {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+
+        background: #181c27;
+        color: #ffaa43;
+
+        border: 1px solid rgba(255, 170, 67, .18);
+        border-radius: 14px;
+
+        padding: 11px 18px;
+
+        font-size: .88rem;
+        font-weight: 700;
+        letter-spacing: .01em;
+
+        cursor: pointer;
+
+        transition:
+            background .18s ease,
+            border-color .18s ease,
+            transform .12s ease,
+            box-shadow .18s ease;
+
+        box-shadow:
+            0 8px 20px rgba(0, 0, 0, .18);
+
+        backdrop-filter: blur(6px);
+    }
+
+    .btn-pdf i {
+        font-size: 1rem;
+    }
+
+    .btn-pdf:hover {
+        background: rgba(255, 170, 67, .08);
+        border-color: rgba(255, 170, 67, .32);
+
+        box-shadow:
+            0 12px 24px rgba(0, 0, 0, .28);
+
+        transform: translateY(-1px);
+    }
+
+    .btn-pdf:active {
+        transform: scale(.98);
+    }
+
+    .btn-pdf:focus-visible {
+        outline: none;
+        box-shadow:
+            0 0 0 4px rgba(255, 170, 67, .12),
+            0 12px 24px rgba(0, 0, 0, .28);
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Pulperia.Models.Venta Venta { get; set; } = default!;
+
+    [Parameter]
+    public Pulperia.Models.Empleado Empleado { get; set; } = default!;
+    private async Task ExportarPdf(Pulperia.Models.Venta venta, Pulperia.Models.Empleado empleado)
+    {
+        try
+        {
+            // Generar PDF
+            var pdfData = Pulperia.Services.VentaPdfGenerator.Generar(venta, empleado);
+
+            // Nombre archivo
+            var fileName = $"Recibo_{empleado.Nombre}_{empleado.Apellido}_{venta.Fecha:dd-MM-yyyy}_{venta.Id}.pdf";
+
+            // Descargar
+            await JS.InvokeVoidAsync(
+                "saveAsFile",
+                fileName,
+                Convert.ToBase64String(pdfData)
+            );
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error generando PDF: {ex.Message}");
+        }
+    }
+}

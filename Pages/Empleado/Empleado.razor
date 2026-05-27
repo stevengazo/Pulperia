@@ -272,7 +272,6 @@
     }
 </style>
 
-
   
 <UserValidator>
     <div class="employee-page">
@@ -350,7 +349,7 @@
                             </div>
 
                             <div class="stat-value">
-                                ₡@SumVentas(FilteredVentas)
+                             @SumVentas(FilteredVentas)
                             </div>
                         </div>
 
@@ -359,10 +358,10 @@
                     <!-- FILTERS -->
                     <div class="filters">
 
-                        <DateRangePicker  OnRangeChanged="OnRangeChanged"/>
+                        <DateRangePicker OnRangeChanged="OnRangeChanged" />
 
                         <button class="btn-export" @onclick="ExportCsv">
-                          <i class="fa-solid fa-file-csv"></i>
+                            <i class="fa-solid fa-file-csv"></i>
                         </button>
 
                     </div>
@@ -407,6 +406,7 @@
                                             </td>
 
                                             <td>
+                                                <GenerarTicket Venta="v" Empleado="empleado" />
                                                 <a class="link" href="/venta/@v.Id">
 
                                                     Ver recibo →
