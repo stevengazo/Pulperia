@@ -350,7 +350,7 @@
                             </div>
 
                             <div class="stat-value">
-                                ₡@FilteredVentas.Sum(v => v.Total).ToString("N2")
+                                ₡@SumVentas(FilteredVentas)
                             </div>
                         </div>
 
@@ -359,21 +359,10 @@
                     <!-- FILTERS -->
                     <div class="filters">
 
-                        <div class="filter-group">
-                            <label>Fecha inicio</label>
-
-                            <InputDate class="filter-input" @bind-Value="fechaInicio" />
-                        </div>
-
-                        <div class="filter-group">
-                            <label>Fecha fin</label>
-
-                            <InputDate class="filter-input" @bind-Value="fechaFin" />
-                        </div>
+                        <DateRangePicker  OnRangeChanged="OnRangeChanged"/>
 
                         <button class="btn-export" @onclick="ExportCsv">
-
-                            Exportar CSV
+                          <i class="fa-solid fa-file-csv"></i>
                         </button>
 
                     </div>
@@ -444,6 +433,7 @@
 
 </UserValidator>
 
+
 @code {
 
     [Parameter]
@@ -457,36 +447,56 @@
 
     private PulperiaDbContext? db;
 
-    private DateTime? fechaInicio;
-    private DateTime? fechaFin;
+    private DateTime? fechaInicio = null;
+    private DateTime? fechaFin = null;
+
+    private void OnRangeChanged((DateTime Inicio, DateTime Fin) rango)
+    {
+        fechaInicio = rango.Inicio;
+        fechaFin = rango.Fin;
+    }
 
     private List<Venta> FilteredVentas =>
         Ventas
             .Where(v =>
-                (!fechaInicio.HasValue || v.Fecha.Date >= fechaInicio.Value.Date)
-                &&
+                (!fechaInicio.HasValue || v.Fecha.Date >= fechaInicio.Value.Date) &&
                 (!fechaFin.HasValue || v.Fecha.Date <= fechaFin.Value.Date)
             )
             .OrderByDescending(v => v.Fecha)
             .ToList();
 
+    private string SumVentas(List<Pulperia.Models.Venta> ventas)
+    {
+        var total = ventas.Sum(v => v.Total);
+        return $"₡{total:N2}";
+    }
+
     protected override async Task OnInitializedAsync()
     {
-        db = DbFactory.CreateDbContext();
-
-        empleado = await emp.GetByIdAsync(id);
-
-        if (empleado != null)
+        try
         {
-            Ventas = await db.Venta
-                .Include(v => v.DetalleVentas)
-                .ThenInclude(d => d.Producto)
-                .Where(v => v.ClienteId == empleado.Id.ToString())
-                .OrderByDescending(v => v.Fecha)
-                .ToListAsync();
-        }
+            db = DbFactory.CreateDbContext();
 
-        isLoading = false;
+            empleado = await emp.GetByIdAsync(id);
+
+            if (empleado != null)
+            {
+                Ventas = await db.Venta
+                    .Include(v => v.DetalleVentas)
+                        .ThenInclude(d => d.Producto)
+                    .Where(v => v.ClienteId == empleado.Id.ToString())
+                    .OrderByDescending(v => v.Fecha)
+                    .ToListAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error cargando ventas: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
     }
 
     private async Task ExportCsv()
@@ -499,7 +509,9 @@
 
             foreach (var venta in FilteredVentas)
             {
-                sb.AppendLine($"{venta.Id},{venta.Fecha:yyyy-MM-dd HH:mm},{venta.Total}");
+                sb.AppendLine(
+                    $"{venta.Id},{venta.Fecha:yyyy-MM-dd HH:mm},{venta.Total}"
+                );
             }
 
             var bytes = System.Text.Encoding.UTF8.GetBytes(sb.ToString());
@@ -515,7 +527,12 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            Console.WriteLine($"Error exportando CSV: {ex.Message}");
         }
+    }
+
+    public void Dispose()
+    {
+        db?.Dispose();
     }
 }

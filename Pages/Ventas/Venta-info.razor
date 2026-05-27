@@ -155,7 +155,10 @@
 
                     @if (empleado != null)
                     {
-                        <div><b>Empleado:</b> @empleado.Nombre @empleado.Apellido</div>
+                       
+                            <div><b>Empleado:</b> <a href="/empleado/@empleado.Id"> @empleado.Nombre @empleado.Apellido </a></div>
+                        
+
                     }
                 </div>
 
