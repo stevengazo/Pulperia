@@ -7,7 +7,7 @@ public class Venta
     [Key]
     public int Id { get; set; }
 
-    public string Autor {get;set;}
+    public string Autor { get; set; }
 
     public DateTime Fecha { get; set; } = DateTime.UtcNow;
 
