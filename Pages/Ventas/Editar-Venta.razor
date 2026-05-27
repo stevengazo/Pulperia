@@ -596,7 +596,6 @@
     private List<Producto> productos = new();
     private List<DetalleVenta> carrito = new();
 
-    // IDs de los detalles originales para poder borrarlos al guardar
     private List<int> detallesOriginalesIds = new();
 
     private int productoSeleccionadoId = 0;
@@ -626,7 +625,6 @@
             .OrderBy(p => p.Nombre)
             .ToList();
 
-        // Cargar la venta con sus detalles
         venta = db.Venta
             .Include(v => v.DetalleVentas)
                 .ThenInclude(d => d.Producto)
@@ -634,20 +632,15 @@
 
         if (venta != null)
         {
-            // Poblar campos del panel derecho
             metodoPago = venta.MetodoPago;
             pagoCon = venta.MontoRecibido;
             empleadoId = venta.ClienteId ?? "";
 
-            // Poblar carrito con los detalles existentes
             foreach (var d in venta.DetalleVentas)
             {
-                // Asegurarse de tener referencia al producto actualizado
                 var prod = productos.FirstOrDefault(p => p.Id == d.ProductoId)
                            ?? d.Producto;
 
-                // Restaurar stock "disponible" sumando la cantidad que ya estaba vendida
-                // para que el tope de stock sea correcto al editar
                 if (prod != null)
                     prod.StockActual += d.Cantidad;
 
@@ -664,7 +657,6 @@
                 detallesOriginalesIds.Add(d.Id);
             }
 
-            // Filtrar solo productos con stock > 0 (después de restaurar)
             productos = productos
                 .Where(p => p.StockActual > 0)
                 .ToList();
@@ -741,8 +733,9 @@
 
         guardando = true;
 
-        // 1. Restaurar stock original (revertir la venta anterior)
+        // 1. Restaurar stock original y eliminar detalles antiguos
         var detallesAntiguos = db.DetalleVenta
+            .Include(d => d.Producto)
             .Where(d => d.VentaId == Id)
             .ToList();
 
@@ -789,9 +782,7 @@
 
         await db.SaveChangesAsync();
 
-        // 4. Log de auditoría
-
-
+        // 4. Log de auditoría de la venta
         await LogService.RegistrarAsync(
             tabla: "Venta",
             accion: "Editar",
@@ -799,6 +790,52 @@
             usuario: Session?.CurrentUser?.Email ?? "No indicado",
             anterior: detallesAntiguos.Select(d => new { d.ProductoId, d.Cantidad, d.PrecioUnitarioHistorico }),
             nuevo: carrito.Select(d => new { d.ProductoId, d.Cantidad, d.PrecioUnitarioHistorico }));
+
+        // 5. Log de cambios en inventario
+        var cambiosInventario = new List<object>();
+
+        foreach (var item in carrito)
+        {
+            var anterior = detallesAntiguos.FirstOrDefault(d => d.ProductoId == item.ProductoId);
+            int cantAntes = anterior?.Cantidad ?? 0;
+            int cantDespues = item.Cantidad;
+
+            if (cantAntes != cantDespues)
+            {
+                cambiosInventario.Add(new
+                {
+                    ProductoId = item.ProductoId,
+                    NombreProducto = item.Producto.Nombre,
+                    StockAntes = cantAntes,
+                    StockDespues = cantDespues,
+                    Diferencia = cantDespues - cantAntes
+                });
+            }
+        }
+
+        // Productos eliminados del carrito
+        foreach (var d in detallesAntiguos.Where(d => !carrito.Any(c => c.ProductoId == d.ProductoId)))
+        {
+            cambiosInventario.Add(new
+            {
+                ProductoId = d.ProductoId,
+                NombreProducto = d.Producto?.Nombre ?? d.ProductoId.ToString(),
+                StockAntes = d.Cantidad,
+                StockDespues = 0,
+                Diferencia = -d.Cantidad
+            });
+        }
+
+        if (cambiosInventario.Any())
+        {
+            await LogService.RegistrarAsync(
+                tabla: "Inventario",
+                accion: "ModificacionPorEdicionVenta",
+                registroId: Id.ToString(),
+                usuario: Session?.CurrentUser?.Email ?? "No indicado",
+                anterior: null,
+                nuevo: cambiosInventario);
+        }
 
         guardando = false;
 
