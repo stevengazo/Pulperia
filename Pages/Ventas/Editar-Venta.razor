@@ -41,7 +41,7 @@
     }
     else if (venta == null)
     {
-        <div class="alert-modern">
+        <div class="alert-modern alert-danger">
             <i class="bi bi-exclamation-triangle-fill"></i>
             No se encontró la venta #@Id.
         </div>
@@ -80,7 +80,7 @@
 
                     @if (errorMsg != "")
                     {
-                        <div class="alert-modern">
+                        <div class="alert-modern alert-danger">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             @errorMsg
                         </div>
@@ -186,6 +186,24 @@
                         </select>
                     </div>
 
+                    @* ── Toggle Pagado ── *@
+                    <div>
+                        <label class="label-modern">Estado de pago</label>
+                        <button class="toggle-pagado @(pagado ? "pagado-on" : "pagado-off")"
+                                @onclick="() => pagado = !pagado">
+                            @if (pagado)
+                            {
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>Pagado</span>
+                            }
+                            else
+                            {
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span>No pagado</span>
+                            }
+                        </button>
+                    </div>
+
                     <div>
                         <label class="label-modern">Método de pago</label>
                         <select class="input-modern" @bind="metodoPago">
@@ -243,6 +261,12 @@
         --border: #23232c;
         --text: #f5f5f7;
         --muted: #8c8c98;
+        --green: #4ade80;
+        --green-soft: rgba(74, 222, 128, .12);
+        --green-border: rgba(74, 222, 128, .22);
+        --red: #ff8d8d;
+        --red-soft: rgba(255, 80, 80, .08);
+        --red-border: rgba(255, 120, 120, .18);
     }
 
     .sale-page {
@@ -251,15 +275,8 @@
     }
 
     @@keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(8px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0);   }
     }
 
     .loading-state {
@@ -331,11 +348,11 @@
     }
 
     .card-modern {
-        background: linear-gradient(180deg, rgba(255, 255, 255, .015), rgba(255, 255, 255, .01));
+        background: linear-gradient(180deg, rgba(255,255,255,.015), rgba(255,255,255,.01));
         border: 1px solid var(--border);
         border-radius: 24px;
         padding: 1.5rem;
-        box-shadow: 0 12px 30px rgba(0, 0, 0, .22);
+        box-shadow: 0 12px 30px rgba(0,0,0,.22);
     }
 
     .sticky-card {
@@ -366,7 +383,7 @@
 
     .input-modern:focus {
         border-color: var(--accent);
-        box-shadow: 0 0 0 4px rgba(255, 170, 67, .08);
+        box-shadow: 0 0 0 4px rgba(255,170,67,.08);
     }
 
     .btn-add {
@@ -381,19 +398,54 @@
 
     .btn-add:hover {
         transform: translateY(-1px);
-        box-shadow: 0 12px 26px rgba(255, 170, 67, .18);
+        box-shadow: 0 12px 26px rgba(255,170,67,.18);
     }
 
     .alert-modern {
-        background: rgba(255, 120, 120, .08);
-        border: 1px solid rgba(255, 120, 120, .18);
-        color: #ff9d9d;
         padding: 1rem;
         border-radius: 14px;
         margin-bottom: 1rem;
         display: flex;
         align-items: center;
         gap: .7rem;
+    }
+
+    .alert-danger {
+        background: var(--red-soft);
+        border: 1px solid var(--red-border);
+        color: var(--red);
+    }
+
+    /* ── Toggle pagado ── */
+    .toggle-pagado {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: .6rem;
+        padding: .9rem 1rem;
+        border-radius: 14px;
+        font-weight: 800;
+        font-size: .95rem;
+        border: 1px solid transparent;
+        transition: background .2s ease, border-color .2s ease, color .2s ease, transform .15s ease;
+        cursor: pointer;
+    }
+
+    .toggle-pagado:hover {
+        transform: translateY(-1px);
+    }
+
+    .pagado-on {
+        background: var(--green-soft);
+        border-color: var(--green-border);
+        color: var(--green);
+    }
+
+    .pagado-off {
+        background: var(--red-soft);
+        border-color: var(--red-border);
+        color: var(--red);
     }
 
     .table-wrapper {
@@ -416,17 +468,15 @@
 
     .modern-table td {
         padding: 1rem;
-        border-bottom: 1px solid rgba(255, 255, 255, .04);
+        border-bottom: 1px solid rgba(255,255,255,.04);
         vertical-align: middle;
     }
 
     .modern-table tr:hover {
-        background: rgba(255, 255, 255, .015);
+        background: rgba(255,255,255,.015);
     }
 
-    .product-name {
-        font-weight: 700;
-    }
+    .product-name  { font-weight: 700; }
 
     .product-stock {
         color: var(--muted);
@@ -465,9 +515,9 @@
         width: 34px;
         height: 34px;
         border-radius: 10px;
-        border: 1px solid rgba(255, 80, 80, .15);
-        background: rgba(255, 80, 80, .06);
-        color: #ff8d8d;
+        border: 1px solid var(--red-border);
+        background: var(--red-soft);
+        color: var(--red);
     }
 
     .empty-cart {
@@ -480,22 +530,17 @@
         color: var(--muted);
     }
 
-    .empty-cart i {
-        font-size: 2rem;
-    }
+    .empty-cart i { font-size: 2rem; }
 
     .total-card {
-        background: linear-gradient(135deg, rgba(255, 170, 67, .12), rgba(255, 170, 67, .04));
+        background: linear-gradient(135deg, rgba(255,170,67,.12), rgba(255,170,67,.04));
         border: 1px solid var(--accent-border);
         border-radius: 20px;
         padding: 1.4rem;
         text-align: center;
     }
 
-    .total-label {
-        color: var(--muted);
-        margin-bottom: .4rem;
-    }
+    .total-label { color: var(--muted); margin-bottom: .4rem; }
 
     .total-value {
         color: var(--accent);
@@ -526,9 +571,7 @@
         font-size: 1.1rem;
     }
 
-    .checkout-box {
-        margin-top: 1rem;
-    }
+    .checkout-box { margin-top: 1rem; }
 
     .saving-text {
         color: var(--muted);
@@ -554,7 +597,7 @@
 
     .checkout-btn:hover {
         transform: translateY(-1px);
-        box-shadow: 0 14px 30px rgba(255, 170, 67, .2);
+        box-shadow: 0 14px 30px rgba(255,170,67,.2);
     }
 
     .checkout-btn:disabled {
@@ -563,24 +606,13 @@
     }
 
     @@media(max-width: 1000px) {
-        .sale-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .sticky-card {
-            position: relative;
-            top: auto;
-        }
+        .sale-grid { grid-template-columns: 1fr; }
+        .sticky-card { position: relative; top: auto; }
     }
 
     @@media(max-width: 700px) {
-        .add-product-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .modern-table {
-            min-width: 760px;
-        }
+        .add-product-grid { grid-template-columns: 1fr; }
+        .modern-table { min-width: 760px; }
     }
 </style>
 
@@ -596,7 +628,10 @@
     private List<Producto> productos = new();
     private List<DetalleVenta> carrito = new();
 
-    private List<int> detallesOriginalesIds = new();
+    private List<DetalleVenta> detallesAntiguos = new();
+
+    // Snapshot del estado original de la cabecera (para el log)
+    private object? snapCabecera;
 
     private int productoSeleccionadoId = 0;
     private int cantidad = 1;
@@ -605,6 +640,7 @@
     private decimal pagoCon;
     private string errorMsg = "";
     private string empleadoId = "";
+    private bool pagado;
     private bool guardando = false;
     private bool cargando = true;
 
@@ -632,9 +668,21 @@
 
         if (venta != null)
         {
-            metodoPago = venta.MetodoPago;
-            pagoCon = venta.MontoRecibido;
-            empleadoId = venta.ClienteId ?? "";
+            metodoPago  = venta.MetodoPago;
+            pagoCon     = venta.MontoRecibido;
+            empleadoId  = venta.ClienteId ?? "";
+            pagado      = venta.Pagado;
+
+            // Guardar snapshot de cabecera ANTES de cualquier edición
+            snapCabecera = new
+            {
+                venta.Total,
+                venta.MetodoPago,
+                venta.MontoRecibido,
+                venta.Cambio,
+                venta.Pagado,
+                ClienteId = venta.ClienteId
+            };
 
             foreach (var d in venta.DetalleVentas)
             {
@@ -646,16 +694,17 @@
 
                 carrito.Add(new DetalleVenta
                 {
-                    Id = d.Id,
+                    Id         = d.Id,
                     ProductoId = d.ProductoId,
-                    Producto = prod!,
-                    Cantidad = d.Cantidad,
+                    Producto   = prod!,
+                    Cantidad   = d.Cantidad,
                     PrecioUnitarioHistorico = d.PrecioUnitarioHistorico,
-                    CostoUnitarioHistorico = d.CostoUnitarioHistorico
+                    CostoUnitarioHistorico  = d.CostoUnitarioHistorico
                 });
-
-                detallesOriginalesIds.Add(d.Id);
             }
+
+            // Copia de los detalles originales para el log de inventario
+            detallesAntiguos = venta.DetalleVentas.ToList();
 
             productos = productos
                 .Where(p => p.StockActual > 0)
@@ -669,20 +718,15 @@
     {
         errorMsg = "";
 
-        var producto = productos
-            .FirstOrDefault(p => p.Id == productoSeleccionadoId);
-
+        var producto = productos.FirstOrDefault(p => p.Id == productoSeleccionadoId);
         if (producto == null) return;
 
-        var existente = carrito
-            .FirstOrDefault(c => c.ProductoId == producto.Id);
-
+        var existente    = carrito.FirstOrDefault(c => c.ProductoId == producto.Id);
         int cantidadActual = existente?.Cantidad ?? 0;
 
         if (cantidadActual + cantidad > producto.StockActual)
         {
-            errorMsg =
-                $"Stock insuficiente. Disponible: {producto.StockActual - cantidadActual} unidad(es).";
+            errorMsg = $"Stock insuficiente. Disponible: {producto.StockActual - cantidadActual} unidad(es).";
             return;
         }
 
@@ -695,10 +739,10 @@
             carrito.Add(new DetalleVenta
             {
                 ProductoId = producto.Id,
-                Producto = producto,
-                Cantidad = cantidad,
+                Producto   = producto,
+                Cantidad   = cantidad,
                 PrecioUnitarioHistorico = producto.PrecioVenta,
-                CostoUnitarioHistorico = producto.PrecioVenta
+                CostoUnitarioHistorico  = producto.PrecioVenta
             });
         }
 
@@ -718,8 +762,7 @@
 
         if (nueva > item.Producto.StockActual)
         {
-            errorMsg =
-                $"Stock máximo disponible: {item.Producto.StockActual} unidad(es).";
+            errorMsg = $"Stock máximo disponible: {item.Producto.StockActual} unidad(es).";
             return;
         }
 
@@ -734,12 +777,12 @@
         guardando = true;
 
         // 1. Restaurar stock original y eliminar detalles antiguos
-        var detallesAntiguos = db.DetalleVenta
+        var detallesEnDb = db.DetalleVenta
             .Include(d => d.Producto)
             .Where(d => d.VentaId == Id)
             .ToList();
 
-        foreach (var d in detallesAntiguos)
+        foreach (var d in detallesEnDb)
         {
             var prod = db.Producto.Find(d.ProductoId);
             if (prod != null)
@@ -748,17 +791,16 @@
             db.DetalleVenta.Remove(d);
         }
 
-        // 2. Actualizar cabecera de la venta
+        // 2. Actualizar cabecera con el nuevo estado (incluye el toggle de Pagado)
         var ventaDb = db.Venta.Find(Id);
         if (ventaDb != null)
         {
-            ventaDb.Total = Total;
-            ventaDb.MetodoPago = metodoPago;
+            ventaDb.Total         = Total;
+            ventaDb.MetodoPago    = metodoPago;
             ventaDb.MontoRecibido = metodoPago == "Efectivo" ? pagoCon : Total;
-            ventaDb.Cambio = Cambio;
-            ventaDb.Pagado = metodoPago != "Fiado";
-            ventaDb.ClienteId =
-                string.IsNullOrWhiteSpace(empleadoId) ? null : empleadoId;
+            ventaDb.Cambio        = Cambio;
+            ventaDb.Pagado        = pagado;                          // ← usa el toggle
+            ventaDb.ClienteId     = string.IsNullOrWhiteSpace(empleadoId) ? null : empleadoId;
         }
 
         await db.SaveChangesAsync();
@@ -768,11 +810,11 @@
         {
             db.DetalleVenta.Add(new DetalleVenta
             {
-                VentaId = Id,
-                ProductoId = item.ProductoId,
-                Cantidad = item.Cantidad,
+                VentaId                 = Id,
+                ProductoId              = item.ProductoId,
+                Cantidad                = item.Cantidad,
                 PrecioUnitarioHistorico = item.PrecioUnitarioHistorico,
-                CostoUnitarioHistorico = item.CostoUnitarioHistorico
+                CostoUnitarioHistorico  = item.CostoUnitarioHistorico
             });
 
             var prod = db.Producto.Find(item.ProductoId);
@@ -782,33 +824,64 @@
 
         await db.SaveChangesAsync();
 
-        // 4. Log de auditoría de la venta
-        await LogService.RegistrarAsync(
-            tabla: "Venta",
-            accion: "Editar",
-            registroId: Id.ToString(),
-            usuario: Session?.CurrentUser?.Email ?? "No indicado",
-            anterior: detallesAntiguos.Select(d => new { d.ProductoId, d.Cantidad, d.PrecioUnitarioHistorico }),
-            nuevo: carrito.Select(d => new { d.ProductoId, d.Cantidad, d.PrecioUnitarioHistorico }));
+        // 4. Log de auditoría de la cabecera de la venta
+        //    Captura el estado anterior (snapshot tomado al cargar) y el nuevo
+        var nuevaCabecera = new
+        {
+            Total,
+            MetodoPago    = metodoPago,
+            MontoRecibido = metodoPago == "Efectivo" ? pagoCon : Total,
+            Cambio,
+            Pagado        = pagado,
+            ClienteId     = string.IsNullOrWhiteSpace(empleadoId) ? null : empleadoId
+        };
 
-        // 5. Log de cambios en inventario
+        await LogService.RegistrarAsync(
+            tabla:      "Venta",
+            accion:     "Editar",
+            registroId: Id.ToString(),
+            usuario:    Session?.CurrentUser?.Email ?? "No indicado",
+            anterior:   snapCabecera,
+            nuevo:      nuevaCabecera);
+
+        // 5. Log de cambios en detalles (productos del carrito)
+        await LogService.RegistrarAsync(
+            tabla:      "DetalleVenta",
+            accion:     "Editar",
+            registroId: Id.ToString(),
+            usuario:    Session?.CurrentUser?.Email ?? "No indicado",
+            anterior:   detallesAntiguos.Select(d => new
+                        {
+                            d.ProductoId,
+                            NombreProducto          = d.Producto?.Nombre ?? d.ProductoId.ToString(),
+                            d.Cantidad,
+                            d.PrecioUnitarioHistorico
+                        }),
+            nuevo:      carrito.Select(d => new
+                        {
+                            d.ProductoId,
+                            NombreProducto          = d.Producto?.Nombre ?? d.ProductoId.ToString(),
+                            d.Cantidad,
+                            d.PrecioUnitarioHistorico
+                        }));
+
+        // 6. Log de impacto en inventario (solo productos que cambiaron)
         var cambiosInventario = new List<object>();
 
         foreach (var item in carrito)
         {
-            var anterior = detallesAntiguos.FirstOrDefault(d => d.ProductoId == item.ProductoId);
+            var anterior  = detallesAntiguos.FirstOrDefault(d => d.ProductoId == item.ProductoId);
             int cantAntes = anterior?.Cantidad ?? 0;
-            int cantDespues = item.Cantidad;
 
-            if (cantAntes != cantDespues)
+            if (cantAntes != item.Cantidad)
             {
                 cambiosInventario.Add(new
                 {
-                    ProductoId = item.ProductoId,
+                    item.ProductoId,
                     NombreProducto = item.Producto.Nombre,
-                    StockAntes = cantAntes,
-                    StockDespues = cantDespues,
-                    Diferencia = cantDespues - cantAntes
+                    StockAntes     = cantAntes,
+                    StockDespues   = item.Cantidad,
+                    Diferencia     = item.Cantidad - cantAntes
                 });
             }
         }
@@ -818,23 +891,23 @@
         {
             cambiosInventario.Add(new
             {
-                ProductoId = d.ProductoId,
+                d.ProductoId,
                 NombreProducto = d.Producto?.Nombre ?? d.ProductoId.ToString(),
-                StockAntes = d.Cantidad,
-                StockDespues = 0,
-                Diferencia = -d.Cantidad
+                StockAntes     = d.Cantidad,
+                StockDespues   = 0,
+                Diferencia     = -d.Cantidad
             });
         }
 
         if (cambiosInventario.Any())
         {
             await LogService.RegistrarAsync(
-                tabla: "Inventario",
-                accion: "ModificacionPorEdicionVenta",
+                tabla:      "Inventario",
+                accion:     "ModificacionPorEdicionVenta",
                 registroId: Id.ToString(),
-                usuario: Session?.CurrentUser?.Email ?? "No indicado",
-                anterior: null,
-                nuevo: cambiosInventario);
+                usuario:    Session?.CurrentUser?.Email ?? "No indicado",
+                anterior:   null,
+                nuevo:      cambiosInventario);
         }
 
         guardando = false;
