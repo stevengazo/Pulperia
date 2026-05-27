@@ -15,8 +15,7 @@
 
         <div class="header-left">
 
-            <button class="back-btn"
-                    @onclick='() => Nav.NavigateTo("/ventas")'>
+            <button class="back-btn" @onclick='() => Nav.NavigateTo("/ventas")'>
                 <i class="fa-solid fa-arrow-left"></i>
             </button>
 
@@ -58,8 +57,7 @@
 
                     <div class="add-product-grid">
 
-                        <select class="input-modern"
-                                @bind="productoSeleccionadoId">
+                        <select class="input-modern" @bind="productoSeleccionadoId">
 
                             <option value="0">Seleccione producto...</option>
 
@@ -72,14 +70,9 @@
 
                         </select>
 
-                        <input type="number"
-                               min="1"
-                               class="input-modern text-center"
-                               @bind="cantidad" />
+                        <input type="number" min="1" class="input-modern text-center" @bind="cantidad" />
 
-                        <button class="btn-add"
-                                @onclick="AgregarAlCarrito"
-                                disabled="@(productoSeleccionadoId == 0)">
+                        <button class="btn-add" @onclick="AgregarAlCarrito" disabled="@(productoSeleccionadoId == 0)">
                             <i class="fa-solid fa-plus"></i>
                         </button>
 
@@ -139,13 +132,11 @@
                                         <td>
                                             <div class="qty-box">
 
-                                                <button class="qty-btn"
-                                                        @onclick="() => CambiarCantidad(item, -1)">−</button>
+                                                <button class="qty-btn" @onclick="() => CambiarCantidad(item, -1)">−</button>
 
                                                 <div class="qty-value">@item.Cantidad</div>
 
-                                                <button class="qty-btn"
-                                                        @onclick="() => CambiarCantidad(item, 1)"
+                                                <button class="qty-btn" @onclick="() => CambiarCantidad(item, 1)"
                                                         disabled="@(item.Cantidad >= item.Producto.StockActual)">+</button>
 
                                             </div>
@@ -156,8 +147,7 @@
                                         </td>
 
                                         <td class="text-center">
-                                            <button class="remove-btn"
-                                                    @onclick="() => carrito.Remove(item)">
+                                            <button class="remove-btn" @onclick="() => carrito.Remove(item)">
                                                 <i class="bi bi-x-lg"></i>
                                             </button>
                                         </td>
@@ -210,10 +200,7 @@
                     {
                         <div>
                             <label class="label-modern">Monto recibido</label>
-                            <input type="number"
-                                   class="input-modern"
-                                   @bind-value="pagoCon"
-                                   @bind-value:event="oninput" />
+                            <input type="number" class="input-modern" @bind-value="pagoCon" @bind-value:event="oninput" />
                         </div>
 
                         <div class="change-box">
@@ -229,9 +216,7 @@
                             <div class="saving-text">Guardando cambios...</div>
                         }
 
-                        <button class="checkout-btn"
-                                disabled="@(!carrito.Any() || guardando)"
-                                @onclick="Guardar">
+                        <button class="checkout-btn" disabled="@(!carrito.Any() || guardando)" @onclick="Guardar">
                             <i class="bi bi-floppy-fill"></i>
                             Guardar Cambios
                         </button>
@@ -248,11 +233,10 @@
 </div>
 
 <style>
-
     :root {
         --accent: #ffaa43;
-        --accent-soft: rgba(255,170,67,.12);
-        --accent-border: rgba(255,170,67,.18);
+        --accent-soft: rgba(255, 170, 67, .12);
+        --accent-border: rgba(255, 170, 67, .18);
         --bg: #0c0c10;
         --surface: #14141a;
         --surface-2: #181820;
@@ -267,8 +251,15 @@
     }
 
     @@keyframes fadeIn {
-        from { opacity: 0; transform: translateY(8px); }
-        to   { opacity: 1; transform: translateY(0); }
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     .loading-state {
@@ -297,7 +288,8 @@
     }
 
     .back-btn {
-        width: 48px; height: 48px;
+        width: 48px;
+        height: 48px;
         border-radius: 14px;
         border: 1px solid var(--border);
         background: var(--surface);
@@ -339,11 +331,11 @@
     }
 
     .card-modern {
-        background: linear-gradient(180deg, rgba(255,255,255,.015), rgba(255,255,255,.01));
+        background: linear-gradient(180deg, rgba(255, 255, 255, .015), rgba(255, 255, 255, .01));
         border: 1px solid var(--border);
         border-radius: 24px;
         padding: 1.5rem;
-        box-shadow: 0 12px 30px rgba(0,0,0,.22);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, .22);
     }
 
     .sticky-card {
@@ -374,7 +366,7 @@
 
     .input-modern:focus {
         border-color: var(--accent);
-        box-shadow: 0 0 0 4px rgba(255,170,67,.08);
+        box-shadow: 0 0 0 4px rgba(255, 170, 67, .08);
     }
 
     .btn-add {
@@ -389,12 +381,12 @@
 
     .btn-add:hover {
         transform: translateY(-1px);
-        box-shadow: 0 12px 26px rgba(255,170,67,.18);
+        box-shadow: 0 12px 26px rgba(255, 170, 67, .18);
     }
 
     .alert-modern {
-        background: rgba(255,120,120,.08);
-        border: 1px solid rgba(255,120,120,.18);
+        background: rgba(255, 120, 120, .08);
+        border: 1px solid rgba(255, 120, 120, .18);
         color: #ff9d9d;
         padding: 1rem;
         border-radius: 14px;
@@ -404,7 +396,9 @@
         gap: .7rem;
     }
 
-    .table-wrapper { overflow-x: auto; }
+    .table-wrapper {
+        overflow-x: auto;
+    }
 
     .modern-table {
         width: 100%;
@@ -422,13 +416,17 @@
 
     .modern-table td {
         padding: 1rem;
-        border-bottom: 1px solid rgba(255,255,255,.04);
+        border-bottom: 1px solid rgba(255, 255, 255, .04);
         vertical-align: middle;
     }
 
-    .modern-table tr:hover { background: rgba(255,255,255,.015); }
+    .modern-table tr:hover {
+        background: rgba(255, 255, 255, .015);
+    }
 
-    .product-name { font-weight: 700; }
+    .product-name {
+        font-weight: 700;
+    }
 
     .product-stock {
         color: var(--muted);
@@ -444,7 +442,8 @@
     }
 
     .qty-btn {
-        width: 34px; height: 34px;
+        width: 34px;
+        height: 34px;
         border-radius: 10px;
         border: 1px solid var(--border);
         background: var(--surface);
@@ -463,10 +462,11 @@
     }
 
     .remove-btn {
-        width: 34px; height: 34px;
+        width: 34px;
+        height: 34px;
         border-radius: 10px;
-        border: 1px solid rgba(255,80,80,.15);
-        background: rgba(255,80,80,.06);
+        border: 1px solid rgba(255, 80, 80, .15);
+        background: rgba(255, 80, 80, .06);
         color: #ff8d8d;
     }
 
@@ -480,10 +480,12 @@
         color: var(--muted);
     }
 
-    .empty-cart i { font-size: 2rem; }
+    .empty-cart i {
+        font-size: 2rem;
+    }
 
     .total-card {
-        background: linear-gradient(135deg, rgba(255,170,67,.12), rgba(255,170,67,.04));
+        background: linear-gradient(135deg, rgba(255, 170, 67, .12), rgba(255, 170, 67, .04));
         border: 1px solid var(--accent-border);
         border-radius: 20px;
         padding: 1.4rem;
@@ -524,7 +526,9 @@
         font-size: 1.1rem;
     }
 
-    .checkout-box { margin-top: 1rem; }
+    .checkout-box {
+        margin-top: 1rem;
+    }
 
     .saving-text {
         color: var(--muted);
@@ -550,7 +554,7 @@
 
     .checkout-btn:hover {
         transform: translateY(-1px);
-        box-shadow: 0 14px 30px rgba(255,170,67,.2);
+        box-shadow: 0 14px 30px rgba(255, 170, 67, .2);
     }
 
     .checkout-btn:disabled {
@@ -559,15 +563,25 @@
     }
 
     @@media(max-width: 1000px) {
-        .sale-grid { grid-template-columns: 1fr; }
-        .sticky-card { position: relative; top: auto; }
+        .sale-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .sticky-card {
+            position: relative;
+            top: auto;
+        }
     }
 
     @@media(max-width: 700px) {
-        .add-product-grid { grid-template-columns: 1fr; }
-        .modern-table { min-width: 760px; }
-    }
+        .add-product-grid {
+            grid-template-columns: 1fr;
+        }
 
+        .modern-table {
+            min-width: 760px;
+        }
+    }
 </style>
 
 @code {
@@ -622,7 +636,7 @@
         {
             // Poblar campos del panel derecho
             metodoPago = venta.MetodoPago;
-            pagoCon    = venta.MontoRecibido;
+            pagoCon = venta.MontoRecibido;
             empleadoId = venta.ClienteId ?? "";
 
             // Poblar carrito con los detalles existentes
@@ -639,12 +653,12 @@
 
                 carrito.Add(new DetalleVenta
                 {
-                    Id                      = d.Id,
-                    ProductoId              = d.ProductoId,
-                    Producto                = prod!,
-                    Cantidad                = d.Cantidad,
+                    Id = d.Id,
+                    ProductoId = d.ProductoId,
+                    Producto = prod!,
+                    Cantidad = d.Cantidad,
                     PrecioUnitarioHistorico = d.PrecioUnitarioHistorico,
-                    CostoUnitarioHistorico  = d.CostoUnitarioHistorico
+                    CostoUnitarioHistorico = d.CostoUnitarioHistorico
                 });
 
                 detallesOriginalesIds.Add(d.Id);
@@ -688,11 +702,11 @@
         {
             carrito.Add(new DetalleVenta
             {
-                ProductoId              = producto.Id,
-                Producto                = producto,
-                Cantidad                = cantidad,
+                ProductoId = producto.Id,
+                Producto = producto,
+                Cantidad = cantidad,
                 PrecioUnitarioHistorico = producto.PrecioVenta,
-                CostoUnitarioHistorico  = producto.PrecioVenta
+                CostoUnitarioHistorico = producto.PrecioVenta
             });
         }
 
@@ -745,12 +759,12 @@
         var ventaDb = db.Venta.Find(Id);
         if (ventaDb != null)
         {
-            ventaDb.Total         = Total;
-            ventaDb.MetodoPago    = metodoPago;
+            ventaDb.Total = Total;
+            ventaDb.MetodoPago = metodoPago;
             ventaDb.MontoRecibido = metodoPago == "Efectivo" ? pagoCon : Total;
-            ventaDb.Cambio        = Cambio;
-            ventaDb.Pagado        = metodoPago != "Fiado";
-            ventaDb.ClienteId     =
+            ventaDb.Cambio = Cambio;
+            ventaDb.Pagado = metodoPago != "Fiado";
+            ventaDb.ClienteId =
                 string.IsNullOrWhiteSpace(empleadoId) ? null : empleadoId;
         }
 
@@ -761,11 +775,11 @@
         {
             db.DetalleVenta.Add(new DetalleVenta
             {
-                VentaId                 = Id,
-                ProductoId              = item.ProductoId,
-                Cantidad                = item.Cantidad,
+                VentaId = Id,
+                ProductoId = item.ProductoId,
+                Cantidad = item.Cantidad,
                 PrecioUnitarioHistorico = item.PrecioUnitarioHistorico,
-                CostoUnitarioHistorico  = item.CostoUnitarioHistorico
+                CostoUnitarioHistorico = item.CostoUnitarioHistorico
             });
 
             var prod = db.Producto.Find(item.ProductoId);
@@ -778,13 +792,13 @@
         // 4. Log de auditoría
 
 
-      await LogService.RegistrarAsync(
-    tabla:      "Venta",
-    accion:     "Editar",
-    registroId: Id.ToString(),
-    usuario:    Session?.CurrentUser?.Email ?? "No indicado",
-    anterior:   detallesAntiguos,
-    nuevo:      carrito);
+        await LogService.RegistrarAsync(
+            tabla: "Venta",
+            accion: "Editar",
+            registroId: Id.ToString(),
+            usuario: Session?.CurrentUser?.Email ?? "No indicado",
+            anterior: detallesAntiguos.Select(d => new { d.ProductoId, d.Cantidad, d.PrecioUnitarioHistorico }),
+            nuevo: carrito.Select(d => new { d.ProductoId, d.Cantidad, d.PrecioUnitarioHistorico }));
 
         guardando = false;
 
