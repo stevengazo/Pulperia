@@ -30,9 +30,19 @@ public class AppSessionService
 
     public event Action? OnChange;
 
-    public async Task<bool> LoginAsync(string email, string password)
+    public async Task<bool> LoginAsync(string email, string password, bool keepLoggedIn = false)
     {
-        var response = await _supabase.Auth.SignIn(email, password);
+        Session response;
+
+        try
+        {
+            response = await _supabase.Auth.SignIn(email, password);
+        }
+        catch (Supabase.Gotrue.Exceptions.GotrueException)
+        {
+            // Credenciales inválidas, email no confirmado, etc.
+            return false;
+        }
 
         if (response?.User == null)
             return false;
@@ -43,11 +53,14 @@ public class AppSessionService
         {
             AccessToken = response.AccessToken,
             RefreshToken = response.RefreshToken,
-            ExpiresAt = DateTime.UtcNow.Add(SessionDuration)
+            ExpiresAt = DateTime.UtcNow.Add(SessionDuration),
+            KeepLoggedIn = keepLoggedIn
         };
 
+        // keepLoggedIn = true  -> localStorage (persiste al cerrar el navegador)
+        // keepLoggedIn = false -> sessionStorage (se borra al cerrar la pestaña)
         await JS.InvokeVoidAsync("appStorage.save", SessionKey,
-            JsonSerializer.Serialize(saved));
+            JsonSerializer.Serialize(saved), keepLoggedIn);
 
         Notify();
         return true;
@@ -86,11 +99,11 @@ public class AppSessionService
                     {
                         CurrentUser = response.User;
 
-                        // renovar expiración
+                        // renovar expiración, conservando dónde se almacenó
                         saved.ExpiresAt = DateTime.UtcNow.Add(SessionDuration);
 
                         await JS.InvokeVoidAsync("appStorage.save", SessionKey,
-                            JsonSerializer.Serialize(saved));
+                            JsonSerializer.Serialize(saved), saved.KeepLoggedIn);
                     }
                     else
                     {
@@ -129,5 +142,6 @@ public class AppSessionService
         public string AccessToken { get; set; } = "";
         public string RefreshToken { get; set; } = "";
         public DateTime ExpiresAt { get; set; }
+        public bool KeepLoggedIn { get; set; }
     }
 }

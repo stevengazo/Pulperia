@@ -25,8 +25,13 @@
                    placeholder="••••••••" />
         </div>
 
-        <button @onclick="Login">
-            Ingresar al sistema
+        <label class="remember">
+            <input type="checkbox" @bind="keepLoggedIn" />
+            Mantener la sesión abierta
+        </label>
+
+        <button @onclick="Login" disabled="@isLoading">
+            @(isLoading ? "Ingresando..." : "Ingresar al sistema")
         </button>
 
         @if (!string.IsNullOrEmpty(error))
@@ -47,6 +52,8 @@
     string email = "";
     string password = "";
     string? error;
+    bool isLoading;
+    bool keepLoggedIn;
 
     private async Task Login()
     {
@@ -59,15 +66,28 @@
             return;
         }
 
-        var ok = await Session.LoginAsync(email, password);
+        isLoading = true;
 
-        if (ok)
+        try
         {
-            NavigationManager.NavigateTo("/", true);
+            var ok = await Session.LoginAsync(email, password, keepLoggedIn);
+
+            if (ok)
+            {
+                NavigationManager.NavigateTo("/", true);
+            }
+            else
+            {
+                error = "Credenciales inválidas";
+            }
         }
-        else
+        catch
         {
-            error = "Credenciales inválidas";
+            error = "No se pudo conectar con el servidor. Intenta de nuevo.";
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 }

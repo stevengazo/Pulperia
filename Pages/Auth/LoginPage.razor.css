@@ -83,6 +83,25 @@ input::placeholder {
     color: #6d7585;
 }
 
+.remember {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    margin: .25rem 0 .5rem;
+    font-size: .85rem;
+    color: #b8c0d0;
+    cursor: pointer;
+    user-select: none;
+}
+
+.remember input {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    accent-color: #ffaa43;
+    cursor: pointer;
+}
+
 button {
     width: 100%;
     padding: 14px;
