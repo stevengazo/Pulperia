@@ -1,0 +1,231 @@
+.pg-root {
+    min-height: 100vh;
+    padding: 2rem 2.5rem;
+
+    font-family: 'Inter', system-ui, sans-serif;
+}
+
+.pg-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+}
+
+.pg-head h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #f5f7fa;
+    margin: 0;
+    letter-spacing: -0.04em;
+}
+
+.pg-head p {
+    margin: 6px 0 0;
+    color: #707887;
+    font-size: .92rem;
+}
+
+.btn-new {
+    border: none;
+    background: #ffaa43;
+    color: #0f1117;
+    padding: 12px 18px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .9rem;
+    font-weight: 700;
+    transition: .2s ease;
+    box-shadow: 0 10px 25px rgba(255,170,67,.25);
+}
+
+.btn-new:hover {
+    transform: translateY(-2px);
+    background: #ffc266;
+    box-shadow: 0 14px 30px rgba(255,170,67,.35);
+}
+
+.pg-toolbar {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 14px;
+    margin-bottom: 1.5rem;
+}
+
+.pg-input {
+    width: 100%;
+    border: 1px solid #1b1f27;
+    background: #181c27;
+    color: #eef2f7;
+    border-radius: 14px;
+    padding: 13px 16px;
+    font-size: .92rem;
+    outline: none;
+    transition: .2s ease;
+}
+
+.pg-input:focus {
+    border-color: #ffaa43;
+    box-shadow: 0 0 0 4px rgba(255,170,67,.12);
+}
+
+.pg-input::placeholder {
+    color: #5f6775;
+}
+
+.pg-table-wrap {
+    background: #181c27;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,.35);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #0f1117;
+}
+
+thead th {
+    padding: 18px 16px;
+    color: #7e8796;
+    font-size: .72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+thead th.num { text-align: right; }
+thead th.ctr { text-align: center; }
+
+tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: .15s ease;
+}
+
+tbody tr:last-child { border-bottom: none; }
+
+tbody tr:hover { background: rgba(255,255,255,.02); }
+
+tbody td {
+    padding: 18px 16px;
+    color: #c7cfdb;
+    font-size: .92rem;
+}
+
+.td-name {
+    color: #f5f7fa;
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.td-pres {
+    color: #667080;
+    font-size: .8rem;
+}
+
+.td-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: rgba(255,170,67,.1);
+    color: #ffaa43;
+    font-size: .78rem;
+    font-weight: 600;
+    border: 1px solid rgba(255,170,67,.18);
+}
+
+.td-num {
+    text-align: right;
+    font-weight: 600;
+    color: #eef2f7;
+    font-variant-numeric: tabular-nums;
+}
+
+.td-ctr { text-align: center; }
+
+.stock-ok,
+.stock-low {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: .82rem;
+}
+
+.stock-ok {
+    background: rgba(34,197,94,.12);
+    color: #4ade80;
+}
+
+.stock-low {
+    background: rgba(239,68,68,.12);
+    color: #f87171;
+}
+
+.stock-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.dot-ok  { background: #4ade80; }
+.dot-low { background: #f87171; }
+
+.actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.btn-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.07);
+    background: #1e2333;
+    color: #7e8796;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: .18s ease;
+    font-size: .92rem;
+}
+
+.btn-icon:hover { transform: translateY(-2px); }
+
+.btn-edit:hover {
+    color: #ffaa43;
+    border-color: #ffaa43;
+    background: rgba(255,170,67,.12);
+}
+
+.btn-delete:hover {
+    color: #f87171;
+    border-color: #f87171;
+    background: rgba(248,113,113,.12);
+}
+
+.pg-empty {
+    text-align: center;
+    padding: 4rem;
+    color: #5c6472;
+}
+
+.pg-count {
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    color: #6f7786;
+    font-size: .84rem;
+}
