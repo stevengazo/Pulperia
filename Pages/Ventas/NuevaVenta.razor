@@ -35,7 +35,7 @@
         </div>
 
         <div class="folio-badge">
-            Folio #@ventaId.ToString("D6")
+            Folio: pendiente
         </div>
 
     </div>
@@ -352,8 +352,6 @@
 
     private bool guardando = false;
 
-    private int ventaId = 0;
-
     private decimal Total =>
         carrito.Sum(i => i.PrecioUnitarioHistorico * i.Cantidad);
 
@@ -362,7 +360,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        db = DbFactory.CreateDbContext();
+        db = await DbFactory.CreateDbContextAsync();
 
         empleados = await empleadoService.GetAllAsync();
 
@@ -370,14 +368,10 @@
             .OrderBy(e => e.Nombre)
             .ToList();
 
-        productos = db.Producto
+        productos = await db.Producto
             .Where(p => p.StockActual > 0)
             .OrderBy(p => p.Nombre)
-            .ToList();
-
-        ventaId = db.Venta.Any()
-            ? db.Venta.Max(v => v.Id) + 1
-            : 1;
+            .ToListAsync();
     }
 
     void AgregarAlCarrito()
@@ -415,7 +409,7 @@
                 Producto = producto,
                 Cantidad = cantidad,
                 PrecioUnitarioHistorico = producto.PrecioVenta,
-                CostoUnitarioHistorico = producto.PrecioVenta
+                CostoUnitarioHistorico = producto.PrecioCosto
             });
         }
 
@@ -452,50 +446,76 @@
             return;
 
         guardando = true;
+        errorMsg = "";
 
-        var venta = new Pulperia.Models.Venta
+        try
         {
-            Fecha = DateTime.Now,
-            Total = Total,
-            MetodoPago = metodoPago,
-            MontoRecibido =
-                metodoPago == "Efectivo"
-                    ? pagoCon
-                    : Total,
-            Cambio = Cambio,
-            Notas = "",
-            Autor =
-                Session?.CurrentUser?.Email ?? "No indicado",
-            Pagado =
-                metodoPago != "Fiado",
-            ClienteId =
-                string.IsNullOrWhiteSpace(empleadoId)
-                    ? null
-                    : empleadoId
-        };
+            await using var tx = await db.Database.BeginTransactionAsync();
 
-        db.Venta.Add(venta);
-
-        await db.SaveChangesAsync();
-
-        foreach (var item in carrito)
-        {
-            item.VentaId = venta.Id;
-
-            db.DetalleVenta.Add(item);
-
-            var prod = db.Producto.Find(item.ProductoId);
-
-            if (prod != null)
+            var venta = new Pulperia.Models.Venta
             {
-                prod.StockActual -= item.Cantidad;
+                Fecha = DateTime.Now,
+                Total = Total,
+                MetodoPago = metodoPago,
+                MontoRecibido =
+                    metodoPago == "Efectivo"
+                        ? pagoCon
+                        : Total,
+                Cambio = Cambio,
+                Notas = "",
+                Autor =
+                    Session?.CurrentUser?.Email ?? "No indicado",
+                Pagado =
+                    metodoPago != "Fiado",
+                ClienteId =
+                    string.IsNullOrWhiteSpace(empleadoId)
+                        ? null
+                        : empleadoId
+            };
+
+            db.Venta.Add(venta);
+
+            await db.SaveChangesAsync();
+
+            foreach (var item in carrito)
+            {
+                item.VentaId = venta.Id;
+
+                db.DetalleVenta.Add(item);
+
+                // Descuento atómico de stock con guarda: solo afecta la fila
+                // si todavía hay existencias suficientes. Esto evita la
+                // condición de carrera entre ventas simultáneas.
+                var filas = await db.Producto
+                    .Where(p => p.Id == item.ProductoId
+                                && p.StockActual >= item.Cantidad)
+                    .ExecuteUpdateAsync(s => s.SetProperty(
+                        p => p.StockActual,
+                        p => p.StockActual - item.Cantidad));
+
+                if (filas == 0)
+                {
+                    errorMsg =
+                        $"Stock insuficiente para {item.Producto.Nombre}. " +
+                        "Otra venta pudo haber modificado el inventario; revisa el carrito.";
+
+                    await tx.RollbackAsync();
+                    return;
+                }
             }
+
+            await db.SaveChangesAsync();
+            await tx.CommitAsync();
+
+            Nav.NavigateTo("/ventas");
         }
-
-        await db.SaveChangesAsync();
-
-        guardando = false;
-
-        Nav.NavigateTo("/ventas");
+        catch (Exception)
+        {
+            errorMsg = "No se pudo procesar la venta. Intenta de nuevo.";
+        }
+        finally
+        {
+            guardando = false;
+        }
     }
 }

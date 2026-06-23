@@ -485,6 +485,9 @@ $RECYCLE.BIN/
 *.swp
 bin/*
 bin/
+
+# App configuration with secrets (use appsettings.Example.json as template)
 appsettings.json
 appsettings.Development.json
-appsettings.json
+appsettings.*.json
+!appsettings.Example.json
