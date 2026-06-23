@@ -2,6 +2,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject PulperiaDbContext db
 @inject NavigationManager Nav
+@inject LogService LogService
 
 <UserValidator>
   
@@ -179,8 +180,27 @@
         var p = await db.Producto.FindAsync(id);
         if (p is not null)
         {
+            var anterior = new
+            {
+                p.Id,
+                p.Nombre,
+                p.Presentacion,
+                p.PrecioCosto,
+                p.PrecioVenta,
+                p.StockActual,
+                p.StockMinimo,
+                p.CategoriaId
+            };
+
             db.Producto.Remove(p);
             await db.SaveChangesAsync();
+
+            await LogService.RegistrarAsync(
+                tabla: "Producto",
+                accion: "DELETE",
+                registroId: id.ToString(),
+                anterior: anterior);
+
             CargarDatos();
         }
     }

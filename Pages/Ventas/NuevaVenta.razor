@@ -5,6 +5,7 @@
 @inject AppSessionService Session
 @inject NavigationManager Nav
 @inject ILogger<NuevaVenta> Logger
+@inject LogService LogService
 
 @using Microsoft.EntityFrameworkCore
 
@@ -507,6 +508,29 @@
 
             await db.SaveChangesAsync();
             await tx.CommitAsync();
+
+            await LogService.RegistrarAsync(
+                tabla: "Venta",
+                accion: "INSERT",
+                registroId: venta.Id.ToString(),
+                nuevo: new
+                {
+                    venta.Id,
+                    venta.Total,
+                    venta.MetodoPago,
+                    venta.MontoRecibido,
+                    venta.Cambio,
+                    venta.Pagado,
+                    venta.ClienteId,
+                    Detalles = carrito.Select(d => new
+                    {
+                        d.ProductoId,
+                        NombreProducto = d.Producto?.Nombre,
+                        d.Cantidad,
+                        d.PrecioUnitarioHistorico,
+                        d.CostoUnitarioHistorico
+                    })
+                });
 
             Nav.NavigateTo("/ventas");
         }

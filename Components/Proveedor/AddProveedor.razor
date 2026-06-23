@@ -1,6 +1,7 @@
 @page   "/agregar-proveedor"
 @inject PulperiaDbContext db
 @inject ILogger<AddProveedor> Logger
+@inject LogService LogService
 @using Microsoft.EntityFrameworkCore
 
 <div class="card shadow-sm p-4" style="max-width: 500px;">
@@ -55,6 +56,12 @@
 
             // 2. IMPORTANTE: Confirmamos los cambios en la base de datos de forma asíncrona
             await db.SaveChangesAsync();
+
+            await LogService.RegistrarAsync(
+                tabla: "Proveedor",
+                accion: "INSERT",
+                registroId: proveedor.Id.ToString(),
+                nuevo: new { proveedor.Id, proveedor.Nombre, proveedor.Telefono, proveedor.Email });
 
             // 3. Limpiamos el formulario para un nuevo registro
             proveedor = new();
