@@ -487,3 +487,4 @@ bin/*
 bin/
 appsettings.json
 appsettings.Development.json
+appsettings.json
