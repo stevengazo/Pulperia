@@ -62,3 +62,88 @@ a, .btn-link {
     .blazor-error-boundary::after {
         content: "An error has occurred."
     }
+
+/* ===================================================================
+   Tema global y reset (movido desde el <style> inline de MainLayout).
+   Las variables viven aquí para estar disponibles en toda la app;
+   cada componente puede sobreescribirlas en su propio wrapper.
+   =================================================================== */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --bg: #090909;
+    --surface: #101014;
+    --surface-2: #141419;
+
+    --border: #1d1d25;
+
+    --text: #f4f4f5;
+    --muted: #8b8b99;
+
+    --accent: #ffaa43;
+    --accent-soft: rgba(255,170,67,.12);
+
+    --danger: #ff5c5c;
+
+    --sidebar-width: 255px;
+    --topbar-height: 62px;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, sans-serif;
+}
+
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #23232b;
+    border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #31313d;
+}
+
+/* Reglas de impresión del recibo (movido desde Venta-info; usan body, deben ser globales) */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    .receipt,
+    .receipt * {
+        visibility: visible;
+    }
+
+    .receipt {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border: none;
+        box-shadow: none;
+    }
+
+    .actions {
+        display: none;
+    }
+
+    body {
+        background: white;
+    }
+}

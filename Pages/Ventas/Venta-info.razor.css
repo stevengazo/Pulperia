@@ -1,0 +1,90 @@
+.page {
+    min-height: 100vh;
+    background: #0b0d11;
+    padding: 2rem;
+    font-family: system-ui, sans-serif;
+    color: #f5f7fa;
+}
+
+.actions {
+    max-width: 420px;
+    margin: auto;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-print {
+    background: #ffaa43;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 10px;
+    color: #111;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+/* RECEIPT */
+.receipt {
+    max-width: 420px;
+    margin: auto;
+    background: #11151b;
+    border: 1px solid #1b1f27;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .4);
+}
+
+.header {
+    text-align: center;
+    border-bottom: 1px dashed #2a2f3a;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+}
+
+.muted {
+    color: #707887;
+    font-size: .8rem;
+}
+
+.info {
+    margin-bottom: .8rem;
+    font-size: .85rem;
+}
+
+.line {
+    display: flex;
+    justify-content: space-between;
+    font-size: .9rem;
+    padding: .25rem 0;
+    gap: .5rem;
+}
+
+.item {
+    border-bottom: 1px dashed #2a2f3a;
+    padding-bottom: .5rem;
+    margin-bottom: .5rem;
+}
+
+.name {
+    font-weight: 600;
+}
+
+.total {
+    margin-top: 1rem;
+    border-top: 1px solid #2a2f3a;
+    padding-top: 1rem;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 800;
+    color: #ffaa43;
+    font-size: 1.05rem;
+}
+
+/* Las reglas @media print se movieron a wwwroot/css/site.css (dependen de body *, deben ser globales). */

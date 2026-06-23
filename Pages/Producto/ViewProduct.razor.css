@@ -1,0 +1,146 @@
+.view-container {
+    max-width: 800px;
+    margin: 0 auto;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.product-detail-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.detail-header {
+    padding: 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.category-tag {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.product-name {
+    font-size: 24px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.detail-body {
+    padding: 24px;
+}
+
+.info-section {
+    margin-bottom: 32px;
+}
+
+.info-section label,
+.info-item label {
+    font-size: 12px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-section p {
+    font-size: 16px;
+    color: var(--text);
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+}
+
+.value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.price {
+    color: #4ade80;
+}
+
+/* Verde suave para ventas */
+
+.btn-back {
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    font-size: 14px;
+    transition: color 0.2s;
+    cursor: pointer;
+    padding: 0;
+}
+
+.btn-back:hover {
+    color: var(--accent);
+}
+
+.btn-edit {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-edit:hover {
+    background: var(--accent);
+    transform: translateY(-1px);
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 100px;
+    color: var(--muted);
+}
+
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.text-danger {
+    color: #f87171 !important;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
