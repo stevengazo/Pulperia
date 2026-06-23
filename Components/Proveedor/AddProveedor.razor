@@ -1,5 +1,6 @@
 @page   "/agregar-proveedor"
 @inject PulperiaDbContext db
+@inject ILogger<AddProveedor> Logger
 @using Microsoft.EntityFrameworkCore
 
 <div class="card shadow-sm p-4" style="max-width: 500px;">
@@ -67,8 +68,7 @@
         }
         catch (Exception ex)
         {
-            // Aquí capturarías el error de "Invalid object name" si la tabla aún no existe
-            Console.WriteLine($"Error al guardar: {ex.Message}");
+            Logger.LogError(ex, "Error al guardar el proveedor.");
         }
     }
 }

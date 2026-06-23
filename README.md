@@ -395,9 +395,9 @@ dotnet publish -c Release -o ./publish
 - [x] Costo histórico correcto en líneas de venta
 - [x] Sesión persistente opcional («mantener sesión abierta»)
 - [x] Crear categoría desde el alta de producto
+- [x] Logging estructurado con `ILogger<T>`
 - [ ] Autorización por roles (`RolSystem` / `RolUser`)
 - [ ] Migrar páginas a `DbContextFactory` efímero
-- [ ] Logging estructurado con `ILogger<T>`
 - [ ] Secretos fuera del historial de git + rotación
 
 <br/>

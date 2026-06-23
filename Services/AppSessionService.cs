@@ -9,16 +9,21 @@ public class AppSessionService
 {
     private readonly Supabase.Client _supabase;
     private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<AppSessionService> _logger;
 
     private IJSRuntime JS => _serviceProvider.GetRequiredService<IJSRuntime>();
 
     private const string SessionKey = "pulperia_session";
     private static readonly TimeSpan SessionDuration = TimeSpan.FromDays(7);
 
-    public AppSessionService(Supabase.Client supabase, IServiceProvider serviceProvider)
+    public AppSessionService(
+        Supabase.Client supabase,
+        IServiceProvider serviceProvider,
+        ILogger<AppSessionService> logger)
     {
         _supabase = supabase;
         _serviceProvider = serviceProvider;
+        _logger = logger;
     }
 
     public User? CurrentUser { get; private set; }
@@ -116,9 +121,10 @@ public class AppSessionService
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
             // sesión inválida o storage no disponible
+            _logger.LogWarning(ex, "No se pudo restaurar la sesión guardada; se continuará sin sesión.");
         }
         finally
         {

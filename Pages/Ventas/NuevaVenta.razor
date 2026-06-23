@@ -4,6 +4,7 @@
 @inject EmpleadoService empleadoService
 @inject AppSessionService Session
 @inject NavigationManager Nav
+@inject ILogger<NuevaVenta> Logger
 
 @using Microsoft.EntityFrameworkCore
 
@@ -509,9 +510,10 @@
 
             Nav.NavigateTo("/ventas");
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             errorMsg = "No se pudo procesar la venta. Intenta de nuevo.";
+            Logger.LogError(ex, "Error al procesar la venta (Total {Total}, método {MetodoPago}).", Total, metodoPago);
         }
         finally
         {

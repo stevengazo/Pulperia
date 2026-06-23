@@ -110,7 +110,35 @@ dotnet ef database update
 
 ---
 
-## 6. Publicación
+## 6. Logging (Serilog)
+
+El logging usa **Serilog** (configurado en [`Program.cs`](../Program.cs)) con dos destinos:
+
+| Destino | Detalle |
+|---------|---------|
+| 🖥️ **Consola** | Salida en la terminal durante la ejecución. |
+| 📄 **Archivo** | `logs/pulperia-YYYYMMDD.log`, **rotación diaria**, se conservan los últimos **30** días. |
+
+- La carpeta `logs/` está **ignorada por git**.
+- Los niveles mínimos se definen en código: `Information` global, `Warning` para `Microsoft*`. Puedes sobreescribirlos añadiendo una sección `"Serilog"` en `appsettings.json` (se lee con `ReadFrom.Configuration`). Ejemplo:
+
+```json
+{
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": { "Microsoft": "Warning", "System": "Warning" }
+    }
+  }
+}
+```
+
+- Cada petición HTTP se resume en una línea vía `UseSerilogRequestLogging()`.
+- En el código, inyecta `ILogger<T>` y usa logging estructurado: `Logger.LogError(ex, "... {VentaId}", id)`.
+
+---
+
+## 7. Publicación
 
 ```bash
 # Framework-dependent

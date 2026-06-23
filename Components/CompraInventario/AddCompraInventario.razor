@@ -1,4 +1,5 @@
 @inject PulperiaDbContext db
+@inject ILogger<AddCompraInventario> Logger
 @using Microsoft.EntityFrameworkCore
 
 @if (isVisible)
@@ -378,7 +379,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            Logger.LogError(ex, "Error al guardar la compra de inventario.");
         }
     }
 

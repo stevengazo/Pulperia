@@ -1,4 +1,5 @@
 @inject IJSRuntime JS
+@inject ILogger<GenerarTicket> Logger
 
 <button class="btn-pdf" @onclick="() => ExportarPdf(Venta,Empleado)">
     <i class="fa-solid fa-file-pdf"></i>
@@ -30,7 +31,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error generando PDF: {ex.Message}");
+            Logger.LogError(ex, "Error generando el PDF de la venta {VentaId}.", venta?.Id);
         }
     }
 }

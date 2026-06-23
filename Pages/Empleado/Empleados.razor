@@ -1,6 +1,7 @@
 @page "/empleados"
 
 @inject EmpleadoService emp
+@inject ILogger<Empleados> Logger
 
 
 <UserValidator>
@@ -159,7 +160,7 @@
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
+            Logger.LogError(e, "Error al cargar la lista de empleados.");
         }
     }
 }
