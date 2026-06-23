@@ -52,14 +52,49 @@
 
                     <div class="pm-field">
                         <label>Categoría</label>
-                        <InputSelect class="form-control" @bind-Value="producto.CategoriaId">
-                            <option value="">— Seleccione —</option>
-                            @foreach (var i in Categorias)
+
+                        @if (!creandoCategoria)
+                        {
+                            <div class="pm-inline">
+                                <InputSelect class="form-control" @bind-Value="producto.CategoriaId">
+                                    <option value="">— Seleccione —</option>
+                                    @foreach (var i in Categorias)
+                                    {
+                                        <option value="@i.Id">@i.Nombre</option>
+                                    }
+                                </InputSelect>
+                                <button type="button" class="pm-icon-btn"
+                                        title="Crear nueva categoría"
+                                        @onclick="IniciarCreacionCategoria">
+                                    +
+                                </button>
+                            </div>
+                            <ValidationMessage For="@(() => producto.CategoriaId)" class="pm-validation" />
+                        }
+                        else
+                        {
+                            <div class="pm-inline">
+                                <input class="form-control"
+                                       placeholder="Nombre de la nueva categoría"
+                                       @bind="nuevaCategoria"
+                                       @bind:event="oninput" />
+                                <button type="button" class="pm-icon-btn pm-icon-ok"
+                                        title="Guardar categoría"
+                                        disabled="@(guardandoCategoria || string.IsNullOrWhiteSpace(nuevaCategoria))"
+                                        @onclick="CrearCategoria">
+                                    ✓
+                                </button>
+                                <button type="button" class="pm-icon-btn"
+                                        title="Cancelar"
+                                        @onclick="CancelarCreacionCategoria">
+                                    ✕
+                                </button>
+                            </div>
+                            @if (!string.IsNullOrEmpty(categoriaError))
                             {
-                                <option value="@i.Id">@i.Nombre</option>
+                                <span class="pm-validation">@categoriaError</span>
                             }
-                        </InputSelect>
-                        <ValidationMessage For="@(() => producto.CategoriaId)" class="pm-validation" />
+                        }
                     </div>
 
                 </div>
@@ -87,9 +122,77 @@
     private bool isSaving = false;
     private List<Categoria> Categorias = new();
 
+    // Creación inline de categoría
+    private bool creandoCategoria = false;
+    private string nuevaCategoria = "";
+    private string? categoriaError;
+    private bool guardandoCategoria = false;
+
     protected override async Task OnInitializedAsync()
     {
-        Categorias = await db.Categoria.AsNoTracking().ToListAsync();
+        await CargarCategorias();
+    }
+
+    private async Task CargarCategorias()
+    {
+        Categorias = await db.Categoria
+            .AsNoTracking()
+            .OrderBy(c => c.Nombre)
+            .ToListAsync();
+    }
+
+    private void IniciarCreacionCategoria()
+    {
+        creandoCategoria = true;
+        nuevaCategoria = "";
+        categoriaError = null;
+    }
+
+    private void CancelarCreacionCategoria()
+    {
+        creandoCategoria = false;
+        nuevaCategoria = "";
+        categoriaError = null;
+    }
+
+    private async Task CrearCategoria()
+    {
+        if (guardandoCategoria) return;
+
+        var nombre = nuevaCategoria?.Trim() ?? "";
+
+        if (string.IsNullOrWhiteSpace(nombre))
+        {
+            categoriaError = "Ingrese un nombre.";
+            return;
+        }
+
+        if (Categorias.Any(c =>
+                string.Equals(c.Nombre, nombre, StringComparison.OrdinalIgnoreCase)))
+        {
+            categoriaError = "Esa categoría ya existe.";
+            return;
+        }
+
+        guardandoCategoria = true;
+
+        try
+        {
+            var categoria = new Categoria { Nombre = nombre };
+            db.Categoria.Add(categoria);
+            await db.SaveChangesAsync();
+
+            await CargarCategorias();
+            producto.CategoriaId = categoria.Id;
+
+            creandoCategoria = false;
+            nuevaCategoria = "";
+            categoriaError = null;
+        }
+        finally
+        {
+            guardandoCategoria = false;
+        }
     }
 
     public void Show()
@@ -102,6 +205,7 @@
     {
         isVisible = false;
         producto = new Producto();
+        CancelarCreacionCategoria();
     }
 
     private async Task Guardar()

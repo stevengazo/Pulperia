@@ -1,82 +1,196 @@
 <div align="center">
 
+<img src="https://img.shields.io/badge/%F0%9F%8F%AA-PULPER%C3%8DA-7C6BFF?style=for-the-badge&labelColor=0e0e10&color=7C6BFF" alt="Pulpería" height="42" />
+
 # 🏪 Pulpería
 
-### Sistema de Punto de Venta e Inventario
+#### Sistema de Punto de Venta e Inventario para tu tienda de barrio
 
-Gestión integral para una pulpería (tienda de abarrotes): productos, inventario, compras, ventas, empleados y auditoría — todo en una aplicación **Blazor Server** sobre **.NET 8**.
+*Productos · Inventario · Compras · Ventas · Empleados · Auditoría* — todo en una app **Blazor Server** sobre **.NET 8**.
 
 <br/>
 
+<!-- Badges de estado -->
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![Blazor](https://img.shields.io/badge/Blazor-Server-512BD4?style=for-the-badge&logo=blazor&logoColor=white)
 ![EF Core](https://img.shields.io/badge/EF%20Core-8-512BD4?style=for-the-badge)
-![SQL Server](https://img.shields.io/badge/SQL%20Server-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+![License](https://img.shields.io/badge/License-MIT-3ECF8E?style=for-the-badge)
+![PRs](https://img.shields.io/badge/PRs-welcome-7C6BFF?style=for-the-badge)
+
+<br/>
+
+<!-- Stack visual en fila -->
+<img src="https://skillicons.dev/icons?i=dotnet,cs,blazor,sqlserver,supabase,bootstrap,git,vscode&theme=dark" alt="Tech stack" />
+
+<br/><br/>
+
+[**🚀 Inicio rápido**](#-inicio-rápido) &nbsp;·&nbsp; [**🏗️ Arquitectura**](#-arquitectura) &nbsp;·&nbsp; [**📚 Documentación**](#-documentación) &nbsp;·&nbsp; [**🗺️ Roadmap**](#-roadmap)
 
 </div>
 
----
+<br/>
 
-## 📑 Tabla de contenidos
+<div align="center">
 
-- [Descripción](#-descripción)
-- [Características](#-características)
-- [Stack tecnológico](#-stack-tecnológico)
-- [Arquitectura](#-arquitectura)
-- [Inicio rápido](#-inicio-rápido)
-- [Configuración](#-configuración)
-- [Estructura del proyecto](#-estructura-del-proyecto)
-- [Comandos útiles](#-comandos-útiles)
-- [Documentación](#-documentación)
-- [Licencia](#-licencia)
+`█████████████████████████████████████████████████████████`
 
----
+</div>
 
-## 📖 Descripción
+<br/>
 
-**Pulpería** es un sistema administrativo para el día a día de una tienda de barrio. Combina dos orígenes de datos:
+## 📖 ¿Qué es?
 
-- 🗄️ **SQL Server** (vía Entity Framework Core) para los datos transaccionales: productos, categorías, proveedores, inventario, compras, ventas y auditoría.
-- ☁️ **Supabase** (Auth + Postgrest) para la **autenticación** de usuarios y la gestión de **empleados**.
+> **Pulpería** es un sistema administrativo para el día a día de una tienda de abarrotes. Caja rápida, control de inventario en tiempo real, tickets en PDF y auditoría de cada movimiento.
 
-La interfaz es 100 % **Blazor Server**, con una experiencia de caja moderna, generación de **tickets en PDF** y **exportación a Excel**.
+Combina **dos orígenes de datos** según su naturaleza:
 
----
+<table>
+<tr>
+<td width="50%" valign="top">
+
+### 🗄️ SQL Server
+*vía Entity Framework Core*
+
+Datos **transaccionales**: productos, categorías, proveedores, inventario, compras, ventas y logs de auditoría.
+
+</td>
+<td width="50%" valign="top">
+
+### ☁️ Supabase
+*Auth + Postgrest*
+
+**Autenticación** de usuarios y gestión de **empleados** en la nube.
+
+</td>
+</tr>
+</table>
+
+<br/>
 
 ## ✨ Características
 
-| Módulo | Descripción |
-|--------|-------------|
-| 📊 **Dashboard** | Estadísticas generales de la pulpería en la página principal. |
-| 🛒 **Ventas** | Caja con carrito, métodos de pago (Efectivo, SINPE, Tarjeta, Fiado), cálculo de cambio y descuento de stock **atómico y transaccional**. |
-| 📦 **Productos** | Alta, edición, detalle y control de stock (actual / mínimo) con validaciones. |
-| 🏷️ **Categorías y Proveedores** | Catálogos base para clasificar productos y registrar compras. |
-| 📥 **Inventario y Compras** | Registro de compras a proveedores con detalle por producto. |
-| 🧾 **Tickets PDF** | Generación de recibos térmicos (58 mm) con QuestPDF. |
-| 📑 **Exportación Excel** | Reportes vía ClosedXML. |
-| 👥 **Empleados** | Gestión a través de Supabase. |
-| 🔐 **Autenticación** | Login con Supabase Auth y sesión persistente opcional («mantener la sesión abierta»). |
-| 📝 **Auditoría** | Registro de cambios (`LogCambio`) sobre las operaciones del sistema. |
+<table>
+<tr>
+<td width="33%" valign="top">
 
----
+### 📊 Dashboard
+Estadísticas generales de la pulpería de un vistazo.
+
+</td>
+<td width="33%" valign="top">
+
+### 🛒 Ventas
+Caja con carrito, 4 métodos de pago y descuento de stock **atómico y transaccional**.
+
+</td>
+<td width="33%" valign="top">
+
+### 📦 Productos
+Alta, edición, detalle y control de stock (actual / mínimo) con validaciones.
+
+</td>
+</tr>
+<tr>
+<td width="33%" valign="top">
+
+### 🏷️ Catálogos
+Categorías y proveedores. Crea categorías **al vuelo** desde el alta de producto.
+
+</td>
+<td width="33%" valign="top">
+
+### 📥 Inventario
+Compras a proveedores con detalle por producto y costo histórico.
+
+</td>
+<td width="33%" valign="top">
+
+### 🧾 Tickets PDF
+Recibos térmicos (58 mm) generados con QuestPDF.
+
+</td>
+</tr>
+<tr>
+<td width="33%" valign="top">
+
+### 📑 Excel
+Exportación de reportes vía ClosedXML.
+
+</td>
+<td width="33%" valign="top">
+
+### 🔐 Autenticación
+Login con Supabase Auth y sesión persistente opcional.
+
+</td>
+<td width="33%" valign="top">
+
+### 📝 Auditoría
+Registro de cambios (`LogCambio`) en cada operación.
+
+</td>
+</tr>
+</table>
+
+<br/>
+
+## 🖼️ Vista previa
+
+> 📸 *Capturas de pantalla — añade tus imágenes en `docs/assets/` y enlázalas aquí.*
+
+<table>
+<tr>
+<td width="50%" align="center">
+
+**🔐 Login**
+
+<sub>`docs/assets/login.png`</sub>
+
+</td>
+<td width="50%" align="center">
+
+**📊 Dashboard**
+
+<sub>`docs/assets/dashboard.png`</sub>
+
+</td>
+</tr>
+<tr>
+<td width="50%" align="center">
+
+**🛒 Nueva venta**
+
+<sub>`docs/assets/venta.png`</sub>
+
+</td>
+<td width="50%" align="center">
+
+**📦 Productos**
+
+<sub>`docs/assets/productos.png`</sub>
+
+</td>
+</tr>
+</table>
+
+<br/>
 
 ## 🧰 Stack tecnológico
 
-| Área | Tecnología |
-|------|------------|
-| Framework | .NET 8 (`net8.0`) |
-| UI | Blazor Server (Razor Components) |
-| ORM | Entity Framework Core 8 |
-| Base de datos | SQL Server |
-| Auth / Empleados | Supabase (Auth + Postgrest) |
-| PDF | QuestPDF 2026.5.0 |
-| Excel | ClosedXML 0.105.0 |
-| Iconos | Bootstrap Icons + Font Awesome |
+| | Tecnología | Versión |
+|:--:|:--|:--|
+| <img src="https://skillicons.dev/icons?i=dotnet" width="28"/> | **.NET** | 8.0 (`net8.0`) |
+| <img src="https://skillicons.dev/icons?i=blazor" width="28"/> | **Blazor Server** | Razor Components |
+| <img src="https://skillicons.dev/icons?i=cs" width="28"/> | **Entity Framework Core** | 8.0.11 |
+| <img src="https://skillicons.dev/icons?i=sqlserver" width="28"/> | **SQL Server** | — |
+| <img src="https://skillicons.dev/icons?i=supabase" width="28"/> | **Supabase** | 1.1.1 (Auth + Postgrest) |
+| 📄 | **QuestPDF** | 2026.5.0 |
+| 📊 | **ClosedXML** | 0.105.0 |
 
 <details>
-<summary><b>Paquetes NuGet principales</b></summary>
+<summary><b>📦 Ver todos los paquetes NuGet</b></summary>
+
+<br/>
 
 ```
 Microsoft.EntityFrameworkCore           8.0.11
@@ -90,7 +204,7 @@ ClosedXML                               0.105.0
 ```
 </details>
 
----
+<br/>
 
 ## 🏗️ Arquitectura
 
@@ -122,141 +236,184 @@ flowchart TD
     UI -.->|sesión JWT| LS
 ```
 
-> Detalle completo en [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) y el modelo de datos en [`docs/DATA-MODEL.md`](docs/DATA-MODEL.md).
+<div align="center">
 
----
+📐 Detalle completo en [**`docs/ARCHITECTURE.md`**](docs/ARCHITECTURE.md) · Modelo de datos en [**`docs/DATA-MODEL.md`**](docs/DATA-MODEL.md)
+
+</div>
+
+<br/>
 
 ## 🚀 Inicio rápido
 
-### Requisitos previos
-
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- **SQL Server** accesible (local o remoto)
-- Un proyecto de [**Supabase**](https://supabase.com/) (para autenticación y empleados)
-- Opcional: Visual Studio 2022 (17.8+) o VS Code
-
-### Pasos
+> **Requisitos:** [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) · **SQL Server** accesible · un proyecto de [**Supabase**](https://supabase.com/) · *(opcional)* Visual Studio 2022 (17.8+) o VS Code
 
 ```bash
-# 1. Clonar
-git clone <url-del-repositorio>
-cd Pulperia
+# 1️⃣  Clonar
+git clone <url-del-repositorio> && cd Pulperia
 
-# 2. Restaurar dependencias
+# 2️⃣  Restaurar dependencias
 dotnet restore
 
-# 3. Crear tu configuración local a partir de la plantilla
-cp appsettings.Example.json appsettings.json   # (queda fuera de git)
+# 3️⃣  Crear tu configuración local desde la plantilla (queda fuera de git)
+cp appsettings.Example.json appsettings.json
 
-#    …y/o cargar los secretos con User Secrets (recomendado)
+#     …o cargar los secretos con User Secrets (recomendado)
 dotnet user-secrets init
 dotnet user-secrets set "ConnectionStrings:DefaultConnection" "Server=...;Database=Pulperia;..."
 dotnet user-secrets set "Supabase:Url"     "https://TU_PROYECTO.supabase.co"
 dotnet user-secrets set "Supabase:AnonKey" "TU_ANON_KEY"
 
-# 4. Crear / migrar la base de datos
-dotnet ef database update      # o se crea automáticamente al arrancar
+# 4️⃣  Crear / migrar la base de datos (o se crea sola al arrancar)
+dotnet ef database update
 
-# 5. Ejecutar
+# 5️⃣  ¡Ejecutar!
 dotnet run
 ```
 
-La app queda disponible en:
+<div align="center">
 
-- 🔒 https://localhost:7164
-- 🌐 http://localhost:5221
+| | URL |
+|:--|:--|
+| 🔒 HTTPS | https://localhost:7164 |
+| 🌐 HTTP | http://localhost:5221 |
 
-> La primera pantalla es el **login** (`/login`). Necesitas un usuario válido en Supabase Auth.
+</div>
 
----
+> 💡 La primera pantalla es el **login** (`/login`). Necesitas un usuario válido en Supabase Auth.
+
+<br/>
 
 ## ⚙️ Configuración
 
-La configuración vive en [`appsettings.json`](appsettings.json), pero **las credenciales no deben versionarse**: usa [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets) en desarrollo y variables de entorno en producción.
+Las credenciales **no se versionan**: usa [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets) en desarrollo y variables de entorno en producción. La plantilla [`appsettings.Example.json`](appsettings.Example.json) muestra la forma esperada.
 
-| Clave | Descripción |
-|-------|-------------|
+| 🔑 Clave | Descripción |
+|:--|:--|
 | `ConnectionStrings:DefaultConnection` | Cadena de conexión a SQL Server. |
 | `Supabase:Url` | URL del proyecto de Supabase. |
-| `Supabase:AnonKey` | Clave pública/anónima de Supabase. |
+| `Supabase:AnonKey` | Clave pública / anónima de Supabase. |
 
-> Las variables de entorno usan `__` como separador de sección: `ConnectionStrings__DefaultConnection`, `Supabase__Url`.
+> 🌱 Variables de entorno usan `__` como separador: `ConnectionStrings__DefaultConnection`, `Supabase__Url`.
 
-📄 Guía completa: [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md).
+📄 Guía completa en [**`docs/CONFIGURATION.md`**](docs/CONFIGURATION.md).
 
----
+<br/>
 
 ## 📁 Estructura del proyecto
 
 ```
 Pulperia/
-├── App.razor                # Componente raíz Blazor
-├── Program.cs               # Entrada, DI y middleware
-├── _Imports.razor           # Usings globales
-├── appsettings.json         # Configuración (sin secretos en repo)
+├── 📄 Program.cs            ·  Entrada, DI y middleware
+├── 🧩 App.razor             ·  Componente raíz Blazor
 │
-├── Components/              # Componentes reutilizables
-│   ├── Categories/ · CompraInventario/ · Products/
-│   ├── Proveedor/ · Shared/ (DateRangePicker)
-│   ├── Users/ (UserList) · Venta/ (GenerarTicket)
+├── 📂 Components/           ·  Componentes reutilizables
+│   └── Categories · Products · Proveedor · Venta · Users · Shared
 │
-├── Pages/                  # Páginas enrutables (@page)
-│   ├── Auth/               #   LoginPage, UserValidator
-│   ├── Producto/           #   Products, EditProduct, ViewProduct
-│   ├── Ventas/             #   Ventas, NuevaVenta, Editar-Venta, Venta-info
-│   ├── Inventario/ · Empleado/ · Settings/ · logs/
-│   └── Index.razor         #   Dashboard
+├── 📂 Pages/                ·  Páginas enrutables (@page)
+│   ├── Auth      → LoginPage, UserValidator
+│   ├── Producto  → Products, EditProduct, ViewProduct
+│   ├── Ventas    → Ventas, NuevaVenta, Editar-Venta, Venta-info
+│   ├── Inventario · Empleado · Settings · logs
+│   └── Index.razor (Dashboard)
 │
-├── Services/               # Lógica de negocio
-│   ├── AppSessionService.cs    #   Sesión y auth (Supabase)
-│   ├── EmpleadoService.cs      #   Empleados (Supabase)
-│   ├── LogService.cs           #   Auditoría de cambios
-│   └── VentaPdfGenerator.cs    #   Tickets PDF (QuestPDF)
+├── 📂 Services/             ·  Lógica de negocio
+│   ├── AppSessionService   → Sesión y auth (Supabase)
+│   ├── EmpleadoService     → Empleados (Supabase)
+│   ├── LogService          → Auditoría de cambios
+│   └── VentaPdfGenerator   → Tickets PDF (QuestPDF)
 │
-├── Data/                   # PulperiaDbContext (EF Core)
-├── models/                 # Modelos de dominio
-├── Migrations/             # Migraciones EF Core
-├── Shared/                 # MainLayout, NavMenu
-├── Properties/             # launchSettings.json
-└── wwwroot/                # CSS, JS, iconos
+├── 📂 Data/                 ·  PulperiaDbContext (EF Core)
+├── 📂 models/               ·  Modelos de dominio
+├── 📂 Migrations/           ·  Migraciones EF Core
+├── 📂 Shared/               ·  MainLayout, NavMenu
+└── 📂 wwwroot/              ·  CSS, JS, iconos
 ```
 
----
+<br/>
 
 ## 🛠️ Comandos útiles
 
-```bash
-dotnet restore                          # Restaurar paquetes
-dotnet build                            # Compilar
-dotnet run                              # Ejecutar
-dotnet watch run                        # Ejecutar con hot reload
-dotnet publish -c Release -o ./publish  # Publicar para producción
+<table>
+<tr>
+<td valign="top" width="50%">
 
-# Entity Framework Core
-dotnet ef migrations add NombreMigracion   # Nueva migración
-dotnet ef database update                  # Aplicar migraciones
+**🏃 Ejecución**
+```bash
+dotnet restore      # Restaurar
+dotnet build        # Compilar
+dotnet run          # Ejecutar
+dotnet watch run    # Hot reload
 ```
 
----
+</td>
+<td valign="top" width="50%">
+
+**🗃️ Base de datos (EF Core)**
+```bash
+dotnet ef migrations add Nombre
+dotnet ef database update
+dotnet publish -c Release -o ./publish
+```
+
+</td>
+</tr>
+</table>
+
+<br/>
 
 ## 📚 Documentación
 
-| Documento | Contenido |
-|-----------|-----------|
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Arquitectura, capas, ciclo de vida de servicios y flujo de una venta. |
-| [`docs/DATA-MODEL.md`](docs/DATA-MODEL.md) | Modelo de datos, diagrama ER y descripción de cada entidad. |
-| [`docs/CONFIGURATION.md`](docs/CONFIGURATION.md) | Configuración, secretos y despliegue. |
-| [`docs/DEVELOPMENT.md`](docs/DEVELOPMENT.md) | Guía de desarrollo, convenciones y EF Core. |
-| [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) | Cómo contribuir y flujo de ramas. |
+<table>
+<tr>
+<td width="20%" align="center">🏗️</td>
+<td><a href="docs/ARCHITECTURE.md"><b>ARCHITECTURE</b></a><br/><sub>Arquitectura, capas, servicios y flujo de una venta.</sub></td>
+</tr>
+<tr>
+<td align="center">🗂️</td>
+<td><a href="docs/DATA-MODEL.md"><b>DATA-MODEL</b></a><br/><sub>Modelo de datos, diagrama ER y descripción de entidades.</sub></td>
+</tr>
+<tr>
+<td align="center">⚙️</td>
+<td><a href="docs/CONFIGURATION.md"><b>CONFIGURATION</b></a><br/><sub>Configuración, secretos y despliegue.</sub></td>
+</tr>
+<tr>
+<td align="center">👩‍💻</td>
+<td><a href="docs/DEVELOPMENT.md"><b>DEVELOPMENT</b></a><br/><sub>Guía de desarrollo, convenciones y EF Core.</sub></td>
+</tr>
+<tr>
+<td align="center">🤝</td>
+<td><a href="docs/CONTRIBUTING.md"><b>CONTRIBUTING</b></a><br/><sub>Cómo contribuir y flujo de ramas.</sub></td>
+</tr>
+</table>
 
----
+<br/>
+
+## 🗺️ Roadmap
+
+- [x] Venta transaccional con descuento de stock atómico
+- [x] Costo histórico correcto en líneas de venta
+- [x] Sesión persistente opcional («mantener sesión abierta»)
+- [x] Crear categoría desde el alta de producto
+- [ ] Autorización por roles (`RolSystem` / `RolUser`)
+- [ ] Migrar páginas a `DbContextFactory` efímero
+- [ ] Logging estructurado con `ILogger<T>`
+- [ ] Secretos fuera del historial de git + rotación
+
+<br/>
+
+<div align="center">
+
+`█████████████████████████████████████████████████████████`
 
 ## 📄 Licencia
 
-Distribuido bajo licencia **MIT**. Consulta [LICENSE](LICENSE).
+Distribuido bajo licencia **MIT** · [LICENSE](LICENSE)
 
 Copyright © 2026 **Steven Fabricio Gazo Maliaño**
 
-<div align="center">
-<sub>Hecho con ❤️ y .NET</sub>
+<br/>
+
+<sub>Hecho con ❤️ y <b>.NET</b> · si te sirve, deja una ⭐</sub>
+
 </div>
