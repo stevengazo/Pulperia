@@ -2,18 +2,22 @@ services:
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: pulpepos-db
+    ports:
+      - "11433:1433"
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: ${SA_PASSWORD}
       MSSQL_PID: Express
     volumes:
-      - mssql-data:/var/opt/mssql
+      - ./mssql-data:/var/opt/mssql
     healthcheck:
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q \"SELECT 1\" -b -o /dev/null"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
     restart: unless-stopped
 
   app:
@@ -32,8 +36,17 @@ services:
       - "${APP_PORT:-8080}:8080"
     volumes:
       - app-logs:/app/logs
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     restart: unless-stopped
 
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --label-enable --interval 300
+
 volumes:
-  mssql-data:
   app-logs:
