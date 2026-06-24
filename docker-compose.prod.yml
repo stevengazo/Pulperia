@@ -1,13 +1,11 @@
 services:
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: pulperia-db
+    container_name: pulpepos-db
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: ${SA_PASSWORD}
       MSSQL_PID: Express
-    ports:
-      - "1433:1433"
     volumes:
       - mssql-data:/var/opt/mssql
     healthcheck:
@@ -19,11 +17,8 @@ services:
     restart: unless-stopped
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: pulpepos:local
-    container_name: pulperia-app
+    image: ${IMAGE:-stevengazo/pulpepos:latest}
+    container_name: pulpepos-app
     depends_on:
       db:
         condition: service_healthy
@@ -34,7 +29,7 @@ services:
       Supabase__Url: ${SUPABASE_URL}
       Supabase__AnonKey: ${SUPABASE_ANONKEY}
     ports:
-      - "8080:8080"
+      - "${APP_PORT:-8080}:8080"
     volumes:
       - app-logs:/app/logs
     restart: unless-stopped

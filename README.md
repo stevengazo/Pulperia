@@ -286,7 +286,29 @@ dotnet run
 
 ## 🐳 Docker
 
-La forma más rápida de levantar **toda la pila** (app + SQL Server) es con Docker Compose.
+### ⚡ Instalación en un comando
+
+En un servidor Linux limpio (instala Docker si falta, descarga el compose, genera credenciales y levanta todo):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/stevengazo/Pulperia/main/setup.sh | sh
+```
+
+El script [`setup.sh`](setup.sh) te pedirá la **URL y Anon Key de Supabase**, genera una contraseña segura para SQL Server y deja la app en `http://localhost:8080`. Variables opcionales: `IMAGE`, `INSTALL_DIR`, `APP_PORT`, `BRANCH`.
+
+```bash
+# Ejemplo: imagen y puerto personalizados
+IMAGE=miusuario/pulpepos:latest APP_PORT=9000 \
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/stevengazo/Pulperia/main/setup.sh)"
+```
+
+> Usa [`docker-compose.prod.yml`](docker-compose.prod.yml), que **descarga la imagen ya publicada** en Docker Hub (no compila en el servidor).
+
+<br/>
+
+### 🛠️ Desarrollo local (build desde el código)
+
+La forma más rápida de levantar **toda la pila** (app + SQL Server) compilando localmente es con Docker Compose.
 
 > **Requisitos:** [Docker](https://docs.docker.com/get-docker/) + Docker Compose · credenciales de Supabase.
 
@@ -312,26 +334,31 @@ La app queda en **http://localhost:8080** y SQL Server expone el puerto **1433**
 
 ```bash
 # Construir la imagen
-docker build -t pulperia:local .
+docker build -t pulpepos:local .
 
 # Ejecutar apuntando a un SQL Server existente
 docker run -d -p 8080:8080 \
   -e ConnectionStrings__DefaultConnection="Server=...;Database=Pulperia;User Id=...;Password=...;TrustServerCertificate=True;" \
   -e Supabase__Url="https://TU_PROYECTO.supabase.co" \
   -e Supabase__AnonKey="TU_ANON_KEY" \
-  --name pulperia pulperia:local
+  --name pulpepos pulpepos:local
 ```
 </details>
 
 <details>
-<summary><b>📦 Imagen publicada en GHCR (CI)</b></summary>
+<summary><b>📦 Imagen publicada en Docker Hub (CI)</b></summary>
 
 <br/>
 
-El workflow [`.github/workflows/docker.yml`](.github/workflows/docker.yml) construye y publica la imagen en **GitHub Container Registry** en cada push a `main` y en tags `v*.*.*`:
+El workflow [`.github/workflows/docker.yml`](.github/workflows/docker.yml) construye y publica la imagen en **Docker Hub** en cada push a `main` y en tags `v*.*.*`. Requiere dos secretos en el repo (*Settings → Secrets and variables → Actions*):
+
+| Secret | Valor |
+|:--|:--|
+| `DOCKERHUB_USERNAME` | Tu usuario de Docker Hub |
+| `DOCKERHUB_TOKEN` | Un *Access Token* de Docker Hub (Account Settings → Security) |
 
 ```bash
-docker pull ghcr.io/<usuario>/pulperia:latest
+docker pull <usuario>/pulpepos:latest
 ```
 </details>
 
@@ -384,10 +411,12 @@ Pulperia/
 ├── 📂 Shared/               ·  MainLayout, NavMenu
 ├── 📂 wwwroot/              ·  CSS, JS, iconos
 │
-├── 🐳 Dockerfile           ·  Build multi-etapa (SDK → runtime)
-├── 🐳 docker-compose.yml   ·  Stack local (app + SQL Server)
-├── 🔒 .env.example         ·  Plantilla de secretos para Compose
-└── 📂 .github/workflows/   ·  CI: build.yml · docker.yml (GHCR)
+├── 🐳 Dockerfile               ·  Build multi-etapa (SDK → runtime)
+├── 🐳 docker-compose.yml       ·  Stack local (build desde el código)
+├── 🐳 docker-compose.prod.yml  ·  Stack con imagen de Docker Hub
+├── ⚡ setup.sh                 ·  Instalador de una línea (curl | sh)
+├── 🔒 .env.example             ·  Plantilla de secretos para Compose
+└── 📂 .github/workflows/       ·  CI: build.yml · docker.yml (Docker Hub)
 ```
 
 <br/>
