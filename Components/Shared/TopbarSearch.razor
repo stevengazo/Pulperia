@@ -1,0 +1,181 @@
+@* Búsqueda global: empleados, número de venta y productos *@
+
+@inject IDbContextFactory<PulperiaDbContext> DbFactory
+@inject EmpleadoService EmpleadoService
+@inject NavigationManager Nav
+
+@if (open && !string.IsNullOrWhiteSpace(query))
+{
+    <div class="gsearch-backdrop" @onclick="Close"></div>
+}
+
+<div class="gsearch">
+
+    <div class="gsearch-box">
+        <i class="fa-solid fa-magnifying-glass gsearch-icon"></i>
+        <input type="text"
+               class="gsearch-input"
+               placeholder="Buscar empleado, # de venta o producto..."
+               value="@query"
+               @oninput="OnInput" />
+        @if (!string.IsNullOrEmpty(query))
+        {
+            <button class="gsearch-clear" @onclick="Clear" tabindex="-1">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        }
+    </div>
+
+    @if (open && !string.IsNullOrWhiteSpace(query))
+    {
+        <div class="gsearch-results">
+
+            @if (buscando)
+            {
+                <div class="gsearch-empty">Buscando…</div>
+            }
+            else if (!ventas.Any() && !empleados.Any() && !productos.Any())
+            {
+                <div class="gsearch-empty">Sin resultados para "@query"</div>
+            }
+            else
+            {
+                @if (ventas.Any())
+                {
+                    <div class="gsearch-group">Ventas</div>
+                    @foreach (var v in ventas)
+                    {
+                        <button class="gsearch-item" @onclick='() => Go($"/venta/{v.Id}")'>
+                            <span class="gsearch-item-icon icon-orange"><i class="fa-solid fa-receipt"></i></span>
+                            <span class="gsearch-item-main">
+                                <span class="gsearch-item-title">Venta #@v.Id.ToString("D5")</span>
+                                <span class="gsearch-item-sub">@v.Fecha.ToShortDateString() · @v.Total.ToString("C0")</span>
+                            </span>
+                        </button>
+                    }
+                }
+
+                @if (empleados.Any())
+                {
+                    <div class="gsearch-group">Empleados</div>
+                    @foreach (var e in empleados)
+                    {
+                        <button class="gsearch-item" @onclick='() => Go($"/empleado/{e.Id}")'>
+                            <span class="gsearch-item-icon icon-green"><i class="fa-solid fa-user"></i></span>
+                            <span class="gsearch-item-main">
+                                <span class="gsearch-item-title">@e.Nombre @e.Apellido</span>
+                                <span class="gsearch-item-sub">@(string.IsNullOrEmpty(e.Rol) ? e.Email : e.Rol)</span>
+                            </span>
+                        </button>
+                    }
+                }
+
+                @if (productos.Any())
+                {
+                    <div class="gsearch-group">Productos</div>
+                    @foreach (var p in productos)
+                    {
+                        <button class="gsearch-item" @onclick='() => Go($"/producto/{p.Id}")'>
+                            <span class="gsearch-item-icon icon-blue"><i class="fa-solid fa-box"></i></span>
+                            <span class="gsearch-item-main">
+                                <span class="gsearch-item-title">@p.Nombre</span>
+                                <span class="gsearch-item-sub">@p.Presentacion · @p.PrecioVenta.ToString("C0")</span>
+                            </span>
+                        </button>
+                    }
+                }
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private string query = "";
+    private bool open;
+    private bool buscando;
+
+    private List<Pulperia.Models.Venta> ventas = new();
+    private List<Empleado> empleados = new();
+    private List<Producto> productos = new();
+
+    private List<Empleado> todosEmpleados = new();
+    private CancellationTokenSource? cts;
+
+    private void Close() => open = false;
+
+    private void Clear()
+    {
+        query = "";
+        open = false;
+        ventas.Clear();
+        empleados.Clear();
+        productos.Clear();
+    }
+
+    private async Task OnInput(ChangeEventArgs e)
+    {
+        query = e.Value?.ToString() ?? "";
+        open = true;
+
+        // Debounce
+        cts?.Cancel();
+        cts = new CancellationTokenSource();
+        var token = cts.Token;
+
+        try
+        {
+            await Task.Delay(250, token);
+            await Buscar(token);
+        }
+        catch (TaskCanceledException) { /* nueva tecla pulsada */ }
+    }
+
+    private async Task Buscar(CancellationToken token)
+    {
+        var q = query.Trim();
+
+        if (string.IsNullOrWhiteSpace(q))
+        {
+            Clear();
+            return;
+        }
+
+        buscando = true;
+        StateHasChanged();
+
+        // Empleados (Supabase) — cacheados en memoria y filtrados localmente
+        if (!todosEmpleados.Any())
+            todosEmpleados = await EmpleadoService.GetAllAsync();
+
+        empleados = todosEmpleados
+            .Where(e => $"{e.Nombre} {e.Apellido}".Contains(q, StringComparison.OrdinalIgnoreCase)
+                        || (e.CodigoEmpleado ?? "").Contains(q, StringComparison.OrdinalIgnoreCase))
+            .Take(5)
+            .ToList();
+
+        // Ventas y productos (EF Core)
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        productos = await db.Producto
+            .Where(p => p.Nombre.Contains(q))
+            .OrderBy(p => p.Nombre)
+            .Take(5)
+            .ToListAsync(token);
+
+        ventas = await db.Venta
+            .Where(v => v.Id.ToString().Contains(q))
+            .OrderByDescending(v => v.Fecha)
+            .Take(5)
+            .ToListAsync(token);
+
+        buscando = false;
+        StateHasChanged();
+    }
+
+    private void Go(string url)
+    {
+        open = false;
+        Clear();
+        Nav.NavigateTo(url);
+    }
+}

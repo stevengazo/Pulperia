@@ -87,9 +87,16 @@ else
 
                 <div class="topbar-left">
 
-                    <div class="page-title">
-                        Sistema POS
-                    </div>
+                    @if (Session.IsAuthenticated)
+                    {
+                        <TopbarSearch />
+                    }
+                    else
+                    {
+                        <div class="page-title">
+                            Sistema POS
+                        </div>
+                    }
 
                 </div>
 
