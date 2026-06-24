@@ -38,15 +38,6 @@ ask() { # ask <variable> <prompt> <default>
   eval "$1=\$_ans"
 }
 
-# Contraseña aleatoria que cumple la complejidad de SQL Server
-gen_pass() {
-  if command -v openssl >/dev/null 2>&1; then
-    printf '%sAa1!' "$(openssl rand -base64 18 | tr -dc 'A-Za-z0-9' | cut -c1-20)"
-  else
-    printf '%sAa1!' "$(head -c 24 /dev/urandom | od -An -tx1 | tr -d ' \n' | cut -c1-20)"
-  fi
-}
-
 # ── 1. Docker ──────────────────────────────────────────────────────────────
 info "Verificando Docker..."
 if ! command -v docker >/dev/null 2>&1; then
@@ -82,7 +73,7 @@ if [ -f .env ]; then
   ok ".env ya existe — se reutiliza (bórralo para reconfigurar)."
 else
   info "Configurando credenciales..."
-  SA_PASSWORD="$(gen_pass)"
+  ask SA_PASSWORD      "Contraseña de SQL Server"   "PulpePOS_2024!"
   ask SUPABASE_URL     "URL de Supabase"            "https://TU_PROYECTO.supabase.co"
   ask SUPABASE_ANONKEY "Anon Key de Supabase"       "TU_ANON_KEY"
   ask APP_PORT         "Puerto público de la app"   "$APP_PORT"
@@ -95,7 +86,7 @@ SUPABASE_URL=${SUPABASE_URL}
 SUPABASE_ANONKEY=${SUPABASE_ANONKEY}
 EOF
   chmod 600 .env
-  ok ".env creado (contraseña de SQL Server generada automáticamente)."
+  ok ".env creado."
 
   case "$SUPABASE_URL" in
     *TU_PROYECTO*) warn "Recuerda editar SUPABASE_URL / SUPABASE_ANONKEY en $INSTALL_DIR/.env" ;;
