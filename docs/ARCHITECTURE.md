@@ -172,8 +172,7 @@ Aspectos identificados como mejoras pendientes:
 2. **`DbContext` de larga vida** en algunas páginas — migrar a contextos efímeros por operación.
 3. **Autorización por rol** — existen `RolSystem`/`RolUser`, pero `UserValidator` solo distingue «autenticado / no autenticado».
 4. **Migración automática** — `Program.cs` solo migra si no puede conectar; conviene `Migrate()` idempotente al arranque.
-5. **Logging estructurado** — sustituir `Console.WriteLine` por `ILogger<T>`.
-6. **Archivos de plantilla** — `WeatherForecast*`, `Counter`, `FetchData`, `SurveyPrompt` pueden eliminarse.
+5. **Archivos de plantilla** — `WeatherForecast*`, `Counter`, `FetchData`, `SurveyPrompt` pueden eliminarse.
 
 ---
 

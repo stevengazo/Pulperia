@@ -1,4 +1,6 @@
 @inject PulperiaDbContext db
+@inject ILogger<AddCompraInventario> Logger
+@inject LogService LogService
 @using Microsoft.EntityFrameworkCore
 
 @if (isVisible)
@@ -372,13 +374,31 @@
 
             await db.SaveChangesAsync();
 
+            await LogService.RegistrarAsync(
+                tabla: "CompraInventario",
+                accion: "INSERT",
+                registroId: compraInventario.Id.ToString(),
+                nuevo: new
+                {
+                    compraInventario.Id,
+                    compraInventario.ProveedorId,
+                    compraInventario.Fecha,
+                    compraInventario.Notas,
+                    Detalles = detalles.Select(d => new
+                    {
+                        d.ProductoId,
+                        d.Cantidad,
+                        d.PrecioUnitario
+                    })
+                });
+
             await OnSaved.InvokeAsync();
 
             Close();
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            Logger.LogError(ex, "Error al guardar la compra de inventario.");
         }
     }
 

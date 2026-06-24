@@ -102,17 +102,21 @@ Guía de ciclo de vida:
 
 ## 5. Auditoría
 
-Para registrar cambios usa `LogService`:
+Para registrar cambios usa `LogService`. **El usuario se resuelve automáticamente**
+desde la sesión actual (no lo pases salvo que necesites sobreescribirlo), y un fallo
+al auditar **no interrumpe** la operación (se registra en el log de la app):
 
 ```csharp
 await LogService.RegistrarAsync(
     tabla: "Producto",
-    accion: "Editar",
+    accion: "UPDATE",            // INSERT · UPDATE · DELETE
     registroId: producto.Id.ToString(),
-    usuario: Session.CurrentUser?.Email ?? "desconocido",
-    anterior: estadoPrevio,
-    nuevo: producto);
+    anterior: estadoPrevio,      // null en INSERT
+    nuevo: producto);            // null en DELETE
 ```
+
+> Audita **toda** operación de escritura (alta, edición y borrado) justo después del
+> `SaveChangesAsync`, capturando snapshots `anterior`/`nuevo` con las propiedades relevantes.
 
 ---
 

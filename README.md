@@ -20,11 +20,11 @@
 <br/>
 
 <!-- Stack visual en fila -->
-<img src="https://skillicons.dev/icons?i=dotnet,cs,blazor,sqlserver,supabase,bootstrap,git,vscode&theme=dark" alt="Tech stack" />
+<img src="https://skillicons.dev/icons?i=dotnet,cs,blazor,sqlserver,supabase,docker,bootstrap,git,vscode&theme=dark" alt="Tech stack" />
 
 <br/><br/>
 
-[**🚀 Inicio rápido**](#-inicio-rápido) &nbsp;·&nbsp; [**🏗️ Arquitectura**](#-arquitectura) &nbsp;·&nbsp; [**📚 Documentación**](#-documentación) &nbsp;·&nbsp; [**🗺️ Roadmap**](#-roadmap)
+[**🚀 Inicio rápido**](#-inicio-rápido) &nbsp;·&nbsp; [**🐳 Docker**](#-docker) &nbsp;·&nbsp; [**🏗️ Arquitectura**](#-arquitectura) &nbsp;·&nbsp; [**📚 Documentación**](#-documentación) &nbsp;·&nbsp; [**🗺️ Roadmap**](#-roadmap)
 
 </div>
 
@@ -284,6 +284,61 @@ dotnet run
 
 <br/>
 
+## 🐳 Docker
+
+La forma más rápida de levantar **toda la pila** (app + SQL Server) es con Docker Compose.
+
+> **Requisitos:** [Docker](https://docs.docker.com/get-docker/) + Docker Compose · credenciales de Supabase.
+
+```bash
+# 1️⃣  Crear tu .env desde la plantilla y completar los valores
+cp .env.example .env
+#     edita .env → SA_PASSWORD, SUPABASE_URL, SUPABASE_ANONKEY
+
+# 2️⃣  Construir y levantar (app + base de datos)
+docker compose up -d --build
+
+# 3️⃣  Ver logs / detener
+docker compose logs -f app
+docker compose down            # añade -v para borrar también los volúmenes
+```
+
+La app queda en **http://localhost:8080** y SQL Server expone el puerto **1433**. Las migraciones EF Core se aplican solas al arrancar el contenedor. Los datos de SQL Server y los logs persisten en volúmenes (`mssql-data`, `app-logs`).
+
+<details>
+<summary><b>🔧 Solo la imagen (sin Compose)</b></summary>
+
+<br/>
+
+```bash
+# Construir la imagen
+docker build -t pulperia:local .
+
+# Ejecutar apuntando a un SQL Server existente
+docker run -d -p 8080:8080 \
+  -e ConnectionStrings__DefaultConnection="Server=...;Database=Pulperia;User Id=...;Password=...;TrustServerCertificate=True;" \
+  -e Supabase__Url="https://TU_PROYECTO.supabase.co" \
+  -e Supabase__AnonKey="TU_ANON_KEY" \
+  --name pulperia pulperia:local
+```
+</details>
+
+<details>
+<summary><b>📦 Imagen publicada en GHCR (CI)</b></summary>
+
+<br/>
+
+El workflow [`.github/workflows/docker.yml`](.github/workflows/docker.yml) construye y publica la imagen en **GitHub Container Registry** en cada push a `main` y en tags `v*.*.*`:
+
+```bash
+docker pull ghcr.io/<usuario>/pulperia:latest
+```
+</details>
+
+> ⚠️ Dentro del contenedor la app escucha **solo HTTP en 8080**. En producción, termina TLS con un reverse proxy (Nginx, Traefik, Caddy) por delante.
+
+<br/>
+
 ## ⚙️ Configuración
 
 Las credenciales **no se versionan**: usa [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets) en desarrollo y variables de entorno en producción. La plantilla [`appsettings.Example.json`](appsettings.Example.json) muestra la forma esperada.
@@ -327,7 +382,12 @@ Pulperia/
 ├── 📂 models/               ·  Modelos de dominio
 ├── 📂 Migrations/           ·  Migraciones EF Core
 ├── 📂 Shared/               ·  MainLayout, NavMenu
-└── 📂 wwwroot/              ·  CSS, JS, iconos
+├── 📂 wwwroot/              ·  CSS, JS, iconos
+│
+├── 🐳 Dockerfile           ·  Build multi-etapa (SDK → runtime)
+├── 🐳 docker-compose.yml   ·  Stack local (app + SQL Server)
+├── 🔒 .env.example         ·  Plantilla de secretos para Compose
+└── 📂 .github/workflows/   ·  CI: build.yml · docker.yml (GHCR)
 ```
 
 <br/>
@@ -395,9 +455,9 @@ dotnet publish -c Release -o ./publish
 - [x] Costo histórico correcto en líneas de venta
 - [x] Sesión persistente opcional («mantener sesión abierta»)
 - [x] Crear categoría desde el alta de producto
+- [x] Logging estructurado con `ILogger<T>`
 - [ ] Autorización por roles (`RolSystem` / `RolUser`)
 - [ ] Migrar páginas a `DbContextFactory` efímero
-- [ ] Logging estructurado con `ILogger<T>`
 - [ ] Secretos fuera del historial de git + rotación
 
 <br/>

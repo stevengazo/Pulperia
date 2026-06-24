@@ -2,6 +2,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<PulperiaDbContext> DbFactory
 @inject NavigationManager Nav
+@inject ILogger<Inventario> Logger
 
 
 <UserValidator>
@@ -156,7 +157,7 @@
         }
         catch (Exception f)
         {
-            Console.WriteLine(f.Message);
+            Logger.LogError(f, "Error al cargar el inventario (detalles de compra).");
         }
     }
 

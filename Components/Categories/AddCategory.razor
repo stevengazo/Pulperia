@@ -1,6 +1,7 @@
 @page "/add-category"
 
 @inject PulperiaDbContext db
+@inject LogService LogService
 
 <h3 class="mb-3">➕ Agregar Categoría</h3>
 
@@ -43,6 +44,12 @@
     {
         db.Categoria.Add(categoria);
         await db.SaveChangesAsync();
+
+        await LogService.RegistrarAsync(
+            tabla: "Categoria",
+            accion: "INSERT",
+            registroId: categoria.Id.ToString(),
+            nuevo: new { categoria.Id, categoria.Nombre });
 
         categoria = new Categoria();
     }

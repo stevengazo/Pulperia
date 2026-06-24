@@ -1,4 +1,5 @@
 @inject PulperiaDbContext db
+@inject LogService LogService
 
 <div class="@(isVisible ? "pm-overlay" : "d-none")">
     <div class="pm-box">
@@ -182,6 +183,12 @@
             db.Categoria.Add(categoria);
             await db.SaveChangesAsync();
 
+            await LogService.RegistrarAsync(
+                tabla: "Categoria",
+                accion: "INSERT",
+                registroId: categoria.Id.ToString(),
+                nuevo: new { categoria.Id, categoria.Nombre });
+
             await CargarCategorias();
             producto.CategoriaId = categoria.Id;
 
@@ -217,6 +224,22 @@
         {
             db.Producto.Add(producto);
             await db.SaveChangesAsync();
+
+            await LogService.RegistrarAsync(
+                tabla: "Producto",
+                accion: "INSERT",
+                registroId: producto.Id.ToString(),
+                nuevo: new
+                {
+                    producto.Id,
+                    producto.Nombre,
+                    producto.Presentacion,
+                    producto.PrecioCosto,
+                    producto.PrecioVenta,
+                    producto.StockActual,
+                    producto.StockMinimo,
+                    producto.CategoriaId
+                });
 
             isVisible = false;
             producto = new Producto();

@@ -6,6 +6,7 @@
 @inject EmpleadoService emp
 @inject IDbContextFactory<PulperiaDbContext> DbFactory
 @inject IJSRuntime JS
+@inject ILogger<Empleado> Logger
 
 <PageTitle>Empleado</PageTitle>
 
@@ -228,7 +229,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error cargando ventas: {ex.Message}");
+            Logger.LogError(ex, "Error cargando las ventas del empleado {EmpleadoId}.", id);
         }
         finally
         {
@@ -264,7 +265,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error exportando CSV: {ex.Message}");
+            Logger.LogError(ex, "Error exportando el CSV de ventas del empleado {EmpleadoId}.", empleado?.Id);
         }
     }
 

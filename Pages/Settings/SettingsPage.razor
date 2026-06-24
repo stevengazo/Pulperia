@@ -1,6 +1,7 @@
 @page "/configuracion"
 
 @inject IDbContextFactory<PulperiaDbContext> dbContextFactory
+@inject LogService LogService
 
 @using Microsoft.EntityFrameworkCore
 
@@ -230,12 +231,20 @@
         if (string.IsNullOrWhiteSpace(newCategory))
             return;
 
-        db.Categoria.Add(new Categoria
+        var categoria = new Categoria
         {
             Nombre = newCategory.Trim()
-        });
+        };
+
+        db.Categoria.Add(categoria);
 
         await db.SaveChangesAsync();
+
+        await LogService.RegistrarAsync(
+            tabla: "Categoria",
+            accion: "INSERT",
+            registroId: categoria.Id.ToString(),
+            nuevo: new { categoria.Id, categoria.Nombre });
 
         newCategory = "";
 
@@ -247,14 +256,22 @@
         if (string.IsNullOrWhiteSpace(newProveedor.Nombre))
             return;
 
-        db.Proveedores.Add(new Proveedor
+        var proveedor = new Proveedor
         {
             Nombre = newProveedor.Nombre.Trim(),
             Telefono = newProveedor.Telefono,
             Email = newProveedor.Email
-        });
+        };
+
+        db.Proveedores.Add(proveedor);
 
         await db.SaveChangesAsync();
+
+        await LogService.RegistrarAsync(
+            tabla: "Proveedor",
+            accion: "INSERT",
+            registroId: proveedor.Id.ToString(),
+            nuevo: new { proveedor.Id, proveedor.Nombre, proveedor.Telefono, proveedor.Email });
 
         newProveedor = new();
 
