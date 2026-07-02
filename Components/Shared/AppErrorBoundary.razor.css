@@ -1,0 +1,133 @@
+.app-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 60vh;
+    padding: 2rem 1rem;
+}
+
+.app-error-card {
+    width: 100%;
+    max-width: 520px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, .06);
+    padding: 2.5rem 2rem;
+    text-align: center;
+}
+
+.app-error-icon {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #fff4f2;
+    color: #e04f3d;
+    font-size: 2rem;
+}
+
+.app-error-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0 0 .5rem;
+}
+
+.app-error-text {
+    color: var(--muted);
+    margin: 0 0 1.5rem;
+    line-height: 1.5;
+}
+
+.app-error-steps {
+    text-align: left;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.app-error-steps-title {
+    display: block;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: .5rem;
+}
+
+.app-error-steps ol {
+    margin: 0;
+    padding-left: 1.2rem;
+    color: var(--muted);
+    line-height: 1.7;
+    font-size: .925rem;
+}
+
+.app-error-steps a {
+    color: var(--info);
+    text-decoration: none;
+}
+
+.app-error-actions {
+    display: flex;
+    gap: .75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.app-error-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .65rem 1.25rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    font-weight: 600;
+    font-size: .925rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background .15s, border-color .15s;
+}
+
+.app-error-btn:hover {
+    background: var(--surface-2);
+}
+
+.app-error-btn.primary {
+    background: #e04f3d;
+    border-color: #e04f3d;
+    color: #fff;
+}
+
+.app-error-btn.primary:hover {
+    background: #c9412f;
+}
+
+.app-error-details {
+    margin-top: 1.5rem;
+    text-align: left;
+}
+
+.app-error-details summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-size: .85rem;
+}
+
+.app-error-details pre {
+    margin-top: .5rem;
+    padding: .75rem;
+    background: #1f2937;
+    color: #f3f4f6;
+    border-radius: 8px;
+    font-size: .8rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}

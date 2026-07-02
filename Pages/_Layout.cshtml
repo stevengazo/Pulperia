@@ -9,6 +9,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="~/" />
+    <script>
+        // Anti-parpadeo: aplica el tema guardado antes de pintar la página.
+        (function () {
+            try {
+                var t = localStorage.getItem('pulperia-theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', t);
+            } catch (e) { }
+        })();
+    </script>
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link href="css/site.css" rel="stylesheet" />
     <script src="sessionStorage.js"></script>
@@ -35,6 +44,7 @@
         <a class="dismiss">🗙</a>
     </div>
 
+    <script src="js/theme.js"></script>
     <script src="_framework/blazor.server.js"></script>
     <script>
         window.downloadBase64File = (base64, fileName, mimeType) => {

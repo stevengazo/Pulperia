@@ -1,0 +1,104 @@
+@inherits ErrorBoundary
+@inject ILogger<AppErrorBoundary> Logger
+@inject NavigationManager Navigation
+@implements IDisposable
+
+@*
+    Barrera de errores de la aplicación.
+
+    Envuelve el contenido de la página: si un componente lanza una excepción no
+    controlada durante el render o un ciclo de vida, en lugar de matar todo el
+    circuito de Blazor (dejando la app "congelada" hasta recargar), muestra una
+    pantalla amigable con instrucciones para el usuario.
+
+    - En Producción se oculta el detalle técnico (solo se registra en el log).
+    - En Desarrollo se muestra el mensaje de la excepción para depurar.
+    - Se recupera sola al navegar a otra página.
+*@
+
+@if (CurrentException is null)
+{
+    @ChildContent
+}
+else
+{
+    <div class="app-error">
+
+        <div class="app-error-card">
+
+            <div class="app-error-icon">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+
+            <h1 class="app-error-title">Algo salió mal</h1>
+
+            <p class="app-error-text">
+                Ocurrió un problema inesperado al procesar esta pantalla.
+                No te preocupes, tu información está a salvo.
+            </p>
+
+            <div class="app-error-steps">
+                <span class="app-error-steps-title">¿Qué puedes hacer?</span>
+                <ol>
+                    <li>Presiona <strong>Reintentar</strong> para volver a cargar esta pantalla.</li>
+                    <li>Si el problema continúa, <strong>recarga la página</strong> (tecla F5).</li>
+                    <li>Si aún así falla, cierra sesión y vuelve a entrar.</li>
+                    <li>
+                        Si el error persiste, contacta a soporte:
+                        <a href="mailto:soporte@grupomecsa.net">soporte@grupomecsa.net</a>
+                        e indícale la hora en que ocurrió.
+                    </li>
+                </ol>
+            </div>
+
+            <div class="app-error-actions">
+                <button class="app-error-btn primary" @onclick="Recuperar">
+                    <i class="fa-solid fa-rotate-right"></i> Reintentar
+                </button>
+                <a class="app-error-btn" href="/">
+                    <i class="fa-solid fa-house"></i> Ir al inicio
+                </a>
+            </div>
+
+            @if (_isDevelopment)
+            {
+                <details class="app-error-details">
+                    <summary>Detalle técnico (solo visible en desarrollo)</summary>
+                    <pre>@CurrentException.GetType().FullName: @CurrentException.Message</pre>
+                    <pre>@CurrentException.StackTrace</pre>
+                </details>
+            }
+
+        </div>
+
+    </div>
+}
+
+@code {
+    [Inject]
+    private IHostEnvironment Environment { get; set; } = default!;
+
+    private bool _isDevelopment;
+
+    protected override void OnInitialized()
+    {
+        _isDevelopment = Environment.IsDevelopment();
+
+        // Al cambiar de página, olvidamos el error para no dejar al usuario
+        // atrapado en la pantalla de error si navega a otra sección.
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    protected override Task OnErrorAsync(Exception exception)
+    {
+        // Registro para diagnóstico. En producción es la única traza del fallo.
+        Logger.LogError(exception, "Error no controlado capturado por AppErrorBoundary.");
+        return Task.CompletedTask;
+    }
+
+    private void Recuperar() => Recover();
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => Recover();
+
+    void IDisposable.Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+}

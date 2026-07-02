@@ -5,6 +5,7 @@
 
 @inject EmpleadoService emp
 @inject IDbContextFactory<PulperiaDbContext> DbFactory
+@implements IAsyncDisposable
 @inject IJSRuntime JS
 @inject ILogger<Empleado> Logger
 
@@ -184,6 +185,12 @@
     private bool isLoading = true;
 
     private PulperiaDbContext? db;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (db is not null)
+            await db.DisposeAsync();
+    }
 
     private DateTime? fechaInicio = null;
     private DateTime? fechaFin = null;

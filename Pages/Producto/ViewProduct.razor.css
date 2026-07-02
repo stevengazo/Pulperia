@@ -32,7 +32,7 @@
 .product-name {
     font-size: 24px;
     font-weight: 600;
-    color: #fff;
+    color: var(--text);
 }
 
 .detail-body {
@@ -93,7 +93,7 @@
 .btn-edit {
     background: var(--accent-dim);
     border: 1px solid var(--accent);
-    color: #fff;
+    color: var(--accent-contrast);
     padding: 8px 20px;
     border-radius: 6px;
     font-size: 14px;

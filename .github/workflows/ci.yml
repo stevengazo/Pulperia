@@ -1,0 +1,55 @@
+name: CI
+
+# Compila la solución y ejecuta las pruebas unitarias en cada push y pull request.
+on:
+  push:
+    branches: [main, Quality]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: # permite ejecutarlo manualmente desde la pestaña Actions
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Instalar .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      # Cachea los paquetes NuGet entre ejecuciones para acelerar el CI.
+      - name: Cache de NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restaurar dependencias
+        run: dotnet restore Pulperia.sln
+
+      - name: Compilar (Release)
+        run: dotnet build Pulperia.sln --configuration Release --no-restore
+
+      - name: Ejecutar pruebas
+        run: >
+          dotnet test Pulperia.sln
+          --configuration Release
+          --no-build
+          --verbosity normal
+          --logger "trx;LogFileName=test-results.trx"
+          --collect:"XPlat Code Coverage"
+
+      # Publica los resultados como artefacto descargable, aun si las pruebas fallan.
+      - name: Publicar resultados de pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: resultados-pruebas
+          path: "**/TestResults/**/*"
+          if-no-files-found: ignore

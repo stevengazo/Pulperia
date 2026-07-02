@@ -23,4 +23,17 @@ public class PulperiaDbContext : DbContext
     public DbSet<LogCambio> LogsCambios => Set<LogCambio>();
 
     public DbSet<Proveedor> Proveedores => Set<Proveedor>(); public DbSet<Venta> Venta => Set<Venta>();
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        // CategoriaId lleva [Required] para validar el formulario, pero la columna
+        // admite NULL (hay productos sin categoría). Fluent API tiene prioridad sobre
+        // la anotación en el mapeo, así EF genera lectura null-safe y no lanza
+        // SqlNullValueException al materializar esas filas.
+        modelBuilder.Entity<Producto>()
+            .Property(p => p.CategoriaId)
+            .IsRequired(false);
+    }
 }

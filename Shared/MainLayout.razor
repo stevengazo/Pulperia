@@ -20,7 +20,9 @@
 
 @if (IsLoginPage)
 {
-    @Body
+    <AppErrorBoundary>
+        @Body
+    </AppErrorBoundary>
 }
 else
 {
@@ -102,6 +104,8 @@ else
 
                 <div class="topbar-right">
 
+                    <ThemeToggle />
+
                     @if (!Session.IsAuthenticated)
                     {
                         <a href="/login" class="login-link">
@@ -121,7 +125,9 @@ else
             </header>
 
             <main class="content">
-                @Body
+                <AppErrorBoundary>
+                    @Body
+                </AppErrorBoundary>
             </main>
 
         </div>

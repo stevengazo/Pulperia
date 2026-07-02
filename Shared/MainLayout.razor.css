@@ -13,7 +13,7 @@
 .sidebar {
 
     width: var(--sidebar-width);
-    background: rgba(16,16,20,.96);
+    background: var(--glass);
 
     border-right: 1px solid var(--border);
 
@@ -51,8 +51,8 @@
 
     background:
         linear-gradient(135deg,
-        #ffaa43 0%,
-        #ff8c1a 100%);
+        var(--accent) 0%,
+        var(--accent-hover) 100%);
 
     display: flex;
     align-items: center;
@@ -61,10 +61,10 @@
     font-weight: 800;
     font-size: 1rem;
 
-    color: #111;
+    color: var(--accent-contrast);
 
     box-shadow:
-        0 10px 30px rgba(255,170,67,.18);
+        0 10px 30px var(--accent-soft-2);
 }
 
 .brand-content {
@@ -193,7 +193,7 @@
 
     border-bottom: 1px solid var(--border);
 
-    background: rgba(16,16,20,.82);
+    background: var(--glass-2);
 
     backdrop-filter: blur(16px);
 
@@ -262,10 +262,10 @@
     text-decoration: none;
 
     background: linear-gradient(135deg,
-    #ffaa43 0%,
-    #ff8c1a 100%);
+    var(--accent) 0%,
+    var(--accent-hover) 100%);
 
-    color: #111;
+    color: var(--accent-contrast);
 
     padding: .75rem 1.2rem;
 

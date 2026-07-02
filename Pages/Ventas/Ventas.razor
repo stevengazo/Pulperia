@@ -1,5 +1,6 @@
 @page "/ventas"
 @inject IDbContextFactory<PulperiaDbContext> DbFactory
+@implements IAsyncDisposable
 @inject EmpleadoService empleadoService
 @inject AppSessionService Session
 @inject NavigationManager Nav
@@ -18,7 +19,7 @@
             </div>
 
             <div class="d-flex gap-2">
-                <button class="btn-export" @onclick="ExportarExcel">
+                <button class="btn-export" @onclick="() => ExportarExcel(false)">
                     <i class="fa-solid fa-file-excel"></i>
                     Exportar Excel
                 </button>
@@ -91,6 +92,14 @@
 
                     <div class="col-md-6">
                         <div class="filter-group">
+                            <select class="method-filter" value="@filtroMetodo" @onchange="CambiarMetodo">
+                                <option value="Todos">Todos los métodos</option>
+                                @foreach (var metodo in MetodosDisponibles)
+                                {
+                                    <option value="@metodo">@metodo</option>
+                                }
+                            </select>
+
                             <button class="filter-btn @(filtroEstado == "Todas" ? "filter-active" : "")"
                                     @onclick='() => CambiarFiltro("Todas")'>Todas</button>
 
@@ -105,12 +114,42 @@
                 </div>
             </div>
 
+            @if (HaySeleccion)
+            {
+                <div class="bulk-bar">
+                    <span class="bulk-count">
+                        <i class="fa-solid fa-check-double"></i>
+                        @seleccionadas.Count seleccionada(s)
+                    </span>
+
+                    <div class="bulk-actions">
+                        <button class="bulk-btn bulk-pay" @onclick="MarcarSeleccionadasPagadas"
+                                disabled="@(!HaySeleccionPendiente)">
+                            <i class="fa-solid fa-check"></i> Marcar pagadas
+                        </button>
+
+                        <button class="bulk-btn bulk-export" @onclick="() => ExportarExcel(true)">
+                            <i class="fa-solid fa-file-excel"></i> Exportar selección
+                        </button>
+
+                        <button class="bulk-btn bulk-clear" @onclick="LimpiarSeleccion">
+                            <i class="fa-solid fa-xmark"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+            }
+
             <div class="table-responsive">
                 <table class="table align-middle">
 
                     <thead>
                         <tr>
-                            <th class="ps-4">Folio</th>
+                            <th class="check-col ps-4">
+                                <input type="checkbox" class="row-check"
+                                       checked="@TodasPaginaSeleccionadas"
+                                       @onchange="ToggleSeleccionarTodas" />
+                            </th>
+                            <th>Folio</th>
                             <th>Fecha/Hora</th>
                             <th>Empleado</th>
                             <th>Método</th>
@@ -125,13 +164,18 @@
                         {
                             var empleado = empleados.FirstOrDefault(e => e.Id.ToString() == venta.ClienteId);
 
-                            <tr>
-                                <td class="ps-4">
+                            <tr class="@(seleccionadas.Contains(venta.Id) ? "row-selected" : "")">
+                                <td class="check-col ps-4">
+                                    <input type="checkbox" class="row-check"
+                                           checked="@seleccionadas.Contains(venta.Id)"
+                                           @onchange="e => ToggleSeleccion(venta.Id, e)" />
+                                </td>
+                                <td>
                                     <span class="folio">#@venta.Id.ToString("D5")</span>
                                 </td>
 
                                 <td>
-                                    <div class="date-main">@venta.Fecha.ToShortDateString()</div>
+                                    <div class="date-main">@FechaLarga(venta.Fecha)</div>
                                     <div class="date-sub">@venta.Fecha.ToShortTimeString()</div>
                                 </td>
 
@@ -264,9 +308,43 @@
 
     private PulperiaDbContext db = default!;
     private List<Pulperia.Models.Venta> ventas = new();
+
+    public async ValueTask DisposeAsync()
+    {
+        if (db is not null)
+            await db.DisposeAsync();
+    }
     private List<Empleado> empleados = new();
     private string filtro = "";
     private string filtroEstado = "Todas";
+    private string filtroMetodo = "Todos";
+
+    // Cultura fija en español para el formato largo de fecha (independiente del
+    // idioma del servidor). Ej: "Lunes 3 Marzo 26".
+    private static readonly CultureInfo CulturaEs = new("es-CR");
+
+    private static string FechaLarga(DateTime fecha) =>
+        CulturaEs.TextInfo.ToTitleCase(fecha.ToString("dddd d MMMM yy", CulturaEs));
+
+    // Métodos de pago realmente presentes en las ventas, para poblar el filtro.
+    private IEnumerable<string> MetodosDisponibles =>
+        ventas.Select(v => v.MetodoPago)
+              .Where(m => !string.IsNullOrWhiteSpace(m))
+              .Distinct()
+              .OrderBy(m => m);
+
+    // ── Selección de filas ────────────────────────────────────
+    private HashSet<int> seleccionadas = new();
+
+    private bool HaySeleccion => seleccionadas.Count > 0;
+
+    // Hay al menos una seleccionada que todavía está pendiente de pago.
+    private bool HaySeleccionPendiente =>
+        ventas.Any(v => seleccionadas.Contains(v.Id) && !v.Pagado);
+
+    // Todas las filas visibles en la página actual están seleccionadas.
+    private bool TodasPaginaSeleccionadas =>
+        VentasPaginadas.Any() && VentasPaginadas.All(v => seleccionadas.Contains(v.Id));
 
     private DateTime _inicio = DateTime.MinValue;
     private DateTime _fin = DateTime.MaxValue;
@@ -311,8 +389,10 @@ v.Total);
         filtroEstado switch
         {
             "Fiado" => v.MetodoPago == "Fiado",
+            "Hoy" => v.Fecha.Date == DateTime.Today,
             _ => true
         } &&
+        (filtroMetodo == "Todos" || v.MetodoPago == filtroMetodo) &&
         (_inicio == DateTime.MinValue || v.Fecha.Date >= _inicio) &&
         (_fin == DateTime.MaxValue || v.Fecha.Date <= _fin));
 
@@ -344,6 +424,12 @@ v.Total);
         ResetPagina();
     }
 
+    private void CambiarMetodo(ChangeEventArgs e)
+    {
+        filtroMetodo = e.Value?.ToString() ?? "Todos";
+        ResetPagina();
+    }
+
     private void CambiarTamañoPagina(ChangeEventArgs e)
     {
         tamañoPagina = int.Parse(e.Value!.ToString()!);
@@ -371,15 +457,86 @@ v.Total);
         StateHasChanged();
     }
 
-    // ── Exportar Excel ────────────────────────────────────────
-    private async Task ExportarExcel()
+    // ── Selección de filas ────────────────────────────────────
+    private void ToggleSeleccion(int id, ChangeEventArgs e)
     {
+        if (e.Value is true)
+            seleccionadas.Add(id);
+        else
+            seleccionadas.Remove(id);
+    }
+
+    private void ToggleSeleccionarTodas(ChangeEventArgs e)
+    {
+        var marcar = e.Value is true;
+
+        foreach (var v in VentasPaginadas)
+        {
+            if (marcar)
+                seleccionadas.Add(v.Id);
+            else
+                seleccionadas.Remove(v.Id);
+        }
+    }
+
+    private void LimpiarSeleccion() => seleccionadas.Clear();
+
+    // ── Marcar pagadas en lote ────────────────────────────────
+    private async Task MarcarSeleccionadasPagadas()
+    {
+        var objetivo = ventas
+            .Where(v => seleccionadas.Contains(v.Id) && !v.Pagado)
+            .ToList();
+
+        if (objetivo.Count == 0)
+            return;
+
+        foreach (var venta in objetivo)
+        {
+            venta.Pagado = true;
+            db.Venta.Update(venta);
+        }
+
+        await db.SaveChangesAsync();
+
+        foreach (var venta in objetivo)
+        {
+            await LogService.RegistrarAsync(
+                tabla: "Ventas",
+                accion: "UPDATE",
+                registroId: venta.Id.ToString(),
+                usuario: Session?.CurrentUser?.Email ?? "Sistema",
+                anterior: new { venta.Id, Pagado = false },
+                nuevo: new { venta.Id, venta.Pagado }
+            );
+        }
+
+        // Quitamos de la selección las que ya quedaron pagadas.
+        foreach (var venta in objetivo)
+            seleccionadas.Remove(venta.Id);
+
+        StateHasChanged();
+    }
+
+    // ── Exportar Excel ────────────────────────────────────────
+    private async Task ExportarExcel(bool soloSeleccion = false)
+    {
+        // Fuente de datos: la selección actual o todo lo filtrado.
+        var fuente = soloSeleccion
+            ? ventas.Where(v => seleccionadas.Contains(v.Id))
+                    .OrderByDescending(v => v.Fecha)
+                    .ToList()
+            : VentasFiltradas.ToList();
+
+        if (fuente.Count == 0)
+            return;
+
         await LogService.RegistrarAsync(
             tabla: "Ventas",
-            accion: "EXPORT_EXCEL",
+            accion: soloSeleccion ? "EXPORT_EXCEL_SELECCION" : "EXPORT_EXCEL",
             registroId: "ALL",
             usuario: Session?.CurrentUser?.Email ?? "Sistema",
-            anterior: new { FiltrosAplicados = VentasFiltradas.Count() }
+            anterior: new { Exportadas = fuente.Count }
         );
 
         using var wb = new XLWorkbook();
@@ -392,7 +549,7 @@ v.Total);
             ws.Cell(1, i + 1).Value = headers[i];
 
         int row = 2;
-        foreach (var venta in VentasFiltradas)
+        foreach (var venta in fuente)
         {
             var empleado = empleados.FirstOrDefault(e => e.Id.ToString() == venta.ClienteId);
             ws.Cell(row, 1).Value = $"#{venta.Id:D5}";
@@ -482,8 +639,8 @@ v.Total);
 
         int r = 1;
 
-        var pendientes = VentasFiltradas.Where(v => !v.Pagado).OrderBy(v => v.Id);
-        var pagadas = VentasFiltradas.Where(v => v.Pagado).OrderBy(v => v.Id);
+        var pendientes = fuente.Where(v => !v.Pagado).OrderBy(v => v.Id);
+        var pagadas = fuente.Where(v => v.Pagado).OrderBy(v => v.Id);
 
         EscribirTablaEstado("Pendientes de Pago", pendientes, ref r);
         EscribirTablaEstado("Pagado", pagadas, ref r);
@@ -494,7 +651,9 @@ v.Total);
         using var stream = new MemoryStream();
         wb.SaveAs(stream);
         var base64 = Convert.ToBase64String(stream.ToArray());
-        var fileName = $"ventas_{DateTime.Today:yyyy-MM-dd}.xlsx";
+        var fileName = soloSeleccion
+            ? $"ventas_seleccion_{DateTime.Today:yyyy-MM-dd}.xlsx"
+            : $"ventas_{DateTime.Today:yyyy-MM-dd}.xlsx";
 
         await JS.InvokeVoidAsync("downloadBase64File", base64, fileName,
             "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

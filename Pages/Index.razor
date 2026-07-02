@@ -1,8 +1,9 @@
-﻿@page "/"
+@page "/"
 @using Microsoft.EntityFrameworkCore
 @using Pulperia.Models
 @inject EmpleadoService emp;
 @inject IDbContextFactory<PulperiaDbContext> dbContextFactory
+@implements IAsyncDisposable
 
 <PageTitle>Dashboard</PageTitle>
 <UserValidator>
@@ -10,45 +11,37 @@
 
     <!-- HEADER -->
     <div class="dash-header">
-        <div>
+        <div class="dash-head-left">
             <h2 class="dash-title">Dashboard</h2>
             <p class="dash-subtitle">Estadísticas generales de la pulpería</p>
+
+            <div class="dash-chips">
+                <span class="dash-chip">
+                    <i class="bi bi-box-seam-fill"></i>
+                    @TotalProductos productos
+                </span>
+                <span class="dash-chip">
+                    <i class="bi bi-tag-fill"></i>
+                    @TotalCategorias categorías
+                </span>
+            </div>
         </div>
-        <div class="dash-date">
-            <i class="bi bi-calendar3"></i>
-            @DateTime.Now.ToString("dd MMM yyyy")
+
+        <div class="dash-head-right">
+            <DateRangePicker OnRangeChanged="OnRangeChanged" />
+            <span class="dash-period">@PeriodoTexto</span>
         </div>
     </div>
 
-    <!-- CARDS SUPERIORES -->
+    <!-- CARDS SUPERIORES (según el período) -->
     <div class="row g-3 mb-4">
-
-        <div class="col-6 col-md-3">
-            <div class="stat-card">
-                <div class="stat-icon" style="background: rgba(255,170,67,0.12); color: #ffaa43;">
-                    <i class="bi bi-box-seam-fill"></i>
-                </div>
-                <p class="stat-label">Productos</p>
-                <h3 class="stat-value" style="color: #ffaa43;">@TotalProductos</h3>
-            </div>
-        </div>
-
-        <div class="col-6 col-md-3">
-            <div class="stat-card">
-                <div class="stat-icon" style="background: rgba(139,92,246,0.12); color: #a78bfa;">
-                    <i class="bi bi-tag-fill"></i>
-                </div>
-                <p class="stat-label">Categorías</p>
-                <h3 class="stat-value" style="color: #a78bfa;">@TotalCategorias</h3>
-            </div>
-        </div>
 
         <div class="col-6 col-md-3">
             <div class="stat-card">
                 <div class="stat-icon" style="background: rgba(34,197,94,0.12); color: #4ade80;">
                     <i class="bi bi-graph-up-arrow"></i>
                 </div>
-                <p class="stat-label">Total Ventas</p>
+                <p class="stat-label">Ventas del período</p>
                 <h3 class="stat-value" style="color: #4ade80;">₡@TotalVentas.ToString("N0")</h3>
             </div>
         </div>
@@ -58,8 +51,30 @@
                 <div class="stat-icon" style="background: rgba(248,113,113,0.12); color: #f87171;">
                     <i class="bi bi-cart-dash-fill"></i>
                 </div>
-                <p class="stat-label">Total Compras</p>
+                <p class="stat-label">Compras del período</p>
                 <h3 class="stat-value" style="color: #f87171;">₡@TotalCompras.ToString("N0")</h3>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(255,170,67,0.12); color: #ffaa43;">
+                    <i class="bi bi-cash-coin"></i>
+                </div>
+                <p class="stat-label">Ganancia del período</p>
+                <h3 class="stat-value" style="color: @(Ganancia >= 0 ? "#ffaa43" : "#f87171");">
+                    ₡@Ganancia.ToString("N0")
+                </h3>
+            </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: rgba(139,92,246,0.12); color: #a78bfa;">
+                    <i class="bi bi-receipt"></i>
+                </div>
+                <p class="stat-label">N.º de ventas</p>
+                <h3 class="stat-value" style="color: #a78bfa;">@NumVentas</h3>
             </div>
         </div>
 
@@ -70,10 +85,11 @@
 
         <!-- BAJO STOCK -->
         <div class="col-lg-6">
-            <div class="dash-card h-100">
+            <div class="dash-card">
                 <div class="dash-card-header">
                     <span class="dash-card-dot" style="background:#f87171;"></span>
                     <h6 class="dash-card-title">Productos con bajo stock</h6>
+                    <span class="dash-card-hint">estado actual</span>
                 </div>
 
                 <div class="dash-card-body">
@@ -112,10 +128,11 @@
 
         <!-- TOP PRODUCTOS -->
         <div class="col-lg-6">
-            <div class="dash-card h-100">
+            <div class="dash-card">
                 <div class="dash-card-header">
                     <span class="dash-card-dot" style="background:#ffaa43;"></span>
                     <h6 class="dash-card-title">Productos más vendidos</h6>
+                    <span class="dash-card-hint">del período</span>
                 </div>
 
                 <div class="dash-card-body">
@@ -146,7 +163,7 @@
                     {
                         <div class="empty-state">
                             <i class="bi bi-bar-chart"></i>
-                            <span>Sin ventas registradas</span>
+                            <span>Sin ventas en el período</span>
                         </div>
                     }
                 </div>
@@ -162,6 +179,7 @@
                 <div class="dash-card-header">
                     <span class="dash-card-dot" style="background:#4ade80;"></span>
                     <h6 class="dash-card-title">Ventas por empleado</h6>
+                    <span class="dash-card-hint">del período</span>
                 </div>
 
                 <div class="dash-card-body">
@@ -169,7 +187,7 @@
                     {
                         @foreach (var item in comprasEmpleados.OrderByDescending(e => e.Value))
                         {
-                            var porcentaje = TotalVentas > 0 ? (item.Value / TotalVentas) * 100 : 0;
+                            var porcentaje = MaxEmpleado > 0 ? (item.Value / MaxEmpleado) * 100 : 0;
 
                             <div class="emp-row">
                                 <div class="emp-info">
@@ -177,7 +195,7 @@
                                     <span class="emp-amount">₡@item.Value.ToString("N2")</span>
                                 </div>
                                 <div class="emp-bar-track">
-                                    <div class="emp-bar-fill" style="width: @porcentaje%"></div>
+                                    <div class="emp-bar-fill" style="width: @porcentaje.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)%"></div>
                                 </div>
                             </div>
                         }
@@ -186,7 +204,7 @@
                     {
                         <div class="empty-state">
                             <i class="bi bi-people"></i>
-                            <span>Sin ventas a empleados</span>
+                            <span>Sin ventas a empleados en el período</span>
                         </div>
                     }
                 </div>
@@ -201,72 +219,125 @@
 
     private PulperiaDbContext db;
 
-    private List<Pulperia.Models.Empleado> empleados = new();
+    public async ValueTask DisposeAsync()
+    {
+        if (db is not null)
+            await db.DisposeAsync();
+    }
+
+    // ── Datos crudos (se cargan una vez) ──────────────────────────
     private List<Pulperia.Models.Producto> Productos = new();
+    private List<Venta> ventas = new();
+    private List<CompraInventario> compras = new();
+    private Dictionary<int, string> nombrePorProducto = new();
+    private Dictionary<string, string> nombrePorEmpleado = new();
 
-    private Dictionary<string, decimal> comprasEmpleados = new();
-
+    // ── Métricas del período seleccionado ─────────────────────────
     private decimal TotalVentas;
     private decimal TotalCompras;
+    private decimal Ganancia => TotalVentas - TotalCompras;
+    private int NumVentas;
 
+    private Dictionary<string, decimal> comprasEmpleados = new();
+    private decimal MaxEmpleado;
+    private List<TopProductoDto> TopProductos = new();
+
+    // ── Métricas de estado actual (no dependen de la fecha) ────────
     private int TotalProductos;
     private int TotalCategorias;
-
     private List<Pulperia.Models.Producto> ProductosBajoStock = new();
 
-    private List<Venta> ventas = new();
+    // ── Rango de fechas ───────────────────────────────────────────
+    private DateTime _inicio = DateTime.MinValue;
+    private DateTime _fin = DateTime.MaxValue;
 
-    private List<TopProductoDto> TopProductos = new();
+    private string PeriodoTexto =>
+        (_inicio == DateTime.MinValue && _fin == DateTime.MaxValue)
+            ? "Todos los períodos"
+            : $"{_inicio:dd MMM yyyy} — {_fin:dd MMM yyyy}";
+
+    private bool EnRango(DateTime f) =>
+        (_inicio == DateTime.MinValue || f.Date >= _inicio.Date) &&
+        (_fin == DateTime.MaxValue || f.Date <= _fin.Date);
 
     protected override async Task OnInitializedAsync()
     {
         db = dbContextFactory.CreateDbContext();
 
-        empleados = await emp.GetAllAsync();
+        var empleados = await emp.GetAllAsync();
+        nombrePorEmpleado = empleados
+            .GroupBy(e => e.Id.ToString())
+            .ToDictionary(g => g.Key, g => $"{g.First().Nombre} {g.First().Apellido}");
 
         Productos = await db.Producto
-            .Include(e => e.DetalleCompras)
-            .Include(e => e.DetalleVentas)
             .Include(e => e.Categoria)
+            .AsNoTracking()
             .ToListAsync();
 
-        ventas = await db.Venta.ToListAsync();
+        nombrePorProducto = Productos.ToDictionary(p => p.Id, p => p.Nombre);
 
-        foreach (var e in empleados)
-        {
-            var ventasPorEmpleado = ventas.Where(emp => emp.ClienteId == e.Id.ToString()).ToList();
+        ventas = await db.Venta
+            .Include(v => v.DetalleVentas)
+            .AsNoTracking()
+            .ToListAsync();
 
-            if (ventasPorEmpleado.Any())
-            {
-                var montoVendido = ventasPorEmpleado.Sum(e => e.MontoRecibido);
-                comprasEmpleados.Add($"{e.Nombre} {e.Apellido}", montoVendido);
-            }
-        }
+        compras = await db.CompraInventario
+            .Include(c => c.DetalleCompras)
+            .AsNoTracking()
+            .ToListAsync();
 
-        TotalProductos = Productos.Count();
-
+        // Estado actual (independiente del período).
+        TotalProductos = Productos.Count;
         TotalCategorias = await db.Categoria.CountAsync();
-
-        TotalVentas = await db.Venta
-            .SumAsync(e => (decimal?)e.Total) ?? 0;
-
-        TotalCompras = await db.DetalleCompra
-            .SumAsync(e => (decimal?)(e.Cantidad * e.PrecioUnitario)) ?? 0;
-
         ProductosBajoStock = Productos
             .Where(e => e.StockActual <= e.StockMinimo)
             .OrderBy(e => e.StockActual)
             .ToList();
 
-        TopProductos = Productos
-            .Select(e => new TopProductoDto
+        Recalcular();
+    }
+
+    private void OnRangeChanged((DateTime Inicio, DateTime Fin) rango)
+    {
+        (_inicio, _fin) = rango;
+        Recalcular();
+        StateHasChanged();
+    }
+
+    private void Recalcular()
+    {
+        var ventasRango = ventas.Where(v => EnRango(v.Fecha)).ToList();
+
+        TotalVentas = ventasRango.Sum(v => v.Total);
+        NumVentas = ventasRango.Count;
+
+        TotalCompras = compras
+            .Where(c => EnRango(c.Fecha))
+            .SelectMany(c => c.DetalleCompras)
+            .Sum(d => d.Cantidad * d.PrecioUnitario);
+
+        TopProductos = ventasRango
+            .SelectMany(v => v.DetalleVentas)
+            .GroupBy(d => d.ProductoId)
+            .Select(g => new TopProductoDto
             {
-                Nombre = e.Nombre,
-                TotalVendido = e.DetalleVentas.Sum(v => v.Cantidad)
+                Nombre = nombrePorProducto.TryGetValue(g.Key, out var n) ? n : $"#{g.Key}",
+                TotalVendido = g.Sum(d => d.Cantidad)
             })
-            .OrderByDescending(e => e.TotalVendido)
+            .Where(t => t.TotalVendido > 0)
+            .OrderByDescending(t => t.TotalVendido)
             .Take(5)
             .ToList();
+
+        comprasEmpleados = ventasRango
+            .Where(v => !string.IsNullOrEmpty(v.ClienteId))
+            .GroupBy(v => v.ClienteId!)
+            .Where(g => nombrePorEmpleado.ContainsKey(g.Key))
+            .ToDictionary(
+                g => nombrePorEmpleado[g.Key],
+                g => g.Sum(v => v.MontoRecibido));
+
+        MaxEmpleado = comprasEmpleados.Any() ? comprasEmpleados.Values.Max() : 0;
     }
 
     public class TopProductoDto

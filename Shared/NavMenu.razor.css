@@ -32,7 +32,7 @@
     }
 
     .nav-item ::deep a {
-        color: #d7d7d7;
+        color: var(--text);
         border-radius: 4px;
         height: 3rem;
         display: flex;
@@ -42,12 +42,12 @@
 
 .nav-item ::deep a.active {
     background-color: rgba(255,255,255,0.25);
-    color: white;
+    color: var(--text);
 }
 
 .nav-item ::deep a:hover {
     background-color: rgba(255,255,255,0.1);
-    color: white;
+    color: var(--text);
 }
 
 @media (min-width: 641px) {
@@ -65,17 +65,13 @@
 
 .sidebar-wrapper {
 
-    --accent: #ffaa43;
-    --accent-soft: rgba(255,170,67,.12);
-    --accent-border: rgba(255,170,67,.18);
+    /* Los tokens de color (--accent, --border, --text, --muted) se heredan de
+       site.css para que el sidebar cambie con el tema. Solo se conservan los
+       alias propios del sidebar. */
+    --accent-border: var(--accent-soft-2);
 
-    --sidebar-bg: #101014;
-    --sidebar-surface: #17171d;
-
-    --border: #23232c;
-
-    --text: #f3f4f6;
-    --muted: #8b8b98;
+    --sidebar-bg: var(--surface);
+    --sidebar-surface: var(--surface);
 }
 
 .sidebar-wrapper {
@@ -172,7 +168,7 @@
 
 .nav-content ::deep .nav-link:hover {
 
-    background: rgba(255,255,255,.03);
+    background: var(--tint-weak);
     color: var(--text) !important;
     transform: translateX(2px);
 }
@@ -223,15 +219,15 @@
 
     border-radius: 16px;
 
-    background: linear-gradient(135deg,#ffaa43,#ff8d1f);
+    background: linear-gradient(135deg,var(--accent),var(--accent-hover));
 
-    color: #111 !important;
+    color: var(--accent-contrast) !important;
 
     text-decoration: none;
 
     font-weight: 900;
 
-    box-shadow: 0 12px 28px rgba(255,170,67,.18);
+    box-shadow: 0 12px 28px var(--accent-soft-2);
 }
 
 .nav-content ::deep .btn-sale:hover {

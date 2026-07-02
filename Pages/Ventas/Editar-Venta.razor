@@ -1,9 +1,9 @@
 @page "/venta/editar/{id:int}"
 
 @inject IDbContextFactory<PulperiaDbContext> DbContextFactory
+@implements IAsyncDisposable
 @inject EmpleadoService emp
 @inject LogService LogService
-@inject IDbContextFactory<PulperiaDbContext> dbContextFactory
 @inject AppSessionService Session
 @inject NavigationManager Nav
 
@@ -255,6 +255,12 @@
     [Parameter] public int Id { get; set; }
 
     private PulperiaDbContext db = default!;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (db is not null)
+            await db.DisposeAsync();
+    }
 
     private Pulperia.Models.Venta? venta;
 

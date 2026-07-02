@@ -9,8 +9,8 @@
 }
 
 .pm-box {
-    background: #0e0e10;
-    border: 0.5px solid #1f1f23;
+    background: var(--surface);
+    border: 0.5px solid var(--border);
     border-radius: 12px;
     width: 100%;
     max-width: 580px;
@@ -22,7 +22,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 1.25rem 1.5rem 1rem;
-    border-bottom: 0.5px solid #1f1f23;
+    border-bottom: 0.5px solid var(--border);
 }
 
 .pm-title {
@@ -30,14 +30,14 @@
     font-weight: 500;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #5a5a65;
+    color: var(--muted);
     margin: 0;
 }
 
 .pm-close {
     background: none;
     border: none;
-    color: #5a5a65;
+    color: var(--muted);
     cursor: pointer;
     font-size: 18px;
     padding: 4px;
@@ -47,7 +47,7 @@
 }
 
 .pm-close:hover {
-    color: #e2e2e6;
+    color: var(--text);
 }
 
 .pm-body {
@@ -78,15 +78,15 @@
     font-weight: 500;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #5a5a65;
+    color: var(--muted);
 }
 
 /* ::deep alcanza los <input>/<select> que renderizan InputText/InputNumber/InputSelect */
 .pm-field ::deep .form-control {
-    background: #18181c;
-    border: 0.5px solid #2a2a2f;
+    background: var(--surface-2);
+    border: 0.5px solid var(--border);
     border-radius: 6px;
-    color: #e2e2e6;
+    color: var(--text);
     font-size: 13px;
     padding: 9px 12px;
     transition: border-color 0.15s;
@@ -94,9 +94,9 @@
 }
 
 .pm-field ::deep .form-control:focus {
-    background: #18181c;
-    border-color: #3d3d45;
-    color: #e2e2e6;
+    background: var(--surface-2);
+    border-color: var(--border-strong);
+    color: var(--text);
     box-shadow: none;
     outline: none;
 }
@@ -124,10 +124,10 @@
 .pm-inline .form-control {
     flex: 1;
     min-width: 0;
-    background: #18181c;
-    border: 0.5px solid #2a2a2f;
+    background: var(--surface-2);
+    border: 0.5px solid var(--border);
     border-radius: 6px;
-    color: #e2e2e6;
+    color: var(--text);
     font-size: 13px;
     padding: 9px 12px;
     transition: border-color 0.15s;
@@ -135,17 +135,17 @@
 }
 
 .pm-inline .form-control:focus {
-    border-color: #3d3d45;
+    border-color: var(--border-strong);
     outline: none;
 }
 
 .pm-icon-btn {
     flex: 0 0 auto;
     width: 38px;
-    background: #1a1a1e;
-    border: 0.5px solid #2a2a2f;
+    background: var(--surface-2);
+    border: 0.5px solid var(--border);
     border-radius: 6px;
-    color: #8888a0;
+    color: var(--muted);
     font-size: 15px;
     line-height: 1;
     cursor: pointer;
@@ -153,7 +153,7 @@
 }
 
 .pm-icon-btn:hover {
-    color: #e2e2e6;
+    color: var(--text);
 }
 
 .pm-icon-ok {
@@ -169,7 +169,7 @@
 
 .pm-divider {
     height: 0.5px;
-    background: #1f1f23;
+    background: var(--border);
     margin: 1.25rem 0 1rem;
 }
 
@@ -194,9 +194,9 @@
 }
 
 .pm-btn-cancel {
-    background: #1a1a1e;
-    border-color: #2a2a2f;
-    color: #8888a0;
+    background: var(--surface-2);
+    border-color: var(--border);
+    color: var(--muted);
 }
 
 .pm-btn-save {

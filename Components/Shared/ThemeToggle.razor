@@ -1,0 +1,42 @@
+@inject IJSRuntime JS
+
+@*
+    Botón de cambio de tema (diurno/nocturno).
+
+    El tema visual ya lo aplica el script anti-parpadeo del <head> antes de
+    renderizar; este botón solo lee el estado actual (tras el primer render,
+    cuando JS interop está disponible) para mostrar el ícono correcto y permite
+    alternarlo, persistiendo la preferencia en el navegador.
+*@
+
+<button class="theme-toggle" @onclick="Toggle" type="button"
+        title="@(_theme == "light" ? "Modo nocturno" : "Modo diurno")"
+        aria-label="Cambiar tema">
+    @if (_theme == "light")
+    {
+        <i class="fa-solid fa-moon"></i>
+    }
+    else
+    {
+        <i class="fa-solid fa-sun"></i>
+    }
+</button>
+
+@code {
+    private string _theme = "dark";
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _theme = await JS.InvokeAsync<string>("pulperiaTheme.get");
+            StateHasChanged();
+        }
+    }
+
+    private async Task Toggle()
+    {
+        _theme = _theme == "light" ? "dark" : "light";
+        await JS.InvokeVoidAsync("pulperiaTheme.set", _theme);
+    }
+}

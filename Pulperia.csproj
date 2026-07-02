@@ -6,6 +6,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- El proyecto de pruebas vive en una subcarpeta; se excluye del proyecto web
+       para que su globbing no arrastre los .cs de las pruebas (ni el obj generado). -->
+  <ItemGroup>
+    <Compile Remove="Pulperia.Tests/**/*.cs" />
+    <Content Remove="Pulperia.Tests/**/*" />
+    <None Remove="Pulperia.Tests/**/*" />
+    <EmbeddedResource Remove="Pulperia.Tests/**/*" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
@@ -13,7 +22,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.11">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

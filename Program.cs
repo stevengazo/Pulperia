@@ -26,6 +26,7 @@ try
         .MinimumLevel.Information()
         .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
         .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+        .MinimumLevel.Override("Microsoft.Hosting.Lifetime", LogEventLevel.Information)
         .WriteTo.Console()
         .WriteTo.File(
             path: "logs/pulperia-.log",
@@ -36,9 +37,8 @@ try
     // Add services to the container.
     builder.Services.AddRazorPages();
     builder.Services.AddServerSideBlazor();
-    builder.Services.AddSingleton<WeatherForecastService>();
 
-    // SQLite
+    // SQL Server
     builder.Services.AddDbContextFactory<PulperiaDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -52,6 +52,7 @@ try
     builder.Services.AddScoped<AppSessionService>();
     builder.Services.AddScoped<EmpleadoService>();
     builder.Services.AddScoped<LogService>();
+    builder.Services.AddScoped<VentaService>();
 
     var app = builder.Build();
 

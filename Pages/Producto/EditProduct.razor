@@ -4,6 +4,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @inject LogService LogService
 @inject IDbContextFactory<PulperiaDbContext> dbContextFactory
+@implements IAsyncDisposable
 @inject AppSessionService Session
 @inject NavigationManager Nav
 @inject ILogger<EditProduct> Logger
@@ -185,6 +186,12 @@ else
 
     private PulperiaDbContext? db;
     private Producto? producto;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (db is not null)
+            await db.DisposeAsync();
+    }
 
     private bool isLoading = true;
     private bool isSaving;
