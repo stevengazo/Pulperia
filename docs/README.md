@@ -51,4 +51,16 @@ En la parte superior (barra superior) siempre tienes disponibles:
 
 ---
 
+## ¿Buscas documentación técnica?
+
+Este es el **manual de usuario**. Si eres desarrollador o administrador del sistema, en esta misma carpeta hay documentación técnica aparte:
+
+- [ARCHITECTURE.md](ARCHITECTURE.md) — arquitectura del proyecto
+- [DATA-MODEL.md](DATA-MODEL.md) — modelo de datos
+- [CONFIGURATION.md](CONFIGURATION.md) — configuración
+- [DEVELOPMENT.md](DEVELOPMENT.md) — entorno de desarrollo
+- [CONTRIBUTING.md](CONTRIBUTING.md) — cómo contribuir
+
+---
+
 *Última actualización del manual: julio de 2026.*
