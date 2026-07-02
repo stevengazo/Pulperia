@@ -11,6 +11,7 @@
 <br/>
 
 <!-- Badges de estado -->
+[![CI](https://img.shields.io/github/actions/workflow/status/stevengazo/Pulperia/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/stevengazo/Pulperia/actions/workflows/ci.yml)
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![Blazor](https://img.shields.io/badge/Blazor-Server-512BD4?style=for-the-badge&logo=blazor&logoColor=white)
 ![EF Core](https://img.shields.io/badge/EF%20Core-8-512BD4?style=for-the-badge)

@@ -60,6 +60,7 @@ Este es el **manual de usuario**. Si eres desarrollador o administrador del sist
 - [CONFIGURATION.md](CONFIGURATION.md) — configuración
 - [DEVELOPMENT.md](DEVELOPMENT.md) — entorno de desarrollo
 - [CONTRIBUTING.md](CONTRIBUTING.md) — cómo contribuir
+- [PRUEBAS-UNITARIAS.md](PRUEBAS-UNITARIAS.md) — **guía completa de pruebas unitarias** (cómo funcionan, con detalle)
 
 ---
 
