@@ -1,6 +1,7 @@
 @page "/configuracion"
 
 @inject IDbContextFactory<PulperiaDbContext> dbContextFactory
+@implements IAsyncDisposable
 @inject LogService LogService
 
 @using Microsoft.EntityFrameworkCore
@@ -198,6 +199,12 @@
 @code {
 
     private PulperiaDbContext db = default!;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (db is not null)
+            await db.DisposeAsync();
+    }
 
     private List<Categoria> categories = new();
     private List<Proveedor> proveedors = new();

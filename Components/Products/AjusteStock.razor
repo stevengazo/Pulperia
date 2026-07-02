@@ -1,0 +1,208 @@
+@inject PulperiaDbContext db
+@inject LogService LogService
+@using Microsoft.EntityFrameworkCore
+
+@*
+    Modal reutilizable para ajustar el stock de un producto sin tocar el esquema
+    de la base de datos. Dos modos:
+
+      - Devolucion  → RESTA unidades (devolución al proveedor).
+      - Incremento  → SUMA unidades (ingreso manual de inventario).
+
+    Cada ajuste modifica Producto.StockActual y deja un registro de auditoría en
+    LogsCambios (vía LogService) con el stock anterior, el nuevo, la cantidad y el
+    motivo. No se crean tablas ni columnas nuevas.
+*@
+
+<div class="@(isVisible ? "aj-overlay" : "d-none")">
+    <div class="aj-box">
+
+        <div class="aj-header">
+            <div class="aj-title-wrap">
+                <span class="aj-icon @(EsDevolucion ? "aj-icon-out" : "aj-icon-in")">
+                    <i class="fa-solid @(EsDevolucion ? "fa-rotate-left" : "fa-boxes-stacked")"></i>
+                </span>
+                <div>
+                    <p class="aj-title">@Titulo</p>
+                    <p class="aj-subtitle">@Subtitulo</p>
+                </div>
+            </div>
+            <button class="aj-close" @onclick="Close">✕</button>
+        </div>
+
+        <div class="aj-body">
+
+            <div class="aj-field">
+                <label>Producto</label>
+                <select class="form-control" @bind="productoIdStr">
+                    <option value="">— Seleccione un producto —</option>
+                    @foreach (var p in productos)
+                    {
+                        <option value="@p.Id">@p.Nombre — @p.Presentacion (stock: @p.StockActual)</option>
+                    }
+                </select>
+            </div>
+
+            <div class="aj-2col">
+                <div class="aj-field">
+                    <label>Cantidad</label>
+                    <InputNumber class="form-control" @bind-Value="cantidad" />
+                </div>
+                <div class="aj-field">
+                    <label>Stock resultante</label>
+                    <div class="aj-preview @(StockResultante < 0 ? "aj-preview-bad" : "")">
+                        @(ProductoSel is null ? "—" : $"{ProductoSel.StockActual} → {StockResultante}")
+                    </div>
+                </div>
+            </div>
+
+            <div class="aj-field">
+                <label>Motivo @(EsDevolucion ? "(producto dañado, vencido, acuerdo con proveedor…)" : "(ajuste, conteo físico, ingreso…)")</label>
+                <textarea class="form-control" rows="2" @bind="motivo"
+                          placeholder="Describe el motivo del ajuste"></textarea>
+            </div>
+
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="aj-error">@error</div>
+            }
+
+        </div>
+
+        <div class="aj-footer">
+            <button type="button" class="aj-btn aj-btn-cancel" @onclick="Close" disabled="@isSaving">Cancelar</button>
+            <button type="button" class="aj-btn @(EsDevolucion ? "aj-btn-out" : "aj-btn-in")"
+                    @onclick="Confirmar" disabled="@isSaving">
+                @(isSaving ? "Procesando..." : (EsDevolucion ? "Registrar devolución" : "Incrementar stock"))
+            </button>
+        </div>
+
+    </div>
+</div>
+
+@code {
+    public enum Modo { Devolucion, Incremento }
+
+    [Parameter] public EventCallback OnSaved { get; set; }
+
+    private Modo modo = Modo.Devolucion;
+    private bool isVisible = false;
+    private bool isSaving = false;
+
+    private List<Producto> productos = new();
+    private string productoIdStr = "";
+    private int cantidad = 1;
+    private string motivo = "";
+    private string? error;
+
+    private bool EsDevolucion => modo == Modo.Devolucion;
+
+    private string Titulo => EsDevolucion ? "Devolución al proveedor" : "Incrementar inventario";
+
+    private string Subtitulo => EsDevolucion
+        ? "Resta unidades del stock y registra la devolución"
+        : "Suma unidades al stock y registra el ingreso";
+
+    private Producto? ProductoSel =>
+        int.TryParse(productoIdStr, out var id)
+            ? productos.FirstOrDefault(p => p.Id == id)
+            : null;
+
+    private int StockResultante =>
+        ProductoSel is null
+            ? 0
+            : EsDevolucion
+                ? ProductoSel.StockActual - cantidad
+                : ProductoSel.StockActual + cantidad;
+
+    public async Task Show(Modo m)
+    {
+        modo = m;
+        productoIdStr = "";
+        cantidad = 1;
+        motivo = "";
+        error = null;
+        await CargarProductos();
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    private async Task CargarProductos()
+    {
+        productos = await db.Producto
+            .AsNoTracking()
+            .OrderBy(p => p.Nombre)
+            .ToListAsync();
+    }
+
+    private void Close()
+    {
+        isVisible = false;
+        error = null;
+    }
+
+    private async Task Confirmar()
+    {
+        if (isSaving) return;
+        error = null;
+
+        if (ProductoSel is null)
+        {
+            error = "Seleccione un producto.";
+            return;
+        }
+
+        if (cantidad <= 0)
+        {
+            error = "La cantidad debe ser mayor que cero.";
+            return;
+        }
+
+        if (EsDevolucion && cantidad > ProductoSel.StockActual)
+        {
+            error = $"No puede devolver más de lo disponible en stock ({ProductoSel.StockActual}).";
+            return;
+        }
+
+        isSaving = true;
+
+        try
+        {
+            // Entidad rastreada para persistir el nuevo stock.
+            var prod = await db.Producto.FindAsync(ProductoSel.Id);
+            if (prod is null)
+            {
+                error = "El producto ya no existe.";
+                return;
+            }
+
+            var stockAnterior = prod.StockActual;
+            prod.StockActual = EsDevolucion
+                ? stockAnterior - cantidad
+                : stockAnterior + cantidad;
+
+            await db.SaveChangesAsync();
+
+            await LogService.RegistrarAsync(
+                tabla: "Producto",
+                accion: EsDevolucion ? "DEVOLUCION_PROVEEDOR" : "INCREMENTO_INVENTARIO",
+                registroId: prod.Id.ToString(),
+                anterior: new { prod.Id, prod.Nombre, StockActual = stockAnterior },
+                nuevo: new
+                {
+                    prod.Id,
+                    prod.Nombre,
+                    StockActual = prod.StockActual,
+                    Cantidad = cantidad,
+                    Motivo = string.IsNullOrWhiteSpace(motivo) ? "(sin motivo)" : motivo.Trim()
+                });
+
+            isVisible = false;
+            await OnSaved.InvokeAsync();
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+}

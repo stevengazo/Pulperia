@@ -1,9 +1,9 @@
 .page {
     min-height: 100vh;
-    background: #0b0d11;
+    background: var(--bg);
     padding: 2rem;
     font-family: system-ui, sans-serif;
-    color: #f5f7fa;
+    color: var(--text);
 }
 
 .actions {
@@ -15,29 +15,30 @@
 }
 
 .btn-print {
-    background: #ffaa43;
+    background: var(--accent);
     border: none;
     padding: 10px 14px;
     border-radius: 10px;
-    color: #111;
+    color: var(--accent-contrast);
     cursor: pointer;
     font-weight: 700;
 }
 
-/* RECEIPT */
+/* RECEIPT — usa tokens para adaptarse al tema (claro/oscuro) dentro de la app.
+   Al imprimir se fuerza blanco/negro (bloque @media print al final). */
 .receipt {
     max-width: 420px;
     margin: auto;
-    background: #11151b;
-    border: 1px solid #1b1f27;
+    background: var(--surface);
+    border: 1px solid var(--border);
     border-radius: 16px;
     padding: 1.5rem;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, .4);
+    box-shadow: 0 20px 50px var(--shadow-lg);
 }
 
 .header {
     text-align: center;
-    border-bottom: 1px dashed #2a2f3a;
+    border-bottom: 1px dashed var(--border-strong);
     padding-bottom: 1rem;
     margin-bottom: 1rem;
 }
@@ -49,7 +50,7 @@
 }
 
 .muted {
-    color: #707887;
+    color: var(--muted);
     font-size: .8rem;
 }
 
@@ -67,7 +68,7 @@
 }
 
 .item {
-    border-bottom: 1px dashed #2a2f3a;
+    border-bottom: 1px dashed var(--border-strong);
     padding-bottom: .5rem;
     margin-bottom: .5rem;
 }
@@ -78,13 +79,44 @@
 
 .total {
     margin-top: 1rem;
-    border-top: 1px solid #2a2f3a;
+    border-top: 1px solid var(--border-strong);
     padding-top: 1rem;
     display: flex;
     justify-content: space-between;
     font-weight: 800;
-    color: #ffaa43;
+    color: var(--accent);
     font-size: 1.05rem;
 }
 
-/* Las reglas @media print se movieron a wwwroot/css/site.css (dependen de body *, deben ser globales). */
+/* Las reglas @media print de aislamiento (visibilidad/posición) están en site.css.
+   Aquí forzamos que el recibo salga SIEMPRE en papel blanco con texto oscuro,
+   sin importar si la app está en modo claro u oscuro. */
+@media print {
+    .receipt {
+        background: #fff;
+        border-color: #ddd;
+        box-shadow: none;
+        color: #000;
+    }
+
+    .title,
+    .name,
+    .line,
+    .info {
+        color: #000;
+    }
+
+    .muted {
+        color: #555;
+    }
+
+    .header,
+    .item {
+        border-bottom-color: #ccc;
+    }
+
+    .total {
+        color: #000;
+        border-top-color: #ccc;
+    }
+}

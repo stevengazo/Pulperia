@@ -40,6 +40,14 @@
     {
         var hoy = DateTime.Today;
 
+        // "Todos los períodos": rango completo (sin filtro por fecha). No se
+        // reescriben los inputs de fecha para no mostrar valores raros.
+        if (string.IsNullOrEmpty(e.Value?.ToString()))
+        {
+            await OnRangeChanged.InvokeAsync((DateTime.MinValue, DateTime.MaxValue));
+            return;
+        }
+
         (Inicio, Fin) = e.Value?.ToString() switch
         {
             "hoy"        => (hoy, hoy),

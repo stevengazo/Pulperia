@@ -1,17 +1,8 @@
 .sale-page {
 
-    --accent: #ffaa43;
-    --accent-soft: rgba(255,170,67,.12);
-    --accent-border: rgba(255,170,67,.18);
-
-    --bg: #0c0c10;
-    --surface: #14141a;
-    --surface-2: #181820;
-
-    --border: #23232c;
-
-    --text: #f5f5f7;
-    --muted: #8c8c98;
+    /* Los tokens de superficie/texto/acento se heredan de site.css (:root / [data-theme]).
+       Solo se conserva el alias local que apunta al token global. */
+    --accent-border: var(--accent-soft-2);
 }
 
 .sale-page {
@@ -124,8 +115,8 @@
 
     background:
         linear-gradient(180deg,
-        rgba(255,255,255,.015),
-        rgba(255,255,255,.01));
+        var(--tint-weak),
+        var(--tint-weak));
 
     border: 1px solid var(--border);
 
@@ -134,7 +125,7 @@
     padding: 1.5rem;
 
     box-shadow:
-        0 12px 30px rgba(0,0,0,.22);
+        0 12px 30px var(--shadow);
 }
 
 .sticky-card {
@@ -194,10 +185,10 @@
 
     background:
         linear-gradient(135deg,
-        #ffaa43 0%,
-        #ff8c1f 100%);
+        var(--accent) 0%,
+        var(--accent-hover) 100%);
 
-    color: #111;
+    color: var(--accent-contrast);
 
     font-size: 1rem;
     font-weight: 800;
@@ -261,14 +252,14 @@
 
     padding: 1rem;
 
-    border-bottom: 1px solid rgba(255,255,255,.04);
+    border-bottom: 1px solid var(--tint-weak);
 
     vertical-align: middle;
 }
 
 .modern-table tr:hover {
 
-    background: rgba(255,255,255,.015);
+    background: var(--tint-weak);
 }
 
 .product-name {
@@ -361,7 +352,7 @@
 
     background:
         linear-gradient(135deg,
-        rgba(255,170,67,.12),
+        var(--accent-soft),
         rgba(255,170,67,.04));
 
     border: 1px solid var(--accent-border);
@@ -446,10 +437,10 @@
 
     background:
         linear-gradient(135deg,
-        #ffaa43 0%,
-        #ff8c1f 100%);
+        var(--accent) 0%,
+        var(--accent-hover) 100%);
 
-    color: #111;
+    color: var(--accent-contrast);
 
     padding: 1rem;
 

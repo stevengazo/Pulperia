@@ -1,16 +1,14 @@
 .modal {
 
-    --bg-main: #0b0d11;
-    --bg-card: #11151b;
-    --bg-input: #151922;
-
-    --border: #1b1f27;
+    --bg-main: var(--bg);
+    --bg-card: var(--surface);
+    --bg-input: var(--surface-2);
 
     --primary: #7c6bff;
     --primary-soft: rgba(124,107,255,.14);
 
-    --text-main: #f5f7fa;
-    --text-muted: #707887;
+    --text-main: var(--text);
+    --text-muted: var(--muted);
 }
 
 .modal-modern {
@@ -18,13 +16,13 @@
     border: 1px solid var(--border);
     border-radius: 28px;
     overflow: hidden;
-    box-shadow: 0 30px 60px rgba(0,0,0,.45);
+    box-shadow: 0 30px 60px var(--shadow-lg);
 }
 
 .modal-header-modern {
     padding: 1.5rem 1.8rem;
     border-bottom: 1px solid var(--border);
-    background: rgba(255,255,255,.015);
+    background: var(--tint-weak);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -47,18 +45,18 @@
     height: 42px;
     border-radius: 14px;
     border: 1px solid var(--border);
-    background: #151922;
-    color: #7e8796;
+    background: var(--surface-2);
+    color: var(--muted);
     transition: .18s ease;
 }
 
 .btn-close-modern:hover {
-    background: rgba(255,255,255,.04);
-    color: white;
+    background: var(--tint-weak);
+    color: var(--text);
 }
 
 .label-modern {
-    color: #9aa3b2;
+    color: var(--muted);
     font-size: .82rem;
     font-weight: 700;
     margin-bottom: .7rem;
@@ -92,11 +90,11 @@
 .modal-body ::deep .input-modern:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 4px rgba(124,107,255,.12);
-    background: rgba(255,255,255,.02);
+    background: var(--tint-weak);
 }
 
 .product-zone {
-    background: rgba(255,255,255,.015);
+    background: var(--tint-weak);
     border: 1px solid var(--border);
     border-radius: 24px;
     padding: 1.3rem;
@@ -122,7 +120,7 @@
 }
 
 .table-modern-wrap {
-    background: rgba(255,255,255,.015);
+    background: var(--tint-weak);
     border: 1px solid var(--border);
     border-radius: 22px;
     overflow: hidden;
@@ -133,12 +131,12 @@
 }
 
 .table-modern thead {
-    background: #0f1318;
+    background: var(--bg);
 }
 
 .table-modern thead th {
     border: none;
-    color: #7e8796;
+    color: var(--muted);
     font-size: .72rem;
     text-transform: uppercase;
     letter-spacing: .08em;
@@ -146,12 +144,12 @@
 }
 
 .table-modern tbody tr {
-    border-top: 1px solid #1a1f27;
+    border-top: 1px solid var(--border);
     transition: .15s ease;
 }
 
 .table-modern tbody tr:hover {
-    background: rgba(255,255,255,.02);
+    background: var(--tint-weak);
 }
 
 .table-modern tbody td {
@@ -192,8 +190,8 @@
 
 .btn-cancel-modern {
     border: 1px solid var(--border);
-    background: #151922;
-    color: #d7dde7;
+    background: var(--surface-2);
+    color: var(--text-2);
     padding: .9rem 1.4rem;
     border-radius: 16px;
     font-weight: 600;
@@ -201,7 +199,7 @@
 }
 
 .btn-cancel-modern:hover {
-    background: rgba(255,255,255,.03);
+    background: var(--tint-weak);
 }
 
 .btn-save-modern {

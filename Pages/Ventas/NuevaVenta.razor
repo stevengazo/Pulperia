@@ -4,8 +4,7 @@
 @inject EmpleadoService empleadoService
 @inject AppSessionService Session
 @inject NavigationManager Nav
-@inject ILogger<NuevaVenta> Logger
-@inject LogService LogService
+@inject VentaService VentaService
 
 @using Microsoft.EntityFrameworkCore
 
@@ -335,8 +334,6 @@
 
 @code {
 
-    private PulperiaDbContext db = default!;
-
     private List<Empleado> empleados = new();
     private List<Producto> productos = new();
     private List<DetalleVenta> carrito = new();
@@ -362,13 +359,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        db = await DbFactory.CreateDbContextAsync();
-
-        empleados = await empleadoService.GetAllAsync();
-
-        empleados = empleados
+        empleados = (await empleadoService.GetAllAsync())
             .OrderBy(e => e.Nombre)
             .ToList();
+
+        // Contexto acotado a la carga: se crea y se libera aquí mismo, sin
+        // mantenerlo vivo durante todo el ciclo del componente.
+        await using var db = await DbFactory.CreateDbContextAsync();
 
         productos = await db.Producto
             .Where(p => p.StockActual > 0)
@@ -452,92 +449,17 @@
 
         try
         {
-            await using var tx = await db.Database.BeginTransactionAsync();
+            var resultado = await VentaService.ProcesarAsync(
+                carrito,
+                metodoPago,
+                pagoCon,
+                string.IsNullOrWhiteSpace(empleadoId) ? null : empleadoId,
+                Session?.CurrentUser?.Email ?? "No indicado");
 
-            var venta = new Pulperia.Models.Venta
-            {
-                Fecha = DateTime.Now,
-                Total = Total,
-                MetodoPago = metodoPago,
-                MontoRecibido =
-                    metodoPago == "Efectivo"
-                        ? pagoCon
-                        : Total,
-                Cambio = Cambio,
-                Notas = "",
-                Autor =
-                    Session?.CurrentUser?.Email ?? "No indicado",
-                Pagado =
-                    metodoPago != "Fiado",
-                ClienteId =
-                    string.IsNullOrWhiteSpace(empleadoId)
-                        ? null
-                        : empleadoId
-            };
-
-            db.Venta.Add(venta);
-
-            await db.SaveChangesAsync();
-
-            foreach (var item in carrito)
-            {
-                item.VentaId = venta.Id;
-
-                db.DetalleVenta.Add(item);
-
-                // Descuento atómico de stock con guarda: solo afecta la fila
-                // si todavía hay existencias suficientes. Esto evita la
-                // condición de carrera entre ventas simultáneas.
-                var filas = await db.Producto
-                    .Where(p => p.Id == item.ProductoId
-                                && p.StockActual >= item.Cantidad)
-                    .ExecuteUpdateAsync(s => s.SetProperty(
-                        p => p.StockActual,
-                        p => p.StockActual - item.Cantidad));
-
-                if (filas == 0)
-                {
-                    errorMsg =
-                        $"Stock insuficiente para {item.Producto.Nombre}. " +
-                        "Otra venta pudo haber modificado el inventario; revisa el carrito.";
-
-                    await tx.RollbackAsync();
-                    return;
-                }
-            }
-
-            await db.SaveChangesAsync();
-            await tx.CommitAsync();
-
-            await LogService.RegistrarAsync(
-                tabla: "Venta",
-                accion: "INSERT",
-                registroId: venta.Id.ToString(),
-                nuevo: new
-                {
-                    venta.Id,
-                    venta.Total,
-                    venta.MetodoPago,
-                    venta.MontoRecibido,
-                    venta.Cambio,
-                    venta.Pagado,
-                    venta.ClienteId,
-                    Detalles = carrito.Select(d => new
-                    {
-                        d.ProductoId,
-                        NombreProducto = d.Producto?.Nombre,
-                        d.Cantidad,
-                        d.PrecioUnitarioHistorico,
-                        d.CostoUnitarioHistorico
-                    })
-                });
-
-            Nav.NavigateTo("/ventas");
-        }
-        catch (Exception ex)
-        {
-            errorMsg = "No se pudo procesar la venta. Intenta de nuevo.";
-            Logger.LogError(ex, "Error al procesar la venta (Total {Total}, método {MetodoPago}).", Total, metodoPago);
+            if (resultado.Exito)
+                Nav.NavigateTo("/ventas");
+            else
+                errorMsg = resultado.Error ?? "No se pudo procesar la venta.";
         }
         finally
         {

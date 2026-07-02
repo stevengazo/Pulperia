@@ -76,29 +76,117 @@ a, .btn-link {
     padding: 0;
 }
 
+/* ── Tokens de tema ────────────────────────────────────────────────
+   :root define el tema OSCURO (por defecto). El bloque [data-theme="light"]
+   sobreescribe solo lo que cambia en modo claro. Los componentes deben usar
+   estos tokens (var(--…)) en lugar de colores fijos, para que ambos temas
+   funcionen. Los valores oscuros conservan la apariencia previa de la app. */
 :root {
+    /* Fondos y superficies (de más oscuro a más elevado) */
     --bg: #090909;
     --surface: #101014;
-    --surface-2: #141419;
+    --surface-2: #1a1a20;
+    --surface-3: #23232c;
 
+    /* Bordes */
     --border: #1d1d25;
+    --border-strong: #31313d;
 
+    /* Texto */
     --text: #f4f4f5;
+    --text-2: #c7cfdb;
     --muted: #8b8b99;
 
+    /* Acento (marca) — igual en ambos temas */
     --accent: #ffaa43;
+    --accent-hover: #ff8c1f;
+    --accent-contrast: #1b1408; /* texto sobre fondo acento */
     --accent-soft: rgba(255,170,67,.12);
+    --accent-soft-2: rgba(255,170,67,.18);
 
+    /* Estados */
+    --success: #4ade80;
+    --success-soft: rgba(74,222,128,.12);
     --danger: #ff5c5c;
+    --danger-soft: rgba(239,68,68,.12);
+    --warning: #facc15;
+    --warning-soft: rgba(250,204,21,.12);
+    --info: #60a5fa;
+    --info-soft: rgba(59,130,246,.12);
+    --purple: #7c6bff;
 
+    /* Tintes translúcidos (destellos sutiles). En claro se invierten a negro. */
+    --tint-weak: rgba(255,255,255,.03);
+    --tint: rgba(255,255,255,.06);
+
+    /* Sombras */
+    --shadow: rgba(0,0,0,.35);
+    --shadow-lg: rgba(0,0,0,.45);
+
+    /* Scrollbar */
+    --scroll-thumb: #23232b;
+    --scroll-thumb-hover: #31313d;
+
+    /* Superficies "vidrio" translúcidas del sidebar / topbar */
+    --glass: rgba(16,16,20,.96);
+    --glass-2: rgba(16,16,20,.82);
+
+    /* Métricas del layout */
     --sidebar-width: 255px;
     --topbar-height: 62px;
+
+    color-scheme: dark;
+}
+
+[data-theme="light"] {
+    --bg: #eef1f6;
+    --surface: #ffffff;
+    --surface-2: #f3f5f9;
+    --surface-3: #e7ebf2;
+
+    --border: #e2e6ee;
+    --border-strong: #d1d7e2;
+
+    --text: #1a1d24;
+    --text-2: #3c4453;
+    --muted: #6b7280;
+
+    --accent: #ff9d24;
+    --accent-hover: #f2870c;
+    --accent-contrast: #ffffff;
+    --accent-soft: rgba(255,157,36,.14);
+    --accent-soft-2: rgba(255,157,36,.20);
+
+    --success: #16a34a;
+    --success-soft: rgba(22,163,74,.12);
+    --danger: #e5484d;
+    --danger-soft: rgba(229,72,77,.12);
+    --warning: #c98a00;
+    --warning-soft: rgba(201,138,0,.14);
+    --info: #2563eb;
+    --info-soft: rgba(37,99,235,.10);
+    --purple: #6d5cf0;
+
+    --tint-weak: rgba(15,20,35,.03);
+    --tint: rgba(15,20,35,.06);
+
+    --shadow: rgba(20,28,48,.10);
+    --shadow-lg: rgba(20,28,48,.16);
+
+    --scroll-thumb: #cdd3dd;
+    --scroll-thumb-hover: #b6bdc9;
+
+    --glass: rgba(255,255,255,.88);
+    --glass-2: rgba(255,255,255,.72);
+
+    color-scheme: light;
 }
 
 body {
     background: var(--bg);
     color: var(--text);
     font-family: Inter, system-ui, sans-serif;
+    transition: background .25s ease, color .25s ease;
 }
 
 ::-webkit-scrollbar {
@@ -111,12 +199,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #23232b;
+    background: var(--scroll-thumb);
     border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #31313d;
+    background: var(--scroll-thumb-hover);
 }
 
 /* Reglas de impresión del recibo (movido desde Venta-info; usan body, deben ser globales) */

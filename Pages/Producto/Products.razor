@@ -10,6 +10,7 @@
 <div class="pg-root">
 
     <AddProduct @ref="addProductModal" OnSaved="RecargarProductos" />
+    <AjusteStock @ref="ajusteModal" OnSaved="RecargarProductos" />
 
     <div class="pg-head">
         <div>
@@ -17,10 +18,22 @@
             <p>@productosFiltrados.Count resultado@(productosFiltrados.Count != 1 ? "s" : "")</p>
         </div>
 
-        <button class="btn-new" @onclick="AbrirModal">
-            <i class="fa-solid fa-plus"></i>
-            Nuevo producto
-        </button>
+        <div class="pg-actions">
+            <button class="btn-stock btn-stock-out" @onclick="AbrirDevolucion">
+                <i class="fa-solid fa-rotate-left"></i>
+                Devolución a proveedor
+            </button>
+
+            <button class="btn-stock btn-stock-in" @onclick="AbrirIncremento">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                Incrementar inventario
+            </button>
+
+            <button class="btn-new" @onclick="AbrirModal">
+                <i class="fa-solid fa-plus"></i>
+                Nuevo producto
+            </button>
+        </div>
     </div>
 
     <div class="pg-toolbar">
@@ -137,6 +150,7 @@
     }
 
     private AddProduct addProductModal;
+    private AjusteStock ajusteModal;
 
     private List<Producto> productos = new();
     private List<Categoria> Categorias = new();
@@ -172,6 +186,9 @@
     }
 
     private void AbrirModal() => addProductModal.Show();
+
+    private Task AbrirDevolucion() => ajusteModal.Show(AjusteStock.Modo.Devolucion);
+    private Task AbrirIncremento() => ajusteModal.Show(AjusteStock.Modo.Incremento);
 
     private void RecargarProductos() => CargarDatos();
 

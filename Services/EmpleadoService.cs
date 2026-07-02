@@ -20,11 +20,14 @@ public class EmpleadoService
 
     public async Task<Empleado?> GetByIdAsync(string id)
     {
+        // Usamos Get() + FirstOrDefault en lugar de Single(): Single() lanza
+        // excepción cuando no hay coincidencias, y aquí "no encontrado" es un
+        // caso normal que debe devolver null.
         var result = await _supabase
             .From<Empleado>()
             .Filter("id", Supabase.Postgrest.Constants.Operator.Equals, id)
-            .Single();
+            .Get();
 
-        return result;
+        return result.Models.FirstOrDefault();
     }
 }

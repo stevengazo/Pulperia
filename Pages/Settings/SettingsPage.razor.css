@@ -1,15 +1,9 @@
 .settings-page {
 
-    --accent: #ffaa43;
-    --accent-soft: rgba(255, 170, 67, .12);
-    --accent-border: rgba(255, 170, 67, .18);
-
-    --surface: #121217;
-
-    --border: #23232c;
-
-    --text: #f5f5f7;
-    --muted: #8b8b97;
+    /* Alias de token local al global de site.css (habilita claro/oscuro).
+       Los tokens con el mismo nombre (--accent, --accent-soft, --surface,
+       --border, --text, --muted) se heredan de :root. */
+    --accent-border: var(--accent-soft-2);
 }
 
 .settings-page {
@@ -100,8 +94,8 @@
 .card-modern {
 
     background: linear-gradient(180deg,
-            rgba(255, 255, 255, .015),
-            rgba(255, 255, 255, .01));
+            var(--tint-weak),
+            var(--tint-weak));
 
     border: 1px solid var(--border);
 
@@ -111,7 +105,7 @@
     backdrop-filter: blur(10px);
 
     box-shadow:
-        0 10px 30px rgba(0, 0, 0, .22);
+        0 10px 30px var(--shadow);
 }
 
 .card-title {
@@ -154,10 +148,10 @@
     border: none;
 
     background: linear-gradient(135deg,
-            #ffaa43 0%,
-            #ff8c1f 100%);
+            var(--accent) 0%,
+            var(--accent-hover) 100%);
 
-    color: #111;
+    color: var(--accent-contrast);
 
     padding: 1rem;
 
@@ -190,7 +184,7 @@
 
     padding: 1rem 0;
 
-    border-bottom: 1px solid rgba(255, 255, 255, .05);
+    border-bottom: 1px solid var(--tint);
 }
 
 .item-title {

@@ -1,6 +1,7 @@
 @page "/inventario"
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<PulperiaDbContext> DbFactory
+@implements IAsyncDisposable
 @inject NavigationManager Nav
 @inject ILogger<Inventario> Logger
 
@@ -143,6 +144,12 @@
     private AddCompraInventario modalCompra;
     private PulperiaDbContext db;
     private List<DetalleCompra> detalleCompras = new();
+
+    public async ValueTask DisposeAsync()
+    {
+        if (db is not null)
+            await db.DisposeAsync();
+    }
 
     protected override async Task OnInitializedAsync()
     {

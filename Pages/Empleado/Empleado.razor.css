@@ -1,7 +1,7 @@
 .employee-page {
     min-height: 100vh;
     padding: 2rem;
-    color: #f5f7fa;
+    color: var(--text);
     font-family: 'Inter', system-ui, sans-serif;
 }
 
@@ -11,18 +11,18 @@
 }
 
 .invoice {
-    background: #181c27;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--surface);
+    border: 1px solid var(--tint);
     border-radius: 22px;
     padding: 2rem;
-    box-shadow: 0 24px 60px rgba(0, 0, 0, .35);
+    box-shadow: 0 24px 60px var(--shadow);
 }
 
 .invoice-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid var(--tint);
     padding-bottom: 1.5rem;
     margin-bottom: 1.5rem;
     gap: 1rem;
@@ -43,7 +43,7 @@
     flex-shrink: 0;
 
     background: rgba(255, 170, 67, .08);
-    border: 1px solid rgba(255, 170, 67, .18);
+    border: 1px solid var(--accent-soft-2);
 
     display: flex;
     align-items: center;
@@ -58,7 +58,7 @@
 
 .employee-photo i {
     font-size: 1.4rem;
-    color: #ffaa43;
+    color: var(--accent);
 }
 
 .invoice-title h2 {
@@ -69,7 +69,7 @@
 }
 
 .muted {
-    color: #707887;
+    color: var(--muted);
     font-size: .88rem;
     margin-top: 4px;
 }
@@ -79,7 +79,7 @@
     border-radius: 999px;
     background: rgba(255, 170, 67, .1);
     border: 1px solid rgba(255, 170, 67, .2);
-    color: #ffaa43;
+    color: var(--accent);
     font-size: .75rem;
     font-weight: 700;
     letter-spacing: 0.04em;
@@ -93,20 +93,20 @@
 }
 
 .stat-card {
-    background: #0f1117;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--bg);
+    border: 1px solid var(--tint);
     border-radius: 16px;
     padding: 1rem;
 }
 
 .stat-label {
-    color: #707887;
+    color: var(--muted);
     font-size: .82rem;
     margin-bottom: .5rem;
 }
 
 .stat-value {
-    color: #ffaa43;
+    color: var(--accent);
     font-size: 1.5rem;
     font-weight: 800;
 }
@@ -127,14 +127,14 @@
 
 .filter-group label {
     font-size: .82rem;
-    color: #7e8796;
+    color: var(--muted);
 }
 
 .filter-input {
-    background: #0f1117;
+    background: var(--bg);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
-    color: white;
+    color: var(--text);
     padding: 10px 14px;
     outline: none;
     min-width: 180px;
@@ -146,8 +146,8 @@
 }
 
 .btn-export {
-    background: #ffaa43;
-    color: black;
+    background: var(--accent);
+    color: var(--accent-contrast);
     border: none;
     border-radius: 12px;
     padding: 11px 18px;
@@ -164,7 +164,7 @@
 .loading,
 .empty {
     text-align: center;
-    color: #707887;
+    color: var(--muted);
     padding: 3rem;
 }
 
@@ -176,14 +176,14 @@
 table {
     width: 100%;
     border-collapse: collapse;
-    background: #0f1117;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: var(--bg);
+    border: 1px solid var(--tint);
     border-radius: 12px;
     overflow: hidden;
 }
 
 thead {
-    background: #181c27;
+    background: var(--surface);
 }
 
 th {
@@ -193,15 +193,15 @@ th {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: .08em;
-    color: #7e8796;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--muted);
+    border-bottom: 1px solid var(--tint);
 }
 
 td {
     padding: 14px 16px;
     font-size: .9rem;
-    color: #c7cfdb;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: var(--text-2);
+    border-bottom: 1px solid var(--tint-weak);
 }
 
 tbody tr:last-child td {
@@ -209,11 +209,11 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover td {
-    background: rgba(255, 255, 255, .02);
+    background: var(--tint-weak);
 }
 
 .total {
-    color: #ffaa43;
+    color: var(--accent);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
 }
@@ -222,7 +222,7 @@ tbody tr:hover td {
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    color: #ffaa43;
+    color: var(--accent);
     text-decoration: none;
     font-weight: 600;
     font-size: .85rem;
@@ -233,7 +233,7 @@ tbody tr:hover td {
 }
 
 .id-cell {
-    color: #707887;
+    color: var(--muted);
     font-size: .82rem;
     font-variant-numeric: tabular-nums;
 }
