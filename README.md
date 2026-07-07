@@ -15,6 +15,7 @@
 ![.NET](https://img.shields.io/badge/.NET-8.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
 ![Blazor](https://img.shields.io/badge/Blazor-Server-512BD4?style=for-the-badge&logo=blazor&logoColor=white)
 ![EF Core](https://img.shields.io/badge/EF%20Core-8-512BD4?style=for-the-badge)
+![Tests](https://img.shields.io/badge/Tests-xUnit-3ECF8E?style=for-the-badge&logo=xunit&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-3ECF8E?style=for-the-badge)
 ![PRs](https://img.shields.io/badge/PRs-welcome-7C6BFF?style=for-the-badge)
 
@@ -25,7 +26,7 @@
 
 <br/><br/>
 
-[**🚀 Inicio rápido**](#-inicio-rápido) &nbsp;·&nbsp; [**🐳 Docker**](#-docker) &nbsp;·&nbsp; [**🏗️ Arquitectura**](#-arquitectura) &nbsp;·&nbsp; [**📚 Documentación**](#-documentación) &nbsp;·&nbsp; [**🗺️ Roadmap**](#-roadmap)
+[**🚀 Inicio rápido**](#-inicio-rápido) &nbsp;·&nbsp; [**🐳 Docker**](#-docker) &nbsp;·&nbsp; [**🏗️ Arquitectura**](#-arquitectura) &nbsp;·&nbsp; [**🧪 Tests**](#-tests) &nbsp;·&nbsp; [**📚 Documentación**](#-documentación) &nbsp;·&nbsp; [**🗺️ Roadmap**](#-roadmap)
 
 </div>
 
@@ -412,6 +413,11 @@ Pulperia/
 ├── 📂 Shared/               ·  MainLayout, NavMenu
 ├── 📂 wwwroot/              ·  CSS, JS, iconos
 │
+├── 🧪 Pulperia.Tests/       ·  Suite xUnit (SQLite en memoria)
+│   ├── Infrastructure  → SqliteTestFactory · TestHelpers
+│   └── VentaService · ResultadoVenta · LogService · Model tests
+├── 📄 Pulperia.sln          ·  Solución (app + tests)
+│
 ├── 🐳 Dockerfile               ·  Build multi-etapa (SDK → runtime)
 ├── 🐳 docker-compose.yml       ·  Stack local (build desde el código)
 ├── 🐳 docker-compose.prod.yml  ·  Stack con imagen de Docker Hub
@@ -434,6 +440,7 @@ dotnet restore      # Restaurar
 dotnet build        # Compilar
 dotnet run          # Ejecutar
 dotnet watch run    # Hot reload
+dotnet test         # Pruebas (xUnit)
 ```
 
 </td>
@@ -449,6 +456,29 @@ dotnet publish -c Release -o ./publish
 </td>
 </tr>
 </table>
+
+<br/>
+
+## 🧪 Tests
+
+Suite de pruebas con **xUnit** en el proyecto [`Pulperia.Tests`](Pulperia.Tests/). Las pruebas de datos corren sobre **SQLite en memoria** (vía `SqliteTestFactory`), así que no necesitan un SQL Server real.
+
+```bash
+# Ejecutar toda la suite (usa la solución)
+dotnet test Pulperia.sln
+
+# Con reporte de cobertura (coverlet)
+dotnet test Pulperia.sln --collect:"XPlat Code Coverage"
+```
+
+| Área | Archivo | Cubre |
+|:--|:--|:--|
+| 🛒 Ventas | `VentaServiceTests` | Descuento de stock atómico y flujo transaccional |
+| 📊 Resultado | `ResultadoVentaTests` | Cálculo de totales / resultado de venta |
+| 📝 Auditoría | `LogServiceTests` | Registro de cambios (`LogCambio`) |
+| 🧱 Modelos | `ModelTests` | Invariantes de los modelos de dominio |
+
+> ⚙️ El workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml) construye la solución y ejecuta `dotnet test` en cada push, publicando los resultados (`.trx`) como artefacto.
 
 <br/>
 
@@ -486,6 +516,7 @@ dotnet publish -c Release -o ./publish
 - [x] Sesión persistente opcional («mantener sesión abierta»)
 - [x] Crear categoría desde el alta de producto
 - [x] Logging estructurado con `ILogger<T>`
+- [x] Suite de tests xUnit + CI con `dotnet test`
 - [ ] Autorización por roles (`RolSystem` / `RolUser`)
 - [ ] Migrar páginas a `DbContextFactory` efímero
 - [ ] Secretos fuera del historial de git + rotación
